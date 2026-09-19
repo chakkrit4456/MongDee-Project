@@ -92,3 +92,52 @@ build_windows.bat          # Windows
 ## 4. เริ่มใช้งานสินค้าจริง
 
 แคตตาล็อกสินค้าเริ่มต้นว่างเปล่า — เข้าหน้า `/trainer` แล้ว "เพิ่มสินค้าใหม่" (กรอกชื่อ/แท็กไลน์/ราคา/รายละเอียด/FAQ) จากนั้นอัปโหลดรูป/วิดีโอ หรือใช้ปุ่ม "บันทึกจากกล้อง" ให้ระบบเก็บภาพจากกล้องสดให้อัตโนมัติ
+
+## 5. รันพร้อมกับ MongDee-kiosk บนเครื่องเดียวกัน + เปิดแดชบอร์ดให้ดูจากอินเทอร์เน็ต
+
+ทั้ง `MongDee/web_server.py` และ `MongDee-kiosk/backend` ตั้งพอร์ตเริ่มต้นเป็น
+**8000 เหมือนกัน** — ถ้าจะรันทั้งสองโปรเจคพร้อมกันบนเครื่องเดียว ต้องเปลี่ยน
+พอร์ตของอันใดอันหนึ่ง (ตัวอย่างด้านล่างเปลี่ยนของ kiosk เป็น 8002):
+
+```bash
+# หน้าต่างที่ 1 — MongDee (พอร์ตปกติ 8000)
+cd MongDee
+.venv\Scripts\python.exe web_server.py --host 127.0.0.1 --port 8000 --no-open
+
+# หน้าต่างที่ 2 — MongDee-kiosk (เปลี่ยนพอร์ตเป็น 8002 กันชนกัน)
+# KIOSK_FAKE_CAMERA=1 กันไม่ให้แย่งกล้อง/GPU กับ MongDee ถ้าไม่ได้ทดสอบกล้องจริงของ kiosk
+cd MongDee-kiosk\backend
+set KIOSK_FAKE_CAMERA=1
+venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8002
+```
+
+เปิดดูในเครื่องนี้ได้ที่ `http://127.0.0.1:8000/dashboard` (MongDee) และ
+`http://127.0.0.1:8002/dashboard` (kiosk)
+
+### เปิดให้ดูจากอินเทอร์เน็ต (ไม่ต้อง deploy ที่ไหนเพิ่ม)
+
+รัน proxy อ่านอย่างเดียวของแต่ละโปรเจค (ชี้ไปพอร์ตจริงด้านบน) แล้วเปิด
+cloudflared tunnel ต่อจากนั้น:
+
+```bash
+# หน้าต่างที่ 3 — proxy ของ MongDee (พอร์ต 8090)
+cd MongDee
+.venv\Scripts\python.exe dashboard_proxy.py --target-port 8000 --port 8090
+
+# หน้าต่างที่ 4 — proxy ของ kiosk (พอร์ต 8091, ชี้ไปพอร์ต 8002 ที่เปลี่ยนไว้)
+cd MongDee-kiosk\backend
+venv\Scripts\python.exe dashboard_proxy.py --target-port 8002 --port 8091
+
+# หน้าต่างที่ 5 และ 6 — เปิด tunnel ออกอินเทอร์เน็ตทีละเส้น
+cloudflared tunnel --url http://127.0.0.1:8090
+cloudflared tunnel --url http://127.0.0.1:8091
+```
+
+`cloudflared` แต่ละตัวจะพิมพ์ลิงก์ `https://xxxx.trycloudflare.com` ออกมาหลัง
+เริ่มไม่กี่วินาที — นั่นคือลิงก์แดชบอร์ดสาธารณะ (ต่อท้ายด้วย `/dashboard`)
+ใช้ดูจากมือถือ/เครื่องอื่นได้ทันที **แต่เป็นลิงก์ชั่วคราว** ใช้ได้แค่ตอนที่
+เครื่องนี้เปิดและโปรเซสทั้งหมดยังรันอยู่ — ปิดแล้วต้องรันใหม่ได้ลิงก์ใหม่เสมอ
+(อยากได้ลิงก์ถาวรต้องสมัคร Cloudflare แล้วตั้ง named tunnel แทน)
+
+จะเปิดทีละลิงก์ตรง ๆ ก็ได้ หรือเปิด [`portal/index.html`](../portal/README.md)
+แล้วกด "ตั้งค่า" ใส่ทั้งสองลิงก์ไว้เป็นทางเข้าเดียวก็ได้เช่นกัน
