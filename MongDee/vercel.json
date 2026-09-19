@@ -1,5 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
   "buildCommand": "python3 scripts/build_web_dashboard.py apps/web/dist",
   "outputDirectory": "apps/web/dist",
   "cleanUrls": true,
