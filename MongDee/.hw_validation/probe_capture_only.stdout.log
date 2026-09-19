@@ -1,0 +1,78 @@
+[probe] opening CAM-A (index 1, full profiles) and CAM-B (index 2, low-bandwidth profiles) concurrently...
+[t=  1.0s] {"CAM-A": {"reads_ok": 0, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 0}} open_results={}
+[t=  2.0s] {"CAM-A": {"reads_ok": 0, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 0}} open_results={}
+[t=  3.0s] {"CAM-A": {"reads_ok": 0, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 0}} open_results={}
+[t=  4.0s] {"CAM-A": {"reads_ok": 0, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 0}} open_results={}
+[t=  5.0s] {"CAM-A": {"reads_ok": 0, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 0}} open_results={'CAM-B': False}
+[t=  6.0s] {"CAM-A": {"reads_ok": 0, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 0}} open_results={'CAM-B': False}
+[t=  7.0s] {"CAM-A": {"reads_ok": 0, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 0}} open_results={'CAM-B': False}
+[t=  8.0s] {"CAM-A": {"reads_ok": 0, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 0}} open_results={'CAM-B': False}
+[t=  9.0s] {"CAM-A": {"reads_ok": 0, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 0}} open_results={'CAM-B': False}
+[t= 10.0s] {"CAM-A": {"reads_ok": 0, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 0}} open_results={'CAM-B': False}
+[t= 11.0s] {"CAM-A": {"reads_ok": 0, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 3}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 12.0s] {"CAM-A": {"reads_ok": 1, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 32}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 13.0s] {"CAM-A": {"reads_ok": 2, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 62}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 14.0s] {"CAM-A": {"reads_ok": 3, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 91}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 15.0s] {"CAM-A": {"reads_ok": 3, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 121}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 16.0s] {"CAM-A": {"reads_ok": 4, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 150}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 17.0s] {"CAM-A": {"reads_ok": 5, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 180}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 18.0s] {"CAM-A": {"reads_ok": 6, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 208}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 19.0s] {"CAM-A": {"reads_ok": 7, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 238}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 20.0s] {"CAM-A": {"reads_ok": 8, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 268}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 21.0s] {"CAM-A": {"reads_ok": 9, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 297}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 22.0s] {"CAM-A": {"reads_ok": 10, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 327}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 23.0s] {"CAM-A": {"reads_ok": 11, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 355}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 24.0s] {"CAM-A": {"reads_ok": 12, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 385}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 25.0s] {"CAM-A": {"reads_ok": 13, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 415}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 26.0s] {"CAM-A": {"reads_ok": 14, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 443}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 27.0s] {"CAM-A": {"reads_ok": 15, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 473}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 28.0s] {"CAM-A": {"reads_ok": 16, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 502}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 29.0s] {"CAM-A": {"reads_ok": 17, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 532}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 30.0s] {"CAM-A": {"reads_ok": 18, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 562}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 31.0s] {"CAM-A": {"reads_ok": 19, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 591}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 32.1s] {"CAM-A": {"reads_ok": 20, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 623}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 33.1s] {"CAM-A": {"reads_ok": 21, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 651}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 34.1s] {"CAM-A": {"reads_ok": 22, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 681}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 35.1s] {"CAM-A": {"reads_ok": 23, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 711}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 36.1s] {"CAM-A": {"reads_ok": 24, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 740}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 37.1s] {"CAM-A": {"reads_ok": 25, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 768}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 38.1s] {"CAM-A": {"reads_ok": 26, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 797}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 39.1s] {"CAM-A": {"reads_ok": 27, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 827}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 40.1s] {"CAM-A": {"reads_ok": 28, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 856}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 41.1s] {"CAM-A": {"reads_ok": 29, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 886}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 42.1s] {"CAM-A": {"reads_ok": 30, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 915}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 43.2s] {"CAM-A": {"reads_ok": 31, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 945}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 44.2s] {"CAM-A": {"reads_ok": 32, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 971}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 45.2s] {"CAM-A": {"reads_ok": 33, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 1001}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 46.2s] {"CAM-A": {"reads_ok": 34, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 1030}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 47.2s] {"CAM-A": {"reads_ok": 35, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 1060}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 48.2s] {"CAM-A": {"reads_ok": 36, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 1089}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 49.2s] {"CAM-A": {"reads_ok": 37, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 1119}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 50.2s] {"CAM-A": {"reads_ok": 37, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 1149}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 51.2s] {"CAM-A": {"reads_ok": 38, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 1178}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 52.2s] {"CAM-A": {"reads_ok": 39, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 1207}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 53.2s] {"CAM-A": {"reads_ok": 40, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 1236}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 54.5s] {"CAM-A": {"reads_ok": 42, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 1275}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 55.5s] {"CAM-A": {"reads_ok": 43, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 1304}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 56.5s] {"CAM-A": {"reads_ok": 44, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 1334}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 57.5s] {"CAM-A": {"reads_ok": 45, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 1363}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 58.5s] {"CAM-A": {"reads_ok": 45, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 1391}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 59.5s] {"CAM-A": {"reads_ok": 46, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 1421}} open_results={'CAM-B': False, 'CAM-A': True}
+[t= 60.5s] {"CAM-A": {"reads_ok": 47, "reads_failed": 0}, "CAM-B": {"reads_ok": 0, "reads_failed": 1450}} open_results={'CAM-B': False, 'CAM-A': True}
+[probe] FINAL {
+  "duration_sec": 60.0,
+  "open_results": {
+    "CAM-B": false,
+    "CAM-A": true
+  },
+  "stats": {
+    "CAM-A": {
+      "reads_ok": 48,
+      "reads_failed": 0
+    },
+    "CAM-B": {
+      "reads_ok": 0,
+      "reads_failed": 1450
+    }
+  }
+}

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MONGDEE AI Booth OS</title>
+<link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32.png">
+<link rel="icon" href="/static/favicon.ico">
+<link rel="apple-touch-icon" href="/static/favicon-180.png">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="top-bar">
+  <a href="/" class="brand-link"><img class="brand-logo" src="/static/logo.png" alt="MongDee"></a>
+  <div class="spacer"></div>
+  <button id="theme-toggle-btn" class="theme-toggle-btn" title="สลับโหมดมืด/สว่าง"></button>
+</div>
+
+<div class="home-hero">
+  <div class="home-hero-badge">
+    <span class="status-dot status-online"></span>
+    {{ booth_name }} <span class="home-hero-sep">&middot;</span> {{ booth_id }}{% if event_id %} <span class="home-hero-sep">&middot;</span> {{ event_id }}{% endif %}
+  </div>
+  <h1 class="home-hero-title">ระบบปฏิบัติการบูธอัจฉริยะ</h1>
+  <p class="home-hero-sub">ตรวจจับคนและสินค้าหน้าบูธแบบเรียลไทม์ พร้อมแดชบอร์ดวิเคราะห์ผลและเทรน AI ครบในที่เดียว</p>
+</div>
+
+<div class="home-nav-grid">
+  <a class="home-nav-card" href="/booth">
+    <div class="home-nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9h18v11H3z"/><path d="M9 20v-6h6v6"/></svg></div>
+    <div class="home-nav-title">Booth View</div>
+    <div class="home-nav-desc">ภาพกล้องสด ตรวจจับคน/สินค้า และแจ้งเตือนสุขภาพบูธ</div>
+  </a>
+  <a class="home-nav-card" href="/dashboard">
+    <div class="home-nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="20" x2="5" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="19" y1="20" x2="19" y2="14"/></svg></div>
+    <div class="home-nav-title">Dashboard</div>
+    <div class="home-nav-desc">สรุปยอดคน สินค้าที่ถูกสนใจ และแนวโน้มรายวัน</div>
+  </a>
+  <a class="home-nav-card" href="/trainer">
+    <div class="home-nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l10-5 10 5-10 5-10-5z"/><path d="M6 11.5V17c0 1.5 3 3 6 3s6-1.5 6-3v-5.5"/><path d="M22 9v6"/></svg></div>
+    <div class="home-nav-title">AI Trainer</div>
+    <div class="home-nav-desc">อัปโหลด/บันทึกภาพสินค้า ให้ AI จดจำได้ทันที</div>
+  </a>
+  <a class="home-nav-card" href="/settings">
+    <div class="home-nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+    <div class="home-nav-title">ตั้งค่าบูธ</div>
+    <div class="home-nav-desc">จัดการ Event/Booth กล้อง และตัวเร่งความเร็ว GPU</div>
+  </a>
+</div>
+
+<script src="/static/icons.js"></script>
+<script src="/static/theme.js"></script>
+</body>
+</html>

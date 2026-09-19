@@ -1,0 +1,57 @@
+<title>รายงาน — MONGDEE MINI KIOSK</title>
+<link rel="stylesheet" href="/static/css/style.css">
+
+<div class="topnav">
+  <a class="brand" href="/"><img class="brand-logo" src="/static/img/logo.png" alt="MongDee"> <span>MINI KIOSK</span></a>
+  <nav>
+    <a href="/">จอแสดงผล</a>
+    <a href="/enroll">เพิ่มสินค้า</a>
+    <a href="/manage">จัดการสินค้า</a>
+    <a href="/dashboard" class="active">รายงาน</a>
+    <a href="/calibrate">ปรับตั้งค่า</a>
+  </nav>
+</div>
+
+<div class="page">
+  <div class="dash-toolbar">
+    <div class="range-tabs" id="rangeTabs" role="group" aria-label="ช่วงเวลา"></div>
+    <div class="dash-actions">
+      <a id="exportLink" href="/api/analytics/export?range=all" download><button type="button" class="secondary small">ส่งออกรายงาน (Excel)</button></a>
+      <button type="button" class="secondary small" id="resetDayBtn">เริ่มวันใหม่ (รีเซ็ตรายวัน)</button>
+    </div>
+  </div>
+  <p class="hint" id="dayNote"></p>
+  <div class="hint" id="dashUpdated" role="status" style="margin-bottom:1rem;"></div>
+
+  <div class="stat-row">
+    <div class="card stat-card"><div class="num" id="statTotalScans">-</div><div class="label">สแกนสำเร็จ</div></div>
+    <div class="card stat-card"><div class="num" id="statUnmatched">-</div><div class="label">สแกนไม่รู้จัก</div><div class="sub">สินค้าที่ยังไม่ได้ลงทะเบียน หรือระบบไม่มั่นใจ</div></div>
+    <div class="card stat-card"><div class="num" id="statRate">-</div><div class="label">อัตราสแกนสำเร็จ</div></div>
+    <div class="card stat-card"><div class="num" id="statProducts">-</div><div class="label">สินค้าที่มีคนสแกน / ทั้งหมด</div></div>
+    <div class="card stat-card"><div class="num name-num" id="statTopProduct">-</div><div class="label">สินค้ายอดนิยม</div></div>
+    <div class="card stat-card"><div class="num" id="statCorrected">-</div><div class="label">พนักงานแก้เอง</div><div class="sub">ครั้งที่ระบบเลือกผิดหรือไม่แน่ใจ</div></div>
+  </div>
+
+  <div class="card" style="margin-bottom:1.5rem;">
+    <h3 style="margin-top:0;">แนวโน้มรายวัน</h3>
+    <div class="hourly-chart" id="dailyChart"></div>
+    <div class="hourly-labels" id="dailyLabels"></div>
+  </div>
+
+  <div class="card" style="margin-bottom:1.5rem;">
+    <h3 style="margin-top:0;">สินค้าที่ได้รับความสนใจ</h3>
+    <div class="bar-chart" id="barChart"></div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0;">ช่วงเวลาที่มีผู้สแกนมากที่สุด</h3>
+    <div class="hourly-chart" id="hourlyChart"></div>
+    <div class="hourly-labels" id="hourlyLabels"></div>
+    <p class="hint" id="peakNote"></p>
+  </div>
+
+  <p class="hint" id="dashNote"></p>
+</div>
+
+<script src="/static/js/ui-sound.js"></script>
+<script src="/static/js/dashboard.js"></script>

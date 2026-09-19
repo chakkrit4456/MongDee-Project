@@ -1,0 +1,62 @@
+{
+  "DSHOW+DSHOW, no stagger": {
+    "A": {
+      "opened": false,
+      "read_ok": 0,
+      "read_failed": 2530192
+    },
+    "B": {
+      "opened": false,
+      "read_ok": 0,
+      "read_failed": 2500468
+    }
+  },
+  "DSHOW+DSHOW, 2.5s stagger": {
+    "A": {
+      "opened": false,
+      "read_ok": 0,
+      "read_failed": 3410701
+    },
+    "B": {
+      "opened": false,
+      "read_ok": 0,
+      "read_failed": 5022037
+    }
+  },
+  "MSMF+MSMF, no stagger": {
+    "B": {
+      "opened": true,
+      "read_ok": 0,
+      "read_failed": 153156
+    },
+    "A": {
+      "opened": true,
+      "read_ok": 0,
+      "read_failed": 157024
+    }
+  },
+  "DSHOW(A)+MSMF(B), no stagger": {
+    "A": {
+      "opened": false,
+      "read_ok": 0,
+      "read_failed": 3115616
+    },
+    "B": {
+      "opened": true,
+      "read_ok": 0,
+      "read_failed": 146588
+    }
+  },
+  "MSMF(A)+DSHOW(B), no stagger": {
+    "B": {
+      "opened": true,
+      "read_ok": 137,
+      "read_failed": 0
+    },
+    "A": {
+      "opened": true,
+      "read_ok": 0,
+      "read_failed": 371835
+    }
+  }
+}

@@ -1,0 +1,345 @@
+{
+  "n": 40,
+  "frame_level": {
+    "clean|single": {
+      "acc_all": 0.55,
+      "floor0.6": {
+        "coverage": 0.825,
+        "acc_answered": 0.5757575757575758
+      },
+      "floor0.7": {
+        "coverage": 0.725,
+        "acc_answered": 0.5172413793103449
+      },
+      "floor0.8": {
+        "coverage": 0.65,
+        "acc_answered": 0.5769230769230769
+      },
+      "floor0.9": {
+        "coverage": 0.525,
+        "acc_answered": 0.5714285714285714
+      }
+    },
+    "clean|tta": {
+      "acc_all": 0.55,
+      "floor0.6": {
+        "coverage": 0.825,
+        "acc_answered": 0.5757575757575758
+      },
+      "floor0.7": {
+        "coverage": 0.725,
+        "acc_answered": 0.5172413793103449
+      },
+      "floor0.8": {
+        "coverage": 0.65,
+        "acc_answered": 0.5769230769230769
+      },
+      "floor0.9": {
+        "coverage": 0.525,
+        "acc_answered": 0.5714285714285714
+      }
+    },
+    "down-64px|single": {
+      "acc_all": 0.55,
+      "floor0.6": {
+        "coverage": 0.825,
+        "acc_answered": 0.5757575757575758
+      },
+      "floor0.7": {
+        "coverage": 0.725,
+        "acc_answered": 0.5172413793103449
+      },
+      "floor0.8": {
+        "coverage": 0.65,
+        "acc_answered": 0.5769230769230769
+      },
+      "floor0.9": {
+        "coverage": 0.525,
+        "acc_answered": 0.5714285714285714
+      }
+    },
+    "down-64px|tta": {
+      "acc_all": 0.55,
+      "floor0.6": {
+        "coverage": 0.825,
+        "acc_answered": 0.5757575757575758
+      },
+      "floor0.7": {
+        "coverage": 0.725,
+        "acc_answered": 0.5172413793103449
+      },
+      "floor0.8": {
+        "coverage": 0.65,
+        "acc_answered": 0.5769230769230769
+      },
+      "floor0.9": {
+        "coverage": 0.525,
+        "acc_answered": 0.5714285714285714
+      }
+    },
+    "down-48px|single": {
+      "acc_all": 0.55,
+      "floor0.6": {
+        "coverage": 0.825,
+        "acc_answered": 0.5757575757575758
+      },
+      "floor0.7": {
+        "coverage": 0.725,
+        "acc_answered": 0.5172413793103449
+      },
+      "floor0.8": {
+        "coverage": 0.65,
+        "acc_answered": 0.5769230769230769
+      },
+      "floor0.9": {
+        "coverage": 0.525,
+        "acc_answered": 0.5714285714285714
+      }
+    },
+    "down-48px|tta": {
+      "acc_all": 0.55,
+      "floor0.6": {
+        "coverage": 0.825,
+        "acc_answered": 0.5757575757575758
+      },
+      "floor0.7": {
+        "coverage": 0.725,
+        "acc_answered": 0.5172413793103449
+      },
+      "floor0.8": {
+        "coverage": 0.65,
+        "acc_answered": 0.5769230769230769
+      },
+      "floor0.9": {
+        "coverage": 0.525,
+        "acc_answered": 0.5714285714285714
+      }
+    },
+    "blur|single": {
+      "acc_all": 0.55,
+      "floor0.6": {
+        "coverage": 0.825,
+        "acc_answered": 0.5757575757575758
+      },
+      "floor0.7": {
+        "coverage": 0.725,
+        "acc_answered": 0.5172413793103449
+      },
+      "floor0.8": {
+        "coverage": 0.65,
+        "acc_answered": 0.5769230769230769
+      },
+      "floor0.9": {
+        "coverage": 0.525,
+        "acc_answered": 0.5714285714285714
+      }
+    },
+    "blur|tta": {
+      "acc_all": 0.55,
+      "floor0.6": {
+        "coverage": 0.825,
+        "acc_answered": 0.5757575757575758
+      },
+      "floor0.7": {
+        "coverage": 0.725,
+        "acc_answered": 0.5172413793103449
+      },
+      "floor0.8": {
+        "coverage": 0.65,
+        "acc_answered": 0.5769230769230769
+      },
+      "floor0.9": {
+        "coverage": 0.525,
+        "acc_answered": 0.5714285714285714
+      }
+    },
+    "jpeg-q20|single": {
+      "acc_all": 0.55,
+      "floor0.6": {
+        "coverage": 0.825,
+        "acc_answered": 0.5757575757575758
+      },
+      "floor0.7": {
+        "coverage": 0.725,
+        "acc_answered": 0.5172413793103449
+      },
+      "floor0.8": {
+        "coverage": 0.65,
+        "acc_answered": 0.5769230769230769
+      },
+      "floor0.9": {
+        "coverage": 0.525,
+        "acc_answered": 0.5714285714285714
+      }
+    },
+    "jpeg-q20|tta": {
+      "acc_all": 0.55,
+      "floor0.6": {
+        "coverage": 0.825,
+        "acc_answered": 0.5757575757575758
+      },
+      "floor0.7": {
+        "coverage": 0.725,
+        "acc_answered": 0.5172413793103449
+      },
+      "floor0.8": {
+        "coverage": 0.65,
+        "acc_answered": 0.5769230769230769
+      },
+      "floor0.9": {
+        "coverage": 0.525,
+        "acc_answered": 0.5714285714285714
+      }
+    },
+    "noise|single": {
+      "acc_all": 0.55,
+      "floor0.6": {
+        "coverage": 0.825,
+        "acc_answered": 0.5757575757575758
+      },
+      "floor0.7": {
+        "coverage": 0.725,
+        "acc_answered": 0.5172413793103449
+      },
+      "floor0.8": {
+        "coverage": 0.65,
+        "acc_answered": 0.5769230769230769
+      },
+      "floor0.9": {
+        "coverage": 0.525,
+        "acc_answered": 0.5714285714285714
+      }
+    },
+    "noise|tta": {
+      "acc_all": 0.55,
+      "floor0.6": {
+        "coverage": 0.825,
+        "acc_answered": 0.5757575757575758
+      },
+      "floor0.7": {
+        "coverage": 0.725,
+        "acc_answered": 0.5172413793103449
+      },
+      "floor0.8": {
+        "coverage": 0.65,
+        "acc_answered": 0.5769230769230769
+      },
+      "floor0.9": {
+        "coverage": 0.525,
+        "acc_answered": 0.5714285714285714
+      }
+    },
+    "lowlight|single": {
+      "acc_all": 0.5,
+      "floor0.6": {
+        "coverage": 1.0,
+        "acc_answered": 0.5
+      },
+      "floor0.7": {
+        "coverage": 1.0,
+        "acc_answered": 0.5
+      },
+      "floor0.8": {
+        "coverage": 1.0,
+        "acc_answered": 0.5
+      },
+      "floor0.9": {
+        "coverage": 1.0,
+        "acc_answered": 0.5
+      }
+    },
+    "lowlight|tta": {
+      "acc_all": 0.5,
+      "floor0.6": {
+        "coverage": 1.0,
+        "acc_answered": 0.5
+      },
+      "floor0.7": {
+        "coverage": 1.0,
+        "acc_answered": 0.5
+      },
+      "floor0.8": {
+        "coverage": 1.0,
+        "acc_answered": 0.5
+      },
+      "floor0.9": {
+        "coverage": 1.0,
+        "acc_answered": 0.5
+      }
+    },
+    "combined|single": {
+      "acc_all": 0.575,
+      "floor0.6": {
+        "coverage": 0.825,
+        "acc_answered": 0.5757575757575758
+      },
+      "floor0.7": {
+        "coverage": 0.725,
+        "acc_answered": 0.5172413793103449
+      },
+      "floor0.8": {
+        "coverage": 0.65,
+        "acc_answered": 0.5769230769230769
+      },
+      "floor0.9": {
+        "coverage": 0.525,
+        "acc_answered": 0.5714285714285714
+      }
+    },
+    "combined|tta": {
+      "acc_all": 0.575,
+      "floor0.6": {
+        "coverage": 0.825,
+        "acc_answered": 0.5757575757575758
+      },
+      "floor0.7": {
+        "coverage": 0.725,
+        "acc_answered": 0.5172413793103449
+      },
+      "floor0.8": {
+        "coverage": 0.65,
+        "acc_answered": 0.5769230769230769
+      },
+      "floor0.9": {
+        "coverage": 0.525,
+        "acc_answered": 0.5714285714285714
+      }
+    }
+  },
+  "person_level": {
+    "1_frames": {
+      "frames": 1,
+      "labelled": 0.0,
+      "wrong_among_labelled": 0.0,
+      "wrong_overall": 0.0,
+      "male_labelled_female": 0.0
+    },
+    "2_frames": {
+      "frames": 2,
+      "labelled": 0.675,
+      "wrong_among_labelled": 0.4444444444444444,
+      "wrong_overall": 0.3,
+      "male_labelled_female": 0.5
+    },
+    "3_frames": {
+      "frames": 3,
+      "labelled": 0.725,
+      "wrong_among_labelled": 0.4827586206896552,
+      "wrong_overall": 0.35,
+      "male_labelled_female": 0.55
+    },
+    "5_frames": {
+      "frames": 5,
+      "labelled": 0.725,
+      "wrong_among_labelled": 0.4827586206896552,
+      "wrong_overall": 0.35,
+      "male_labelled_female": 0.55
+    }
+  },
+  "gate": {
+    "max_error": 0.02,
+    "value": 0.4827586206896552,
+    "pass": false,
+    "min_confidence_used": 0.7
+  }
+}

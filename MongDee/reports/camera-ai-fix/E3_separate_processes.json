@@ -1,0 +1,38 @@
+[
+  {
+    "index": 1,
+    "status": "ok",
+    "cams": [
+      {
+        "index": 1,
+        "opened": false,
+        "open_ms": 318,
+        "frames": 0,
+        "fps": 0.0,
+        "read_fail": 0,
+        "bad_frames": 0,
+        "bad_reasons": {},
+        "max_gap_ms": 0
+      }
+    ],
+    "log_tail": "[ WARN:0@0.360] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index\nRESULT_JSON [{\"index\": 1, \"opened\": false, \"open_ms\": 318, \"frames\": 0, \"fps\": 0.0, \"read_fail\": 0, \"bad_frames\": 0, \"bad_reasons\": {}, \"max_gap_ms\": 0}]\n"
+  },
+  {
+    "index": 2,
+    "status": "ok",
+    "cams": [
+      {
+        "index": 2,
+        "opened": false,
+        "open_ms": 289,
+        "frames": 0,
+        "fps": 0.0,
+        "read_fail": 0,
+        "bad_frames": 0,
+        "bad_reasons": {},
+        "max_gap_ms": 0
+      }
+    ],
+    "log_tail": "[ WARN:0@0.337] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index\nRESULT_JSON [{\"index\": 2, \"opened\": false, \"open_ms\": 289, \"frames\": 0, \"fps\": 0.0, \"read_fail\": 0, \"bad_frames\": 0, \"bad_reasons\": {}, \"max_gap_ms\": 0}]\n"
+  }
+]

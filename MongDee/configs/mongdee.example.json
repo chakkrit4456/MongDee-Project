@@ -1,0 +1,94 @@
+{
+  "cameras": [
+    { "id": "CAM01", "name": "Entrance", "protocol": "usb", "location": "entrance", "device_index": 0, "processing_fps": 6 },
+    { "id": "CAM02", "name": "Booth A", "protocol": "rtsp", "location": "booth_a", "url": "rtsp://admin:${CAM02_PASSWORD}@192.168.1.64:554/Streaming/Channels/101", "processing_fps": 5 },
+    { "id": "CAM03", "name": "Booth B", "protocol": "onvif", "location": "booth_b", "host": "192.168.1.65", "username": "admin", "password": "${CAM03_PASSWORD}", "processing_fps": 5 }
+  ],
+  "detection": {
+    "model_path": "yolo11n.pt",
+    "device": "auto",
+    "confidence_threshold": 0.35,
+    "processing_width": 960,
+    "processing_height": 540,
+    "target_fps_per_camera": 4.0
+  },
+  "tracking": {
+    "n_init": 3,
+    "track_buffer": 30,
+    "match_thresh": 0.3
+  },
+  "reid": {
+    "backend": "auto",
+    "torchvision_model": "resnet18",
+    "osnet_weights": "",
+    "min_height_px": 80
+  },
+  "attributes": {
+    "min_color_confidence": 0.25
+  },
+  "identity": {
+    "match_threshold": 0.80,
+    "uncertain_threshold": 0.62,
+    "person_ttl_sec": 900
+  },
+  "topology": {
+    "transitions": [
+      { "from": "CAM01", "to": "CAM02", "min_seconds": 3, "max_seconds": 60 },
+      { "from": "CAM02", "to": "CAM03", "min_seconds": 5, "max_seconds": 90 }
+    ],
+    "graph": {
+      "CAM01": ["CAM02"],
+      "CAM02": ["CAM01", "CAM03"],
+      "CAM03": ["CAM02"]
+    },
+    "locations": { "CAM01": "Entrance", "CAM02": "Booth A", "CAM03": "Booth B" }
+  },
+  "features": {
+    "observe_interval_sec": 0.5,
+    "track_end_timeout_sec": 3.0,
+    "min_samples_to_flush": 1
+  },
+  "interest": {
+    "near_distance_m": 1.5,
+    "min_look_duration_sec": 1.5,
+    "high_interest_threshold": 0.70,
+    "min_signals_for_high": 3
+  },
+  "product": {
+    "reid_backend": "color",
+    "known_similarity": 0.75,
+    "possible_similarity": 0.55,
+    "target_fps_per_camera": 2.0
+  },
+  "spatial": {
+    "enabled": false,
+    "booth_id": "BOOTH-01",
+    "layout_path": "configs/booth_layout.example.json",
+    "calibration_path": "configs/calibration.example.json"
+  },
+  "product_pipeline": {
+    "enabled": false,
+    "gi_database_path": "configs/gi_products.example.json",
+    "gallery_dir": ""
+  },
+  "database": {
+    "path": "",
+    "log_detections": false
+  },
+  "adaptive": {
+    "enabled": true,
+    "tick_interval_sec": 2.0,
+    "cpu_high_pct": 85.0,
+    "latency_high_ms": 300.0,
+    "min_target_fps": 1.0,
+    "max_target_fps": 0.0,
+    "imgsz_levels": [640, 480, 320]
+  },
+  "api": {
+    "host": "127.0.0.1",
+    "port": 8100,
+    "api_key": "${MONGDEE_API_KEY}",
+    "keys": {},
+    "cors_origins": ["https://your-dashboard.vercel.app"]
+  }
+}

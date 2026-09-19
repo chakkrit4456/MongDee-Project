@@ -1,0 +1,526 @@
+2026-09-18 22:33:00,154 INFO comtypes.client._code_cache: Imported existing <module 'comtypes.gen' from 'D:\\mongdee2\\MongDee\\.venv\\Lib\\site-packages\\comtypes\\gen\\__init__.py'>
+2026-09-18 22:33:00,155 INFO comtypes.client._code_cache: Using writeable comtypes cache directory: 'D:\mongdee2\MongDee\.venv\Lib\site-packages\comtypes\gen'
+2026-09-18 22:33:06,040 INFO mongdee.core.vision: [discover:1] index=1 backend=DSHOW format=YUY2 320x240@15 open=OK read=OK (backend=DSHOW resolution=320x240 fps=15 fourcc=YUY2)
+2026-09-18 22:33:11,389 INFO mongdee.core.vision: [discover:2] index=2 backend=DSHOW format=YUY2 320x240@15 open=OK read=OK (backend=DSHOW resolution=320x240 fps=15 fourcc=YUY2)
+[ WARN:0@19.452] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@19.455] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@19.457] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@19.458] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@19.460] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:33:11,796 WARNING mongdee.core.vision: [discover:4] index=4 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:0@19.532] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@19.534] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@19.536] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@19.538] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@19.540] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:33:11,876 WARNING mongdee.core.vision: [discover:5] index=5 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:0@19.614] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@19.615] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@19.617] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@19.619] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@19.621] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:33:11,958 WARNING mongdee.core.vision: [discover:6] index=6 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:0@19.699] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@19.701] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@19.703] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@19.705] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@19.708] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:33:12,044 WARNING mongdee.core.vision: [discover:7] index=7 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:0@19.815] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@19.817] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@19.819] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@19.821] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@19.823] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:33:12,160 WARNING mongdee.core.vision: [discover:8] index=8 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:0@19.911] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@19.913] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@19.914] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@19.916] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@19.918] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:33:12,254 WARNING mongdee.core.vision: [discover:9] index=9 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:0@20.009] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@20.011] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@20.013] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@20.016] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@20.019] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:33:12,355 WARNING mongdee.core.vision: [discover:10] index=10 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:0@20.143] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@20.146] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@20.150] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@20.153] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@20.157] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:33:12,493 WARNING mongdee.core.vision: [discover:11] index=11 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:0@20.266] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@20.267] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@20.269] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@20.271] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@20.273] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:33:12,609 WARNING mongdee.core.vision: [discover:12] index=12 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:0@20.348] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@20.350] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@20.351] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@20.353] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@20.354] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:33:12,691 WARNING mongdee.core.vision: [discover:13] index=13 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:0@20.425] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@20.426] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@20.428] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@20.430] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@20.431] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:33:12,768 WARNING mongdee.core.vision: [discover:14] index=14 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:0@20.516] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@20.518] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@20.520] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@20.522] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@20.524] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:33:12,861 WARNING mongdee.core.vision: [discover:15] index=15 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:0@21.597] global net_impl_backend.cpp:345 cv::dnn::dnn5_v20260605::Net::Impl::setPreferableTarget Targets are not supported by the new graph engine for now
+2026-09-18 22:33:19,224 INFO mongdee.web.booth_manager: [HW] CPU: 8 logical / 4 physical cores | RAM: 15.8 GB | GPU: NVIDIA GeForce GTX 1050 (3.0 GB VRAM) | Tier: HIGH
+[BUILTIN] Camera/virtual device disabled by configuration (index [0, 3])
+[WEB] ไม่ได้ระบุกล้อง กำลังค้นหากล้องอัตโนมัติ...
+[WEB] พบกล้อง: [1, 2]
+[WEB] กำลังโหลดโมเดล AI Vision (YOLO11)...
+[WEB] ใช้งานอุปกรณ์ประมวลผล: cuda:0 (NVIDIA GeForce GTX 1050)
+[WEB] กำลังโหลดโมเดล AI จดจำสินค้า (Product Recognizer)...
+[WEB] กำลังโหลดโมเดล FairFace (วิเคราะห์เพศ/อายุต่อ Global Person ID)...
+[WEB] ใช้โมเดล FairFace เป็นตัวจำแนกเพศ/อายุสำหรับกรอบ detect บนหน้าจอด้วย (male/female/CHILD) — ระบุ --gender-model เพื่อกลับไปใช้โมเดล Caffe/ONNX เดิมแทน
+[WEB] เปิดใช้งานได้ที่: http://127.0.0.1:8000/
+2026-09-18 22:33:19,553 INFO mongdee.web.booth_manager: [SCHEDULE] ถึงเวลาเปิดบูธ (-) — เริ่มกล้องอัตโนมัติ
+2026-09-18 22:33:25,519 INFO mongdee.core.vision: [CAM-1] index=1 backend=DSHOW format=YUY2 320x240@15 open=OK read=OK (backend=DSHOW resolution=320x240 fps=15 fourcc=YUY2)
+[ WARN:1@33.306] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:33:26,084 INFO mongdee.core.performance: [PERF] CAM-1: restoring AI inference rate (every 2 -> 1 frames)
+2026-09-18 22:33:28,087 INFO mongdee.core.performance: [PERF] CAM-1: reducing AI inference rate (every 1 -> 2 frames)
+2026-09-18 22:33:30,094 INFO mongdee.core.performance: [PERF] CAM-1: reducing AI inference rate (every 2 -> 3 frames)
+2026-09-18 22:33:32,126 INFO mongdee.core.performance: [PERF] CAM-1: reducing AI inference rate (every 3 -> 4 frames)
+2026-09-18 22:33:34,133 INFO mongdee.core.performance: [PERF] CAM-1: reducing AI inference rate (every 4 -> 5 frames)
+[ WARN:1@43.187] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:1@43.360] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:1@43.402] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:1@43.449] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:33:35,785 WARNING mongdee.core.vision: [CAM-2] index=2 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+2026-09-18 22:33:36,148 INFO mongdee.core.performance: [PERF] CAM-1: reducing AI inference rate (every 5 -> 6 frames)
+[ WARN:2@44.560] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@44.685] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:33:38,155 INFO mongdee.core.performance: [PERF] CAM-1: reducing AI inference rate (every 6 -> 7 frames)
+2026-09-18 22:33:40,168 INFO mongdee.core.performance: [PERF] CAM-1: reducing AI inference rate (every 7 -> 8 frames)
+2026-09-18 22:33:41,896 WARNING mongdee.core.vision: [CAM-2] Camera stream failed (device=2, attempt=1, next_retry=3s, reason=open_or_read_failed)
+2026-09-18 22:33:42,176 INFO mongdee.core.performance: [PERF] CAM-1: reducing AI input resolution (640px -> 480px)
+2026-09-18 22:33:44,181 INFO mongdee.core.performance: [PERF] CAM-1: reducing AI input resolution (480px -> 320px)
+[ WARN:2@54.534] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@54.584] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@54.611] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:33:46,948 WARNING mongdee.core.vision: [discover:2] index=2 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@55.560] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@55.564] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@55.568] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@55.574] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@55.580] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:33:47,916 WARNING mongdee.core.vision: [discover:4] index=4 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@55.769] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@55.771] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@55.774] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@55.777] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@55.779] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:33:48,116 WARNING mongdee.core.vision: [discover:5] index=5 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@55.930] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@55.935] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@55.939] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@55.944] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@55.950] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:33:48,286 WARNING mongdee.core.vision: [discover:6] index=6 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@56.095] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@56.097] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@56.100] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@56.102] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@56.105] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:33:48,441 WARNING mongdee.core.vision: [discover:7] index=7 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@56.335] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@56.340] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@56.345] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@56.349] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@56.353] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:33:48,689 WARNING mongdee.core.vision: [discover:8] index=8 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:1@56.661] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:1@56.759] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:33:49,096 WARNING mongdee.core.vision: [CAM-2] index=2 state=OPEN_FAILED (tried 2 backend/format combinations, none produced a frame)
+2026-09-18 22:33:49,096 WARNING mongdee.core.vision: [CAM-2] Camera stream failed (device=2, attempt=2, next_retry=6s, reason=open_or_read_failed)
+[ WARN:2@56.994] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@57.017] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@57.031] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@57.043] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@57.053] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:33:49,394 WARNING mongdee.core.vision: [discover:9] index=9 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@57.522] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@57.524] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@57.527] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@57.529] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@57.532] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:33:49,868 WARNING mongdee.core.vision: [discover:10] index=10 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@57.616] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@57.618] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@57.619] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@57.621] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@57.623] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:33:49,959 WARNING mongdee.core.vision: [discover:11] index=11 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@57.693] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@57.694] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@57.696] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@57.697] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@57.699] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:33:50,035 WARNING mongdee.core.vision: [discover:12] index=12 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@57.766] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@57.770] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@57.772] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@57.775] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@57.778] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:33:50,114 WARNING mongdee.core.vision: [discover:13] index=13 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@58.046] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@58.050] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@58.055] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@58.059] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@58.062] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:33:50,399 WARNING mongdee.core.vision: [discover:14] index=14 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@58.217] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@58.221] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@58.226] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@58.230] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@58.234] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:33:50,570 WARNING mongdee.core.vision: [discover:15] index=15 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+2026-09-18 22:34:06,077 WARNING mongdee.core.vision: [CAM-2] Camera stream failed (device=2, attempt=3, next_retry=12s, reason=open_or_read_failed)
+[ WARN:2@78.438] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@78.492] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@78.515] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@78.533] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@78.555] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:34:10,892 WARNING mongdee.core.vision: [discover:2] index=2 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@79.433] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@79.439] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@79.444] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@79.450] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@79.456] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:34:11,793 WARNING mongdee.core.vision: [discover:4] index=4 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@79.692] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@79.696] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@79.701] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@79.706] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@79.710] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:34:12,047 WARNING mongdee.core.vision: [discover:5] index=5 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@79.949] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@79.952] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@79.954] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@79.957] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@79.959] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:34:12,296 WARNING mongdee.core.vision: [discover:6] index=6 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@80.059] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.061] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.063] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.065] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.067] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:34:12,403 WARNING mongdee.core.vision: [discover:7] index=7 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@80.144] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.146] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.148] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.150] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.152] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:34:12,489 WARNING mongdee.core.vision: [discover:8] index=8 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@80.232] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.234] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.235] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.237] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.239] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:34:12,576 WARNING mongdee.core.vision: [discover:9] index=9 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@80.313] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.315] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.316] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.318] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.320] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:34:12,656 WARNING mongdee.core.vision: [discover:10] index=10 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@80.387] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.389] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.390] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.392] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.393] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:34:12,730 WARNING mongdee.core.vision: [discover:11] index=11 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@80.471] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.473] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.475] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.477] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.479] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:34:12,815 WARNING mongdee.core.vision: [discover:12] index=12 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@80.548] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.550] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.552] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.553] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.555] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:34:12,891 WARNING mongdee.core.vision: [discover:13] index=13 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@80.621] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.623] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.625] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.626] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.628] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:34:12,964 WARNING mongdee.core.vision: [discover:14] index=14 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@80.702] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.704] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.706] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.708] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@80.709] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:34:13,046 WARNING mongdee.core.vision: [discover:15] index=15 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:1@93.155] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:1@93.236] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:34:25,573 WARNING mongdee.core.vision: [CAM-2] index=2 state=OPEN_FAILED (tried 2 backend/format combinations, none produced a frame)
+2026-09-18 22:34:25,573 WARNING mongdee.core.vision: [CAM-2] Camera stream failed (device=2, attempt=4, next_retry=24s, reason=open_or_read_failed)
+[ WARN:2@110.684] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@110.712] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@110.727] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@110.735] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@110.746] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:34:43,082 WARNING mongdee.core.vision: [discover:2] index=2 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@110.990] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@110.993] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@110.995] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@110.997] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@110.999] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:34:43,336 WARNING mongdee.core.vision: [discover:4] index=4 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@111.247] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@111.252] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@111.256] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@111.260] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@111.262] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:34:43,599 WARNING mongdee.core.vision: [discover:5] index=5 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@111.418] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@111.421] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@111.424] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@111.427] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@111.430] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:34:43,767 WARNING mongdee.core.vision: [discover:6] index=6 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@111.543] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@111.545] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@111.549] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@111.552] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@111.555] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:34:43,892 WARNING mongdee.core.vision: [discover:7] index=7 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@111.642] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@111.644] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@111.645] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@111.647] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@111.649] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:34:43,985 WARNING mongdee.core.vision: [discover:8] index=8 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@111.747] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@111.750] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@111.753] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@111.757] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@111.760] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:34:44,097 WARNING mongdee.core.vision: [discover:9] index=9 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@111.851] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@111.853] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@111.857] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@111.861] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@111.865] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:34:44,202 WARNING mongdee.core.vision: [discover:10] index=10 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@111.990] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@111.993] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@111.996] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@111.999] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@112.002] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:34:44,339 WARNING mongdee.core.vision: [discover:11] index=11 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@112.122] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@112.125] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@112.129] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@112.132] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@112.134] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:34:44,470 WARNING mongdee.core.vision: [discover:12] index=12 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@112.275] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@112.277] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@112.279] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@112.281] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@112.284] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:34:44,620 WARNING mongdee.core.vision: [discover:13] index=13 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@112.359] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@112.361] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@112.362] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@112.364] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@112.365] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:34:44,702 WARNING mongdee.core.vision: [discover:14] index=14 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@112.431] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@112.432] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@112.434] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@112.435] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@112.437] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:34:44,773 WARNING mongdee.core.vision: [discover:15] index=15 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:1@122.835] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:1@132.590] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:35:04,927 WARNING mongdee.core.vision: [CAM-2] index=2 state=OPEN_FAILED (tried 2 backend/format combinations, none produced a frame)
+2026-09-18 22:35:04,927 WARNING mongdee.core.vision: [CAM-2] Camera stream failed (device=2, attempt=5, next_retry=30s, reason=open_or_read_failed)
+[ WARN:2@152.890] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@153.020] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@153.116] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@153.184] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:35:31,222 WARNING mongdee.core.vision: [CAM-2] Camera stream failed (device=2, attempt=6, next_retry=30s, reason=open_or_read_failed)
+[ WARN:2@162.824] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:35:35,161 WARNING mongdee.core.vision: [discover:2] index=2 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@163.774] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@163.780] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@163.787] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@163.793] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@163.806] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:35:36,143 WARNING mongdee.core.vision: [discover:4] index=4 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@164.243] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@164.249] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@164.256] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@164.262] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@164.269] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:35:36,605 WARNING mongdee.core.vision: [discover:5] index=5 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@164.535] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@164.539] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@164.544] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@164.548] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@164.552] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:35:36,889 WARNING mongdee.core.vision: [discover:6] index=6 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@164.756] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@164.761] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@164.763] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@164.766] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@164.768] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:35:37,105 WARNING mongdee.core.vision: [discover:7] index=7 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@164.863] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@164.867] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@164.871] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@164.875] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@164.879] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:35:37,216 WARNING mongdee.core.vision: [discover:8] index=8 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@165.142] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@165.146] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@165.152] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@165.157] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@165.164] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:35:37,501 WARNING mongdee.core.vision: [discover:9] index=9 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@165.402] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@165.405] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@165.410] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@165.413] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@165.415] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:35:37,752 WARNING mongdee.core.vision: [discover:10] index=10 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@165.648] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@165.653] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@165.658] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@165.662] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@165.667] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:35:38,003 WARNING mongdee.core.vision: [discover:11] index=11 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@165.777] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@165.780] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@165.783] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@165.785] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@165.789] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:35:38,126 WARNING mongdee.core.vision: [discover:12] index=12 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@165.902] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@165.905] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@165.907] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@165.909] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@165.912] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:35:38,248 WARNING mongdee.core.vision: [discover:13] index=13 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@166.026] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@166.029] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@166.032] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@166.035] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@166.038] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:35:38,374 WARNING mongdee.core.vision: [discover:14] index=14 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@166.179] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@166.181] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@166.183] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@166.186] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@166.190] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:35:38,527 WARNING mongdee.core.vision: [discover:15] index=15 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:1@183.076] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:1@183.176] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:35:55,513 WARNING mongdee.core.vision: [CAM-2] index=2 state=OPEN_FAILED (tried 2 backend/format combinations, none produced a frame)
+2026-09-18 22:35:55,514 WARNING mongdee.core.vision: [CAM-2] Camera stream failed (device=2, attempt=7, next_retry=30s, reason=open_or_read_failed)
+[ WARN:1@223.741] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:1@224.540] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:36:36,877 WARNING mongdee.core.vision: [CAM-2] index=2 state=OPEN_FAILED (tried 2 backend/format combinations, none produced a frame)
+2026-09-18 22:36:36,877 WARNING mongdee.core.vision: [CAM-2] Camera stream failed (device=2, attempt=8, next_retry=30s, reason=open_or_read_failed)
+[ WARN:2@226.502] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@226.574] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@226.662] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@236.373] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@236.398] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:36:48,735 WARNING mongdee.core.vision: [discover:2] index=2 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@236.604] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@236.607] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@236.611] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@236.615] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@236.618] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:36:48,955 WARNING mongdee.core.vision: [discover:4] index=4 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@236.726] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@236.728] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@236.729] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@236.731] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@236.732] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:36:49,069 WARNING mongdee.core.vision: [discover:5] index=5 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@236.936] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@236.941] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@236.946] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@236.951] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@236.955] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:36:49,292 WARNING mongdee.core.vision: [discover:6] index=6 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@237.105] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.109] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.113] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.117] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.120] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:36:49,457 WARNING mongdee.core.vision: [discover:7] index=7 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@237.392] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.397] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.406] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.411] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.416] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:36:49,752 WARNING mongdee.core.vision: [discover:8] index=8 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@237.551] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.554] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.558] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.561] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.564] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:36:49,901 WARNING mongdee.core.vision: [discover:9] index=9 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@237.660] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.662] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.663] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.665] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.667] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:36:50,004 WARNING mongdee.core.vision: [discover:10] index=10 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@237.735] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.737] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.738] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.740] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.742] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:36:50,078 WARNING mongdee.core.vision: [discover:11] index=11 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@237.813] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.815] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.817] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.819] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.822] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:36:50,159 WARNING mongdee.core.vision: [discover:12] index=12 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@237.899] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.901] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.903] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.904] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.906] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:36:50,242 WARNING mongdee.core.vision: [discover:13] index=13 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@237.974] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.976] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.977] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.979] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@237.981] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:36:50,317 WARNING mongdee.core.vision: [discover:14] index=14 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:2@238.054] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@238.055] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@238.058] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@238.060] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@238.061] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:36:50,398 WARNING mongdee.core.vision: [discover:15] index=15 state=OPEN_FAILED (tried 5 backend/format combinations, none produced a frame)
+[ WARN:1@243.208] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:1@243.308] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:36:55,645 WARNING mongdee.core.vision: [CAM-2] index=2 state=OPEN_FAILED (tried 2 backend/format combinations, none produced a frame)
+2026-09-18 22:36:55,645 WARNING mongdee.core.vision: [CAM-2] Camera stream failed (device=2, attempt=9, next_retry=30s, reason=open_or_read_failed)
+[ WARN:1@283.072] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:1@283.278] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+2026-09-18 22:37:35,614 WARNING mongdee.core.vision: [CAM-2] index=2 state=OPEN_FAILED (tried 2 backend/format combinations, none produced a frame)
+2026-09-18 22:37:35,615 WARNING mongdee.core.vision: [CAM-2] Camera stream failed (device=2, attempt=10, next_retry=30s, reason=open_or_read_failed)

@@ -1,0 +1,49 @@
+{
+  "cameras": [
+    {
+      "id": "CAM01",
+      "name": "Entrance webcam",
+      "protocol": "usb",
+      "location": "entrance",
+      "device_index": 0,
+      "processing_fps": 10
+    },
+    {
+      "id": "CAM02",
+      "name": "Booth A (IP camera, RTSP)",
+      "protocol": "rtsp",
+      "location": "booth_a",
+      "url": "rtsp://admin:secret@192.168.1.64:554/Streaming/Channels/101",
+      "processing_fps": 8
+    },
+    {
+      "id": "CAM03",
+      "name": "Booth B (ONVIF-discovered stream)",
+      "protocol": "onvif",
+      "location": "booth_b",
+      "host": "192.168.1.65",
+      "port": 80,
+      "username": "admin",
+      "password": "secret",
+      "processing_fps": 8
+    },
+    {
+      "id": "CAM04",
+      "name": "Exit (MJPEG push stream)",
+      "protocol": "http",
+      "location": "exit",
+      "url": "http://192.168.1.66/video",
+      "http_mode": "mjpeg",
+      "processing_fps": 5
+    },
+    {
+      "id": "CAM05",
+      "name": "Overview (HLS)",
+      "protocol": "hls",
+      "location": "overview",
+      "url": "https://example.com/stream/index.m3u8",
+      "processing_fps": 5,
+      "enabled": false
+    }
+  ]
+}

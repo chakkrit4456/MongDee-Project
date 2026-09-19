@@ -1,0 +1,54 @@
+/* Purple/blue gradient theme — scoped to the Dashboard page only (loaded
+   after style.css). Swaps the flat blue accent for an indigo-violet
+   gradient on headline numbers and interactive accents. Everything else
+   (booth/trainer/settings) is untouched. */
+
+:root {
+    --accent: #8b7bff;
+    --accent-soft: rgba(139, 123, 255, 0.14);
+    --accent-soft-border: rgba(139, 123, 255, 0.35);
+}
+:root[data-theme="light"] {
+    --accent: #6d4fe0;
+    --accent-soft: rgba(109, 79, 224, 0.10);
+    --accent-soft-border: rgba(109, 79, 224, 0.3);
+}
+
+body {
+    background:
+        radial-gradient(circle at 15% 0%, rgba(139, 123, 255, 0.12), transparent 40%),
+        radial-gradient(circle at 85% 10%, rgba(168, 85, 247, 0.08), transparent 40%),
+        var(--bg);
+    background-attachment: fixed;
+}
+
+.page-header-name,
+.stat-card .value {
+    background: linear-gradient(120deg, #8b7bff, #c084fc);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: #8b7bff;
+}
+.stat-card.has-alert .value {
+    background: none;
+    -webkit-text-fill-color: unset;
+    color: var(--danger-text);
+}
+
+.stat-card-icon { color: #8b7bff; }
+.stat-card.has-alert .stat-card-icon { color: var(--danger); }
+
+.tab-btn.active { border-bottom-color: #8b7bff; }
+
+button:not(.btn-danger):not(.btn-small), .btn:not(.btn-danger) {
+    transition: box-shadow 0.15s, border-color 0.15s;
+}
+button:not(.btn-danger):not(.btn-small):hover, .btn:not(.btn-danger):hover {
+    box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.chart-line-path { stroke: #8b7bff; }
+.chart-area-path { fill: #8b7bff; opacity: 0.14; }
+.chart-end-dot { fill: #8b7bff; }
+.chart-bar { fill: #8b7bff; }

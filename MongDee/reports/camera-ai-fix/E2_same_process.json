@@ -1,0 +1,194 @@
+[
+  {
+    "stagger": 0.0,
+    "fourcc": "MJPG",
+    "backend": "dshow",
+    "same_process": true,
+    "status": "ok",
+    "cams": [
+      {
+        "index": 1,
+        "opened": false,
+        "open_ms": 292,
+        "frames": 0,
+        "fps": 0.0,
+        "read_fail": 0,
+        "bad_frames": 0,
+        "bad_reasons": {},
+        "max_gap_ms": 0
+      },
+      {
+        "index": 2,
+        "opened": false,
+        "open_ms": 180,
+        "frames": 0,
+        "fps": 0.0,
+        "read_fail": 0,
+        "bad_frames": 0,
+        "bad_reasons": {},
+        "max_gap_ms": 0
+      }
+    ],
+    "log_tail": ":VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index\nRESULT_JSON [{\"index\": 1, \"opened\": false, \"open_ms\": 292, \"frames\": 0, \"fps\": 0.0, \"read_fail\": 0, \"bad_frames\": 0, \"bad_reasons\": {}, \"max_gap_ms\": 0}, {\"index\": 2, \"opened\": false, \"open_ms\": 180, \"frames\": 0, \"fps\": 0.0, \"read_fail\": 0, \"bad_frames\": 0, \"bad_reasons\": {}, \"max_gap_ms\": 0}]\n"
+  },
+  {
+    "stagger": 0.0,
+    "fourcc": "YUY2",
+    "backend": "dshow",
+    "same_process": true,
+    "status": "ok",
+    "cams": [
+      {
+        "index": 1,
+        "opened": false,
+        "open_ms": 194,
+        "frames": 0,
+        "fps": 0.0,
+        "read_fail": 0,
+        "bad_frames": 0,
+        "bad_reasons": {},
+        "max_gap_ms": 0
+      },
+      {
+        "index": 2,
+        "opened": false,
+        "open_ms": 143,
+        "frames": 0,
+        "fps": 0.0,
+        "read_fail": 0,
+        "bad_frames": 0,
+        "bad_reasons": {},
+        "max_gap_ms": 0
+      }
+    ],
+    "log_tail": ":VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index\nRESULT_JSON [{\"index\": 1, \"opened\": false, \"open_ms\": 194, \"frames\": 0, \"fps\": 0.0, \"read_fail\": 0, \"bad_frames\": 0, \"bad_reasons\": {}, \"max_gap_ms\": 0}, {\"index\": 2, \"opened\": false, \"open_ms\": 143, \"frames\": 0, \"fps\": 0.0, \"read_fail\": 0, \"bad_frames\": 0, \"bad_reasons\": {}, \"max_gap_ms\": 0}]\n"
+  },
+  {
+    "stagger": 2.5,
+    "fourcc": "MJPG",
+    "backend": "dshow",
+    "same_process": true,
+    "status": "ok",
+    "cams": [
+      {
+        "index": 1,
+        "opened": false,
+        "open_ms": 159,
+        "frames": 0,
+        "fps": 0.0,
+        "read_fail": 0,
+        "bad_frames": 0,
+        "bad_reasons": {},
+        "max_gap_ms": 0
+      },
+      {
+        "index": 2,
+        "opened": false,
+        "open_ms": 92,
+        "frames": 0,
+        "fps": 0.0,
+        "read_fail": 0,
+        "bad_frames": 0,
+        "bad_reasons": {},
+        "max_gap_ms": 0
+      }
+    ],
+    "log_tail": "::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index\nRESULT_JSON [{\"index\": 1, \"opened\": false, \"open_ms\": 159, \"frames\": 0, \"fps\": 0.0, \"read_fail\": 0, \"bad_frames\": 0, \"bad_reasons\": {}, \"max_gap_ms\": 0}, {\"index\": 2, \"opened\": false, \"open_ms\": 92, \"frames\": 0, \"fps\": 0.0, \"read_fail\": 0, \"bad_frames\": 0, \"bad_reasons\": {}, \"max_gap_ms\": 0}]\n"
+  },
+  {
+    "stagger": 2.5,
+    "fourcc": "YUY2",
+    "backend": "dshow",
+    "same_process": true,
+    "status": "ok",
+    "cams": [
+      {
+        "index": 1,
+        "opened": false,
+        "open_ms": 293,
+        "frames": 0,
+        "fps": 0.0,
+        "read_fail": 0,
+        "bad_frames": 0,
+        "bad_reasons": {},
+        "max_gap_ms": 0
+      },
+      {
+        "index": 2,
+        "opened": false,
+        "open_ms": 191,
+        "frames": 0,
+        "fps": 0.0,
+        "read_fail": 0,
+        "bad_frames": 0,
+        "bad_reasons": {},
+        "max_gap_ms": 0
+      }
+    ],
+    "log_tail": ":VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index\nRESULT_JSON [{\"index\": 1, \"opened\": false, \"open_ms\": 293, \"frames\": 0, \"fps\": 0.0, \"read_fail\": 0, \"bad_frames\": 0, \"bad_reasons\": {}, \"max_gap_ms\": 0}, {\"index\": 2, \"opened\": false, \"open_ms\": 191, \"frames\": 0, \"fps\": 0.0, \"read_fail\": 0, \"bad_frames\": 0, \"bad_reasons\": {}, \"max_gap_ms\": 0}]\n"
+  },
+  {
+    "stagger": 10.0,
+    "fourcc": "MJPG",
+    "backend": "dshow",
+    "same_process": true,
+    "status": "ok",
+    "cams": [
+      {
+        "index": 1,
+        "opened": false,
+        "open_ms": 259,
+        "frames": 0,
+        "fps": 0.0,
+        "read_fail": 0,
+        "bad_frames": 0,
+        "bad_reasons": {},
+        "max_gap_ms": 0
+      },
+      {
+        "index": 2,
+        "opened": false,
+        "open_ms": 108,
+        "frames": 0,
+        "fps": 0.0,
+        "read_fail": 0,
+        "bad_frames": 0,
+        "bad_reasons": {},
+        "max_gap_ms": 0
+      }
+    ],
+    "log_tail": ":VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index\nRESULT_JSON [{\"index\": 1, \"opened\": false, \"open_ms\": 259, \"frames\": 0, \"fps\": 0.0, \"read_fail\": 0, \"bad_frames\": 0, \"bad_reasons\": {}, \"max_gap_ms\": 0}, {\"index\": 2, \"opened\": false, \"open_ms\": 108, \"frames\": 0, \"fps\": 0.0, \"read_fail\": 0, \"bad_frames\": 0, \"bad_reasons\": {}, \"max_gap_ms\": 0}]\n"
+  },
+  {
+    "stagger": 10.0,
+    "fourcc": "YUY2",
+    "backend": "dshow",
+    "same_process": true,
+    "status": "ok",
+    "cams": [
+      {
+        "index": 1,
+        "opened": false,
+        "open_ms": 212,
+        "frames": 0,
+        "fps": 0.0,
+        "read_fail": 0,
+        "bad_frames": 0,
+        "bad_reasons": {},
+        "max_gap_ms": 0
+      },
+      {
+        "index": 2,
+        "opened": false,
+        "open_ms": 131,
+        "frames": 0,
+        "fps": 0.0,
+        "read_fail": 0,
+        "bad_frames": 0,
+        "bad_reasons": {},
+        "max_gap_ms": 0
+      }
+    ],
+    "log_tail": ":VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index\nRESULT_JSON [{\"index\": 1, \"opened\": false, \"open_ms\": 212, \"frames\": 0, \"fps\": 0.0, \"read_fail\": 0, \"bad_frames\": 0, \"bad_reasons\": {}, \"max_gap_ms\": 0}, {\"index\": 2, \"opened\": false, \"open_ms\": 131, \"frames\": 0, \"fps\": 0.0, \"read_fail\": 0, \"bad_frames\": 0, \"bad_reasons\": {}, \"max_gap_ms\": 0}]\n"
+  }
+]

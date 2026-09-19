@@ -1,0 +1,8 @@
+=== Concurrent matrix (8s per combo, 30s hard timeout) ===
+  DSHOW+DSHOW, no stagger: {'B': {'opened': False, 'read_ok': 0, 'read_failed': 2601901}, 'A': {'opened': False, 'read_ok': 0, 'read_failed': 2773279}}
+  DSHOW+DSHOW, 2.5s stagger: {'A': {'opened': False, 'read_ok': 0, 'read_failed': 3302300}, 'B': {'opened': False, 'read_ok': 0, 'read_failed': 5154253}}
+  MSMF+MSMF, no stagger: {'B': {'opened': True, 'read_ok': 0, 'read_failed': 288593}, 'A': {'opened': True, 'read_ok': 0, 'read_failed': 258257}}
+  DSHOW(A)+MSMF(B), no stagger: {'A': {'opened': False, 'read_ok': 0, 'read_failed': 5812611}, 'B': {'opened': True, 'read_ok': 0, 'read_failed': 257063}}
+  MSMF(A)+DSHOW(B), no stagger: {'A': {'opened': True, 'read_ok': 0, 'read_failed': 622874}, 'B': {'opened': False, 'read_ok': 0, 'read_failed': 6569430}}
+
+Saved tests/manual/concurrent_matrix_results.json

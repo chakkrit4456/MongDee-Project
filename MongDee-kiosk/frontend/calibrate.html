@@ -1,0 +1,105 @@
+<title>ปรับตั้งค่า — MONGDEE MINI KIOSK</title>
+<link rel="stylesheet" href="/static/css/style.css">
+
+<div class="topnav">
+  <a class="brand" href="/"><img class="brand-logo" src="/static/img/logo.png" alt="MongDee"> <span>MINI KIOSK</span></a>
+  <nav>
+    <a href="/">จอแสดงผล</a>
+    <a href="/enroll">เพิ่มสินค้า</a>
+    <a href="/manage">จัดการสินค้า</a>
+    <a href="/dashboard">รายงาน</a>
+    <a href="/calibrate" class="active">ปรับตั้งค่า</a>
+  </nav>
+</div>
+
+<div class="page">
+  <div class="calib-grid">
+    <div>
+      <div class="button-row" style="margin-bottom:0.75rem;">
+        <select id="cameraSelect"></select>
+        <button type="button" id="cameraSelectBtn" class="secondary small">ใช้กล้องนี้</button>
+        <span id="cameraSelectStatus" class="hint" style="margin:0;"></span>
+      </div>
+      <div id="refWarning" class="toast error" style="display:none; margin-bottom:0.75rem;">
+        ยังไม่มีภาพอ้างอิง "แท่นเปล่า" สำหรับกล้องนี้ ระบบจะรอจนกว่าจะบันทึกพื้นเปล่า
+        ยกสินค้าและมือออกจากกรอบ รอภาพนิ่ง แล้วกดปุ่มด้านล่าง
+      </div>
+      <h3 style="margin-top:0;">กรอบดิบ — ลากเพื่อปรับพื้นที่ตรวจจับ (ROI)</h3>
+      <div class="cam-box" id="rawBox">
+        <img id="camFeed" src="/api/camera/stream" alt="live camera">
+        <div class="roi-box" id="roiBox">
+          <div class="roi-handle" data-corner="nw"></div>
+          <div class="roi-handle" data-corner="ne"></div>
+          <div class="roi-handle" data-corner="sw"></div>
+          <div class="roi-handle" data-corner="se"></div>
+        </div>
+      </div>
+      <p class="hint">
+        ลากตรงกลางกรอบสีส้มเพื่อย้ายตำแหน่ง ลากจุดที่มุมเพื่อปรับขนาด — ให้ครอบคลุมเฉพาะแท่นหมุน
+        ไม่รวมของอื่นบนโต๊ะ ระบบบันทึกให้อัตโนมัติขณะลาก
+      </p>
+
+      <div class="button-row" style="margin-top:0.75rem;">
+        <button type="button" id="captureRefBtn">📸 บันทึกภาพพื้นเปล่า (ตอนนี้)</button>
+      </div>
+      <p class="hint">
+        <strong>ขั้นตอนแรกก่อนปรับอย่างอื่น:</strong> ยกสินค้าออกจากแท่นให้ว่างจริง ๆ แล้วกดปุ่มนี้ —
+        ระบบจะจำภาพนี้เป็น "ค่าว่างเริ่มต้น" และเทียบภาพสดกับภาพนี้ตลอด (ไม่ใช่ค่อย ๆ ปรับตัวเองแบบเดิม)
+        ถ้าย้ายกล้อง เปลี่ยนแสง หรือของที่วางไว้ข้าง ๆ แท่นเปลี่ยนไป ให้กดใหม่อีกครั้ง
+      </p>
+      <p class="hint">เว้นพื้นที่พื้นหลังนอกกรอบเล็กน้อยเพื่อช่วยชดเชยแสง หากเปลี่ยนกรอบมาก
+        ควรถ่ายภาพตัวอย่างสินค้าใหม่ เพราะภาพที่ใช้เทียบต้องมาจากมุมและกรอบเดียวกัน</p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0;">ตัวอย่างที่ลูกค้าจะเห็น</h3>
+      <div class="preview-frame" id="previewFrame">
+        <div class="preview-crop" id="previewCrop">
+          <img id="previewFeed" src="/api/camera/stream" alt="preview">
+        </div>
+      </div>
+      <p class="hint">
+        กรอบนี้คือสัดส่วน 9:16 จริงที่ขึ้นจอลูกค้า — ROI จะแสดงครบเสมอ (อาจมีขอบดำถ้า ROI ไม่ใช่ 9:16 พอดี)
+      </p>
+
+      <div class="calib-readout">
+        <span>สถานะ:</span>
+        <span class="pill" id="stateBadge">-</span>
+        <span class="ratio-num" id="ratioNum">-</span>
+      </div>
+      <div class="gauge">
+        <div class="fill" id="gaugeFill"></div>
+        <div class="mark" id="markOff"></div>
+        <div class="mark" id="markOn"></div>
+      </div>
+      <p class="hint">
+        แถบคือสัดส่วนพื้นที่ในกรอบ ROI ที่ระบบเห็นว่าเปลี่ยนไปจากพื้นหลัง (foreground) —
+        เส้นซ้ายคือเกณฑ์ "ตรวจไม่พบ" (off) เส้นขวาคือเกณฑ์ "ตรวจพบ" (on)
+        ลองเอาของออก/วางของบนแท่น ดูตัวเลขว่างกับมีของต่างกันแค่ไหน แล้วตั้ง on/off ให้อยู่คนละฝั่งของค่าที่สังเกตได้
+      </p>
+
+      <h3 style="margin-top:1.5rem;">ความไวในการตรวจจับ</h3>
+      <p class="hint" style="margin-top:0;">
+        <strong>ค่ายิ่ง<u>ต่ำ</u> = ตรวจจับได้ง่ายขึ้น (ไว)</strong> — ค่ายิ่งสูงต้องมีอะไรเปลี่ยนแปลงในกรอบมากขึ้นถึงจะนับว่าเจอ
+        ค่าที่ใช้งานได้จริงมักอยู่แค่ <strong>0.05 - 0.3</strong> เท่านั้น (ไม่ใช่ใกล้ 1)
+      </p>
+      <div class="slider-row">
+        <div class="row-head"><span>เกณฑ์ตรวจพบ (on)</span><span id="onVal"></span></div>
+        <input type="range" id="onRatio" min="0.01" max="0.5" step="0.01">
+      </div>
+      <div class="slider-row">
+        <div class="row-head"><span>เกณฑ์ตรวจไม่พบ (off)</span><span id="offVal"></span></div>
+        <input type="range" id="offRatio" min="0" max="0.45" step="0.01">
+      </div>
+
+      <div class="button-row">
+        <button type="button" id="resetBtn" class="secondary">รีเซ็ตเป็นค่าเริ่มต้น</button>
+      </div>
+      <div id="toast" class="hint"></div>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/ui-sound.js"></script>
+<script src="/static/js/detect-box.js"></script>
+<script src="/static/js/calibrate.js"></script>

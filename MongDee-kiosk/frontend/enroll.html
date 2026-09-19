@@ -1,0 +1,96 @@
+<title>เพิ่มสินค้า — MONGDEE MINI KIOSK</title>
+<link rel="stylesheet" href="/static/css/style.css">
+
+<div class="topnav">
+  <a class="brand" href="/"><img class="brand-logo" src="/static/img/logo.png" alt="MongDee"> <span>MINI KIOSK</span></a>
+  <nav>
+    <a href="/">จอแสดงผล</a>
+    <a href="/enroll" class="active">เพิ่มสินค้า</a>
+    <a href="/manage">จัดการสินค้า</a>
+    <a href="/dashboard">รายงาน</a>
+    <a href="/calibrate">ปรับตั้งค่า</a>
+  </nav>
+</div>
+
+<div class="page">
+  <h1>สแกนเพื่อเพิ่มสินค้า</h1>
+  <p class="hint">1. สแกนสินค้า → 2. เลือกภาพที่ชัด → 3. กรอกข้อมูลและบันทึกเข้ารายการ</p>
+  <div id="savedResult" class="card" style="display:none; margin-bottom:1.5rem;" role="status">
+    <p id="savedMessage"></p>
+    <div class="button-row">
+      <button type="button" id="nextProductBtn">สแกนสินค้าชิ้นถัดไป</button>
+      <a href="/manage">ไปจัดการสินค้า</a>
+      <a href="/">ไปหน้าจอสแกนสินค้า</a>
+    </div>
+  </div>
+  <div class="enroll-grid">
+    <div>
+      <div class="button-row" style="margin-bottom:0.75rem;">
+        <select id="cameraSelect"></select>
+        <button type="button" id="cameraSelectBtn" class="secondary small">ใช้กล้องนี้</button>
+        <span id="cameraSelectStatus" class="hint" style="margin:0;"></span>
+      </div>
+      <div class="cam-box">
+        <img id="camFeed" src="/api/camera/stream" alt="live camera">
+        <div class="detect-box" id="detectBox"><span class="detect-label" id="detectLabel"></span></div>
+      </div>
+      <div class="button-row" style="margin:0.6rem 0;">
+        <span id="detectBadge" class="pill" role="status" aria-live="polite">กำลังตรวจสอบกล้อง…</span>
+      </div>
+      <p class="hint">
+        วางสินค้าบนแท่นหมุนให้อยู่กึ่งกลางเฟรม แล้วกดปุ่มด้านล่าง ระบบจะเก็บภาพชุดระหว่างที่แท่นหมุน
+        (ภาพทั้งหมดจะถูกเลือกไว้ให้ก่อน — คลิกรูปที่ไม่ชัด/ไม่ต้องการเพื่อเอาออก จนเหลือรูปที่ใช้ได้อย่างน้อย
+        <span id="minCount"></span> รูป แนะนำ <span id="targetCount"></span> รูป)
+      </p>
+      <div class="button-row">
+        <button type="button" id="captureBtn">สแกนสินค้าเพื่อเพิ่มเข้ารายการ</button>
+        <button id="moreBtn" class="secondary" style="display:none;">ถ่ายเพิ่ม</button>
+      </div>
+      <div id="captureStatus" class="hint" role="status" aria-live="polite"></div>
+
+      <div id="frameGrid" class="frame-grid"></div>
+      <div id="selectionCount" class="hint"></div>
+    </div>
+
+    <div class="card" id="formCard" style="display:none;">
+      <form id="productForm">
+        <div class="field"><label>ชื่อสินค้า *</label><input name="name" required></div>
+        <div class="field"><label>ราคา (บาท)</label><input name="price" type="number" step="0.01" min="0" placeholder="0.00"></div>
+        <div class="field"><label>ประเภทสินค้า</label><input name="category"></div>
+        <div class="field"><label>แหล่งที่มา</label><input name="origin"></div>
+        <div class="field"><label>วัสดุ</label><input name="material"></div>
+        <div class="field"><label>วิธีการผลิต</label><input name="process"></div>
+        <div class="field-row">
+          <div class="field"><label>วันผลิต</label><input name="production_date" type="date"></div>
+          <div class="field"><label>วันหมดอายุ</label><input name="expiry_date" type="date"></div>
+        </div>
+        <div class="field"><label>รายละเอียดสินค้า</label><textarea name="story" rows="4"></textarea></div>
+        <div class="field"><label>ลิงก์วิดีโอนำเสนอ (YouTube ฯลฯ)</label><input name="video_link" type="url" placeholder="https://..."></div>
+        <div class="field"><label>ลิงก์ช่องทางติดต่อ / ข้อมูลเพิ่มเติม</label><input name="video_url" type="url" placeholder="https://..."></div>
+        <div class="button-row">
+          <button type="submit">บันทึกเข้ารายการสินค้า</button>
+          <button type="button" class="secondary" id="cancelBtn">ยกเลิก</button>
+        </div>
+      </form>
+      <div id="toast"></div>
+    </div>
+
+    <div class="card" id="placeholderCard">
+      <div class="hint" id="placeholderText">วางสินค้าแล้วกด “สแกนสินค้าเพื่อเพิ่มเข้ารายการ” จากนั้นเลือกภาพและกรอกข้อมูล</div>
+    </div>
+  </div>
+  <section class="card" style="margin-top:1.5rem;" aria-labelledby="catalogHeading">
+    <div class="button-row">
+      <h2 id="catalogHeading">รายการสินค้าที่บันทึกแล้ว <span id="catalogCount"></span></h2>
+      <button type="button" id="refreshCatalogBtn" class="secondary small">รีเฟรชรายการ</button>
+    </div>
+    <p id="catalogStatus" class="hint" role="status"></p>
+    <div id="enrolledProducts" class="product-list"></div>
+  </section>
+</div>
+
+<script src="/static/js/ui-sound.js"></script>
+<script src="/static/js/media-fallback.js"></script>
+<script src="/static/js/detect-box.js"></script>
+<script src="/static/js/price.js"></script>
+<script src="/static/js/enroll.js"></script>

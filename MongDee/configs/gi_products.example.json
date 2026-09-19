@@ -1,0 +1,16 @@
+{
+  "products": [
+    {
+      "id": "GI-001", "name": "ข้าวหอมมะลิทุ่งกุลาร้องไห้", "class_name": "rice_bag",
+      "gi_reference": "GI-TH-2007-00001", "province": "Roi Et", "production_area": "Thung Kula Rong Hai",
+      "producer": "Thung Kula Farmers Cooperative", "category": "rice",
+      "description": "Jasmine rice grown in the Thung Kula Rong Hai plain — fragrant, soft, GI-registered."
+    },
+    {
+      "id": "GI-002", "name": "กาแฟดอยช้าง", "class_name": "coffee_bag",
+      "gi_reference": "GI-TH-2549-00003", "province": "Chiang Rai", "production_area": "Doi Chaang",
+      "producer": "Doi Chaang Coffee", "category": "coffee",
+      "description": "Arabica coffee from Doi Chaang village, ~1200-1700m altitude."
+    }
+  ]
+}

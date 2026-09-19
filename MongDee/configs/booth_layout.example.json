@@ -1,0 +1,17 @@
+{
+  "booth_id": "BOOTH-01",
+  "width": 10.0,
+  "length": 6.0,
+  "unit": "m",
+  "version": 1,
+  "objects": [
+    { "id": "CAM01", "object_type": "camera", "x": 0.5, "y": 0.5, "rotation": 45, "metadata": { "camera_id": "CAM01" } },
+    { "id": "CAM02", "object_type": "camera", "x": 9.5, "y": 0.5, "rotation": 135, "metadata": { "camera_id": "CAM02" } },
+    { "id": "ENTRANCE", "object_type": "entrance", "x": 5.0, "y": 0.0, "width": 2.0, "height": 0.3 },
+    { "id": "EXIT", "object_type": "exit", "x": 5.0, "y": 6.0, "width": 2.0, "height": 0.3 },
+    { "id": "SHELF-A", "object_type": "shelf", "x": 2.5, "y": 3.0, "width": 1.5, "height": 0.5, "metadata": { "product_ids": ["GI-001"] } },
+    { "id": "SHELF-B", "object_type": "shelf", "x": 7.5, "y": 3.0, "width": 1.5, "height": 0.5, "metadata": { "product_ids": ["GI-002"] } },
+    { "id": "ZONE-A1", "object_type": "product_zone", "x": 2.5, "y": 3.8, "width": 2.5, "height": 2.0, "metadata": { "products": ["GI-001"] } },
+    { "id": "ZONE-B1", "object_type": "product_zone", "x": 7.5, "y": 3.8, "width": 2.5, "height": 2.0, "metadata": { "products": ["GI-002"] } }
+  ]
+}

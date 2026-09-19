@@ -1,0 +1,62 @@
+{
+  "cam1_final": {
+    "reads_ok": 114,
+    "reads_failed": 0
+  },
+  "cam2_sweep": [
+    {
+      "requested": "YUY2 640x480@15",
+      "opened": false,
+      "actual": null,
+      "read_ok": 0,
+      "read_failed": 0,
+      "cam1_reads_ok_so_far": 110,
+      "cam1_reads_failed_so_far": 0
+    },
+    {
+      "requested": "YUY2 640x480@10",
+      "opened": false,
+      "actual": null,
+      "read_ok": 0,
+      "read_failed": 0,
+      "cam1_reads_ok_so_far": 112,
+      "cam1_reads_failed_so_far": 0
+    },
+    {
+      "requested": "YUY2 640x480@5",
+      "opened": false,
+      "actual": null,
+      "read_ok": 0,
+      "read_failed": 0,
+      "cam1_reads_ok_so_far": 112,
+      "cam1_reads_failed_so_far": 0
+    },
+    {
+      "requested": "YUY2 320x240@15",
+      "opened": false,
+      "actual": null,
+      "read_ok": 0,
+      "read_failed": 0,
+      "cam1_reads_ok_so_far": 113,
+      "cam1_reads_failed_so_far": 0
+    },
+    {
+      "requested": "YUY2 320x240@10",
+      "opened": false,
+      "actual": null,
+      "read_ok": 0,
+      "read_failed": 0,
+      "cam1_reads_ok_so_far": 113,
+      "cam1_reads_failed_so_far": 0
+    },
+    {
+      "requested": "YUY2 320x240@5",
+      "opened": false,
+      "actual": null,
+      "read_ok": 0,
+      "read_failed": 0,
+      "cam1_reads_ok_so_far": 114,
+      "cam1_reads_failed_so_far": 0
+    }
+  ]
+}

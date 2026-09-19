@@ -1,0 +1,31 @@
+services:
+  mongdee-vision:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: mongdee-vision:latest
+    ports:
+      - "8100:8100"
+    volumes:
+      - ../configs:/app/configs:ro
+      - mongdee-data:/app/data
+    environment:
+      # camera credentials / API key are read from the environment by
+      # backend/config.py's ${VAR} substitution — set them here or in a .env file
+      - CAM02_PASSWORD=${CAM02_PASSWORD:-}
+      - CAM03_PASSWORD=${CAM03_PASSWORD:-}
+      - MONGDEE_API_KEY=${MONGDEE_API_KEY:-}
+    command: ["configs/mongdee.example.json"]
+    restart: unless-stopped
+    # For an NVIDIA GPU host, uncomment (needs nvidia-container-toolkit) and
+    # rebuild the image from a CUDA base — see docker/Dockerfile:
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+volumes:
+  mongdee-data:

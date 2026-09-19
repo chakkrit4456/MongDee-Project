@@ -1,0 +1,318 @@
+2026-09-18 20:54:55,030 INFO comtypes.client._code_cache: Imported existing <module 'comtypes.gen' from 'D:\\mongdee2\\MongDee\\.venv\\Lib\\site-packages\\comtypes\\gen\\__init__.py'>
+2026-09-18 20:54:55,030 INFO comtypes.client._code_cache: Using writeable comtypes cache directory: 'D:\mongdee2\MongDee\.venv\Lib\site-packages\comtypes\gen'
+2026-09-18 20:55:04,346 INFO mongdee.core.vision: [discover:1] index=1 backend=DSHOW format=YUY2 320x240@15 open=OK read=OK (backend=DSHOW resolution=320x240 fps=15 fourcc=YUY2)
+2026-09-18 20:55:10,617 INFO mongdee.core.vision: [discover:2] index=2 backend=DSHOW format=YUY2 320x240@15 open=OK read=OK (backend=DSHOW resolution=320x240 fps=15 fourcc=YUY2)
+[ WARN:0@20.823] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@20.825] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@20.826] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@20.828] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@20.829] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@0.000] global cap_ffmpeg_impl.hpp:1246 open VIDEOIO/FFMPEG: OpenCV should be configured with libavdevice to open a camera device
+[ERROR:0@21.306] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@21.569] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@21.721] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@21.888] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@22.098] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+2026-09-18 20:55:12,287 WARNING mongdee.core.vision: [discover:4] index=4 state=OPEN_FAILED (tried 10 backend/format combinations, none produced a frame)
+[ WARN:0@22.186] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@22.188] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@22.191] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@22.193] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@22.194] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ERROR:0@22.799] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@23.050] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@23.207] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@23.365] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@23.526] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+2026-09-18 20:55:13,715 WARNING mongdee.core.vision: [discover:5] index=5 state=OPEN_FAILED (tried 10 backend/format combinations, none produced a frame)
+[ WARN:0@23.603] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@23.605] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@23.608] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@23.610] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@23.613] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ERROR:0@23.940] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@24.102] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@24.410] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@24.570] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@24.828] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+2026-09-18 20:55:15,017 WARNING mongdee.core.vision: [discover:6] index=6 state=OPEN_FAILED (tried 10 backend/format combinations, none produced a frame)
+[ WARN:0@24.906] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@24.908] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@24.909] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@24.911] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@24.912] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ERROR:0@25.147] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@25.304] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@25.564] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@25.716] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@25.864] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+2026-09-18 20:55:16,053 WARNING mongdee.core.vision: [discover:7] index=7 state=OPEN_FAILED (tried 10 backend/format combinations, none produced a frame)
+[ WARN:0@25.935] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@25.936] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@25.938] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@25.939] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@25.941] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ERROR:0@26.088] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@26.360] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@26.522] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@26.797] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@27.082] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+2026-09-18 20:55:17,272 WARNING mongdee.core.vision: [discover:8] index=8 state=OPEN_FAILED (tried 10 backend/format combinations, none produced a frame)
+[ WARN:0@27.166] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@27.168] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@27.169] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@27.171] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@27.173] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ERROR:0@27.397] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@27.671] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@27.963] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@28.668] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@28.926] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+2026-09-18 20:55:19,116 WARNING mongdee.core.vision: [discover:9] index=9 state=OPEN_FAILED (tried 10 backend/format combinations, none produced a frame)
+[ WARN:0@29.006] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@29.009] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@29.012] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@29.014] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@29.017] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ERROR:0@29.375] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@29.530] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@29.684] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@29.956] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@30.203] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+2026-09-18 20:55:20,392 WARNING mongdee.core.vision: [discover:10] index=10 state=OPEN_FAILED (tried 10 backend/format combinations, none produced a frame)
+[ WARN:0@30.296] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@30.298] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@30.299] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@30.301] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@30.302] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ERROR:0@30.551] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@30.820] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@31.086] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@31.331] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@31.581] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+2026-09-18 20:55:21,770 WARNING mongdee.core.vision: [discover:11] index=11 state=OPEN_FAILED (tried 10 backend/format combinations, none produced a frame)
+[ WARN:0@31.653] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@31.655] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@31.656] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@31.658] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@31.659] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ERROR:0@31.920] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@32.109] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@32.392] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@32.671] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@32.955] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+2026-09-18 20:55:23,145 WARNING mongdee.core.vision: [discover:12] index=12 state=OPEN_FAILED (tried 10 backend/format combinations, none produced a frame)
+[ WARN:0@33.027] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@33.029] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@33.030] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@33.032] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@33.033] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ERROR:0@33.278] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@33.434] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@33.588] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@33.742] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@33.895] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+2026-09-18 20:55:24,084 WARNING mongdee.core.vision: [discover:13] index=13 state=OPEN_FAILED (tried 10 backend/format combinations, none produced a frame)
+[ WARN:0@33.970] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@33.971] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@33.973] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@33.975] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@33.976] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ERROR:0@34.144] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@34.309] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@34.589] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@34.873] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@35.039] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+2026-09-18 20:55:25,228 WARNING mongdee.core.vision: [discover:14] index=14 state=OPEN_FAILED (tried 10 backend/format combinations, none produced a frame)
+[ WARN:0@35.119] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@35.121] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@35.122] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@35.124] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:0@35.126] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ERROR:0@35.396] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@35.570] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@35.833] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@36.103] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:0@36.392] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+2026-09-18 20:55:26,581 WARNING mongdee.core.vision: [discover:15] index=15 state=OPEN_FAILED (tried 10 backend/format combinations, none produced a frame)
+[ WARN:0@37.239] global net_impl_backend.cpp:345 cv::dnn::dnn5_v20260605::Net::Impl::setPreferableTarget Targets are not supported by the new graph engine for now
+2026-09-18 20:55:32,389 INFO mongdee.web.booth_manager: [HW] CPU: 8 logical / 4 physical cores | RAM: 15.8 GB | GPU: NVIDIA GeForce GTX 1050 (3.0 GB VRAM) | Tier: HIGH
+2026-09-18 20:55:32,711 INFO mongdee.web.booth_manager: [SCHEDULE] ถึงเวลาเปิดบูธ (-) — เริ่มกล้องอัตโนมัติ
+2026-09-18 20:55:42,149 INFO mongdee.core.vision: [CAM-1] index=1 backend=DSHOW format=YUY2 320x240@15 open=OK read=OK (backend=DSHOW resolution=320x240 fps=15 fourcc=YUY2)
+[ WARN:1@52.150] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:1@61.988] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:1@62.049] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:1@62.070] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:1@62.089] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:2@69.667] global cap_msmf.cpp:477 `anonymous-namespace'::SourceReaderCB::OnReadSample videoio(MSMF): OnReadSample() is called with error status: -1072875772
+[ WARN:2@69.667] global cap_msmf.cpp:488 `anonymous-namespace'::SourceReaderCB::OnReadSample videoio(MSMF): async ReadSample() call is failed with error status: -1072875772
+[ WARN:1@69.668] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:1@69.718] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:1@69.769] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:2@76.277] global cap_msmf.cpp:477 `anonymous-namespace'::SourceReaderCB::OnReadSample videoio(MSMF): OnReadSample() is called with error status: -1072875772
+[ WARN:2@76.277] global cap_msmf.cpp:488 `anonymous-namespace'::SourceReaderCB::OnReadSample videoio(MSMF): async ReadSample() call is failed with error status: -1072875772
+[ WARN:1@76.277] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:1@76.328] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:1@76.379] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+2026-09-18 20:56:15,281 INFO mongdee.core.performance: [PERF] CAM-1: restoring AI inference rate (every 2 -> 1 frames)
+[ WARN:2@86.065] global cap_msmf.cpp:477 `anonymous-namespace'::SourceReaderCB::OnReadSample videoio(MSMF): OnReadSample() is called with error status: -2147024865
+[ WARN:2@86.065] global cap_msmf.cpp:488 `anonymous-namespace'::SourceReaderCB::OnReadSample videoio(MSMF): async ReadSample() call is failed with error status: -2147024865
+[ WARN:1@86.065] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -2147024865
+[ WARN:1@86.116] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -2147024865
+[ WARN:1@86.167] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -2147024865
+[ERROR:1@86.314] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ WARN:2@89.259] global cap_msmf.cpp:477 `anonymous-namespace'::SourceReaderCB::OnReadSample videoio(MSMF): OnReadSample() is called with error status: -1072875772
+[ WARN:2@89.259] global cap_msmf.cpp:488 `anonymous-namespace'::SourceReaderCB::OnReadSample videoio(MSMF): async ReadSample() call is failed with error status: -1072875772
+[ WARN:1@89.259] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:1@89.309] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:1@89.360] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+2026-09-18 20:56:19,562 WARNING mongdee.core.vision: [CAM-2] index=2 state=OPENED_BUT_READ_FAILED (tried 10 backend/format combinations, none produced a frame)
+2026-09-18 20:56:19,562 WARNING mongdee.core.vision: [CAM-2] Camera stream failed (device=2, attempt=1, next_retry=3s, reason=open_or_read_failed)
+[ WARN:3@89.604] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@89.607] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@89.610] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@89.614] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@89.616] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ERROR:3@89.849] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:3@90.081] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:3@90.335] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:3@90.571] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:3@90.850] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+2026-09-18 20:56:21,039 WARNING mongdee.core.vision: [discover:9] index=9 state=OPEN_FAILED (tried 10 backend/format combinations, none produced a frame)
+[ WARN:3@91.345] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@91.349] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@91.353] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@91.356] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@91.360] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ERROR:3@91.714] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:3@91.998] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:3@92.278] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:3@92.548] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:3@92.925] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+2026-09-18 20:56:23,114 WARNING mongdee.core.vision: [discover:10] index=10 state=OPEN_FAILED (tried 10 backend/format combinations, none produced a frame)
+[ WARN:1@102.916] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:1@102.955] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:4@109.638] global cap_msmf.cpp:477 `anonymous-namespace'::SourceReaderCB::OnReadSample videoio(MSMF): OnReadSample() is called with error status: -1072875772
+[ WARN:4@109.638] global cap_msmf.cpp:488 `anonymous-namespace'::SourceReaderCB::OnReadSample videoio(MSMF): async ReadSample() call is failed with error status: -1072875772
+[ WARN:1@109.638] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:1@109.688] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:1@109.738] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:5@115.961] global cap_msmf.cpp:477 `anonymous-namespace'::SourceReaderCB::OnReadSample videoio(MSMF): OnReadSample() is called with error status: -1072875772
+[ WARN:5@115.961] global cap_msmf.cpp:488 `anonymous-namespace'::SourceReaderCB::OnReadSample videoio(MSMF): async ReadSample() call is failed with error status: -1072875772
+[ WARN:1@115.961] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:1@116.012] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:1@116.062] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+2026-09-18 20:56:46,274 WARNING mongdee.core.vision: [CAM-2] index=2 state=OPENED_BUT_READ_FAILED (tried 4 backend/format combinations, none produced a frame)
+2026-09-18 20:56:46,274 WARNING mongdee.core.vision: [CAM-2] Camera stream failed (device=2, attempt=2, next_retry=6s, reason=open_or_read_failed)
+[ WARN:3@116.178] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@116.180] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@116.182] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@116.184] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@116.186] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ERROR:3@116.381] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:3@116.578] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:3@116.761] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:3@116.959] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:3@117.173] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+2026-09-18 20:56:47,363 WARNING mongdee.core.vision: [discover:15] index=15 state=OPEN_FAILED (tried 10 backend/format combinations, none produced a frame)
+[ WARN:1@125.739] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:1@125.773] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:6@132.643] global cap_msmf.cpp:477 `anonymous-namespace'::SourceReaderCB::OnReadSample videoio(MSMF): OnReadSample() is called with error status: -1072875772
+[ WARN:6@132.643] global cap_msmf.cpp:488 `anonymous-namespace'::SourceReaderCB::OnReadSample videoio(MSMF): async ReadSample() call is failed with error status: -1072875772
+[ WARN:1@132.643] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:1@132.694] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:1@132.744] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:7@138.828] global cap_msmf.cpp:477 `anonymous-namespace'::SourceReaderCB::OnReadSample videoio(MSMF): OnReadSample() is called with error status: -1072875772
+[ WARN:7@138.828] global cap_msmf.cpp:488 `anonymous-namespace'::SourceReaderCB::OnReadSample videoio(MSMF): async ReadSample() call is failed with error status: -1072875772
+[ WARN:1@138.828] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:1@138.879] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:1@138.929] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+2026-09-18 20:57:09,137 WARNING mongdee.core.vision: [CAM-2] index=2 state=OPENED_BUT_READ_FAILED (tried 4 backend/format combinations, none produced a frame)
+2026-09-18 20:57:09,138 WARNING mongdee.core.vision: [CAM-2] Camera stream failed (device=2, attempt=3, next_retry=12s, reason=open_or_read_failed)
+2026-09-18 20:57:16,986 WARNING mongdee.core.vision: [CAM-2] Camera stream failed (device=2, attempt=4, next_retry=24s, reason=open_or_read_failed)
+[ WARN:3@149.047] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@149.084] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@149.109] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@149.147] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@149.914] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:8@157.506] global cap_msmf.cpp:477 `anonymous-namespace'::SourceReaderCB::OnReadSample videoio(MSMF): OnReadSample() is called with error status: -1072875772
+[ WARN:8@157.506] global cap_msmf.cpp:488 `anonymous-namespace'::SourceReaderCB::OnReadSample videoio(MSMF): async ReadSample() call is failed with error status: -1072875772
+[ WARN:3@157.506] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:3@157.556] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:3@157.607] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:8@167.288] global cap_msmf.cpp:477 `anonymous-namespace'::SourceReaderCB::OnReadSample videoio(MSMF): OnReadSample() is called with error status: -2147024865
+[ WARN:8@167.288] global cap_msmf.cpp:488 `anonymous-namespace'::SourceReaderCB::OnReadSample videoio(MSMF): async ReadSample() call is failed with error status: -2147024865
+[ WARN:3@167.288] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -2147024865
+[ WARN:3@167.338] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -2147024865
+[ WARN:3@167.391] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -2147024865
+[ WARN:8@174.110] global cap_msmf.cpp:477 `anonymous-namespace'::SourceReaderCB::OnReadSample videoio(MSMF): OnReadSample() is called with error status: -1072875772
+[ WARN:8@174.110] global cap_msmf.cpp:488 `anonymous-namespace'::SourceReaderCB::OnReadSample videoio(MSMF): async ReadSample() call is failed with error status: -1072875772
+[ WARN:3@174.110] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:3@174.160] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:3@174.211] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:9@180.426] global cap_msmf.cpp:477 `anonymous-namespace'::SourceReaderCB::OnReadSample videoio(MSMF): OnReadSample() is called with error status: -1072875772
+[ WARN:9@180.426] global cap_msmf.cpp:488 `anonymous-namespace'::SourceReaderCB::OnReadSample videoio(MSMF): async ReadSample() call is failed with error status: -1072875772
+[ WARN:3@180.426] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:3@180.476] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:3@180.527] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:9@182.447] global cap_msmf.cpp:477 `anonymous-namespace'::SourceReaderCB::OnReadSample videoio(MSMF): OnReadSample() is called with error status: -1072875772
+[ WARN:9@182.447] global cap_msmf.cpp:488 `anonymous-namespace'::SourceReaderCB::OnReadSample videoio(MSMF): async ReadSample() call is failed with error status: -1072875772
+[ WARN:3@182.447] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:3@182.497] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:3@182.549] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+2026-09-18 20:57:52,769 WARNING mongdee.core.vision: [discover:2] index=2 state=OPENED_BUT_READ_FAILED (tried 10 backend/format combinations, none produced a frame)
+[ WARN:3@182.980] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@182.983] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@182.986] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@182.988] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@182.991] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ERROR:3@183.339] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:3@183.622] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:3@183.848] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:3@184.042] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:3@184.243] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+2026-09-18 20:57:54,432 WARNING mongdee.core.vision: [discover:4] index=4 state=OPEN_FAILED (tried 10 backend/format combinations, none produced a frame)
+[ WARN:1@194.194] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:1@194.232] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:10@201.884] global cap_msmf.cpp:477 `anonymous-namespace'::SourceReaderCB::OnReadSample videoio(MSMF): OnReadSample() is called with error status: -1072875772
+[ WARN:10@201.884] global cap_msmf.cpp:488 `anonymous-namespace'::SourceReaderCB::OnReadSample videoio(MSMF): async ReadSample() call is failed with error status: -1072875772
+[ WARN:1@201.884] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:1@201.935] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:1@201.986] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:10@208.714] global cap_msmf.cpp:477 `anonymous-namespace'::SourceReaderCB::OnReadSample videoio(MSMF): OnReadSample() is called with error status: -1072875772
+[ WARN:10@208.714] global cap_msmf.cpp:488 `anonymous-namespace'::SourceReaderCB::OnReadSample videoio(MSMF): async ReadSample() call is failed with error status: -1072875772
+[ WARN:1@208.714] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:1@208.764] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+[ WARN:1@208.815] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772
+2026-09-18 20:58:19,017 WARNING mongdee.core.vision: [CAM-2] index=2 state=OPENED_BUT_READ_FAILED (tried 4 backend/format combinations, none produced a frame)
+2026-09-18 20:58:19,017 WARNING mongdee.core.vision: [CAM-2] Camera stream failed (device=2, attempt=5, next_retry=30s, reason=open_or_read_failed)
+[ WARN:3@208.998] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@209.003] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@209.008] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@209.013] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@209.017] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ERROR:3@209.315] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:3@209.568] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:3@209.821] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:3@210.114] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:3@210.323] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+2026-09-18 20:58:20,512 WARNING mongdee.core.vision: [discover:9] index=9 state=OPEN_FAILED (tried 10 backend/format combinations, none produced a frame)
+[ WARN:3@210.500] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@210.830] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@210.832] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@210.833] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@210.835] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ERROR:3@211.042] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:3@211.247] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:3@211.455] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:3@211.652] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:3@211.846] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+2026-09-18 20:58:22,035 WARNING mongdee.core.vision: [discover:10] index=10 state=OPEN_FAILED (tried 10 backend/format combinations, none produced a frame)
+[ WARN:3@211.947] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@211.951] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@211.954] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@211.957] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ WARN:3@211.959] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[ERROR:3@212.174] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:3@212.375] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range
+[ERROR:3@212.704] global obsensor_uvc_stream_channel.cpp:163 cv::obsensor::getStreamChannelGroup Camera index out of range

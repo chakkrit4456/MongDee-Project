@@ -1,0 +1,24 @@
+{
+  "_comment": "Copy to configs/performance.json and pass --performance-config configs/performance.json to web_server.py/app.py to use it. Every field is optional -- omit a field to keep its built-in default (see core/performance.py:AdaptiveConfig). Rule #6/#37 (see MongDee_Multi_Webcam_Real_Time_Performance_Prompt.md): nothing here should need to be hard-coded in Python for a specific machine -- tune these instead.",
+
+  "enabled": true,
+  "tick_interval_sec": 2.0,
+
+  "_comment_thresholds": "A camera is treated as 'overloaded' this tick if EITHER of the first two below is true. drop_rate_high is accepted for backward compatibility but no longer feeds this decision -- a high drop rate means the camera/USB capture is unhealthy (failed reads, corrupted/noise frames), not that AI is running behind, and throttling AI inference rate/resolution never fixed that. Camera capture health is already handled separately (see core/vision.py's CameraWorker offline/reconnecting logic).",
+  "cpu_high_pct": 85.0,
+  "ai_latency_high_ms": 250.0,
+  "drop_rate_high": 0.05,
+
+  "_comment_levers": "Priority order when overloaded: 1) raise detect_every_n_frames up to the max below, 2) once maxed, step down ai_imgsz_levels. Display FPS is never auto-reduced (see AdaptiveController's docstring) -- only a 'degraded' status is raised once both levers are exhausted. A CPU-only box (no CUDA) already starts at detect_every_n_frames=8 / imgsz=320 (see core/vision.py's DETECT_EVERY_N_FRAMES_CPU) -- max_detect_every_n_frames=8 here just means the controller is allowed to go that far under load, not that every camera starts there. A GPU box starts lighter (2 / 640) and this ceiling rarely gets reached.",
+  "min_detect_every_n_frames": 1,
+  "max_detect_every_n_frames": 8,
+  "ai_imgsz_levels": [640, 480, 320],
+
+  "min_samples_before_acting": 5,
+
+  "_comment_ai_pause": "AI Pause: once every lever above is maxed out and system CPU still stays at/above cpu_pause_pct for pause_sustain_sec, AI (YOLO + custom recognition) pauses for every camera at once -- Camera Preview keeps running at full rate throughout, only detection/product-recognition output stops. Resumes automatically once CPU stays at/below cpu_resume_pct for resume_sustain_sec. Both sustain windows exist so one brief spike/dip can't flap it on/off.",
+  "cpu_pause_pct": 95.0,
+  "cpu_resume_pct": 70.0,
+  "pause_sustain_sec": 6.0,
+  "resume_sustain_sec": 6.0
+}

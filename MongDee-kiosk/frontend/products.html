@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <title>สินค้าทั้งหมด — MONGDEE MINI KIOSK</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <header class="topnav">
+    <a class="brand" href="/"><img class="brand-logo" src="/static/img/logo.png" alt="MongDee"> <span>MINI KIOSK</span></a>
+    <a href="/" class="page-close" aria-label="ปิดหน้าสินค้า กลับไปหน้าสแกน">
+      <span aria-hidden="true">×</span> ปิด
+    </a>
+  </header>
+
+  <main class="page">
+    <h1>สินค้าทั้งหมด</h1>
+    <p class="hint" id="showcaseStatus">กำลังโหลด…</p>
+    <div class="showcase-tools">
+      <input id="searchInput" type="search" class="search-input" placeholder="ค้นหาชื่อสินค้า หมวดหมู่ หรือแหล่งที่มา" aria-label="ค้นหาสินค้า" autocomplete="off" autofocus>
+      <div id="categoryChips" class="chips" role="group" aria-label="กรองตามหมวดหมู่"></div>
+    </div>
+    <div id="showcaseGrid" class="showcase-grid"></div>
+  </main>
+
+  <dialog id="productPopup" class="product-popup" aria-label="รายละเอียดสินค้า">
+    <div id="popupContent" class="popup-content"></div>
+  </dialog>
+
+  <script src="/static/js/ui-sound.js"></script>
+  <script src="/static/js/media-fallback.js"></script>
+  <script src="/static/js/spin-viewer.js"></script>
+  <script src="/static/js/price.js"></script>
+  <script src="/static/js/products.js"></script>
+</body>
+</html>

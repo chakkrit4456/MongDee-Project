@@ -1,0 +1,31 @@
+# FairFace Age/Gender/Race training configuration.
+# Any value here can be overridden by the matching train.py CLI flag
+# (e.g. --epochs 30 overrides epochs: 20 below); CLI flags win.
+
+dataset:
+  root: dataset          # never hard-coded elsewhere — always read from here (or --dataset)
+  image_size: 224
+  num_workers: 4
+
+training:
+  epochs: 20
+  batch_size: 32
+  lr: 0.0001
+  weight_decay: 0.0001
+  amp: auto               # auto = enabled when CUDA is available, else off
+  seed: 42
+
+loss_weights:
+  age_weight: 1.0
+  gender_weight: 1.0
+  race_weight: 1.0
+
+model:
+  architecture: resnet34   # resnet18 | resnet34
+  pretrained: true         # ImageNet backbone initialization (never a pretrained FairFace model)
+
+device: auto               # auto | cuda | cpu
+
+output:
+  model_dir: models/fairface
+  log_dir: logs

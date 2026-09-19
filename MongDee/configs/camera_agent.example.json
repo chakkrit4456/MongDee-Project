@@ -1,0 +1,27 @@
+{
+  "server_url": "http://192.168.1.10:8100",
+  "api_key": "${MONGDEE_AGENT_API_KEY}",
+  "register_retry_sec": 5,
+  "retry_backoff_multiplier": 2,
+  "retry_backoff_max_sec": 30,
+  "push_timeout_sec": 5,
+  "jpeg_quality": 80,
+  "cameras": [
+    {
+      "id": "REMOTE-CAM01",
+      "name": "Entrance webcam",
+      "protocol": "usb",
+      "location": "entrance",
+      "device_index": 0,
+      "processing_fps": 10
+    },
+    {
+      "id": "REMOTE-CAM02",
+      "name": "Booth A (IP camera, RTSP)",
+      "protocol": "rtsp",
+      "location": "booth_a",
+      "url": "rtsp://admin:secret@192.168.1.64:554/Streaming/Channels/101",
+      "processing_fps": 8
+    }
+  ]
+}

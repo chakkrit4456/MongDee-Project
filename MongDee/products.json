@@ -1,0 +1,31 @@
+{
+  "_comment": "แคตตาล็อกสินค้า — เริ่มต้นว่างเปล่า เพิ่มสินค้าจริงผ่าน AI Trainer (หน้า /trainer) โดยกรอกรายละเอียดสินค้าและอัปโหลดรูป/วิดีโอ หรือบันทึกจากกล้องโดยตรง ดูรายละเอียดที่ README.md หัวข้อ 'การเทรน AI ให้รู้จักสินค้าจริง'",
+  "product-4b11ff33": {
+    "name": "กระป๋องแป้ง",
+    "tagline": "",
+    "price": "45",
+    "description": "TEST",
+    "faq": []
+  },
+  "product-227cc848": {
+    "name": "แก้วน้ำ",
+    "tagline": "",
+    "price": "",
+    "description": "",
+    "faq": []
+  },
+  "product-89c7f998": {
+    "name": "โทรศ",
+    "tagline": "โทร",
+    "price": "1",
+    "description": "",
+    "faq": []
+  },
+  "product-15bda15f": {
+    "name": "เมาส์",
+    "tagline": "",
+    "price": "",
+    "description": "",
+    "faq": []
+  }
+}

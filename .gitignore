@@ -1,0 +1,7 @@
+# OS/editor junk (subproject-specific ignores live in MongDee/.gitignore
+# and MongDee-kiosk/.gitignore)
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/*
+!.vscode/extensions.json

@@ -1,0 +1,1003 @@
+/* Bundled locally (static/fonts, SIL OFL) — the kiosk runs offline, so no CDN. */
+@font-face { font-family: "Prompt"; src: url("/static/fonts/Prompt-Regular.ttf") format("truetype"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Prompt"; src: url("/static/fonts/Prompt-SemiBold.ttf") format("truetype"); font-weight: 500 600; font-style: normal; font-display: swap; }
+@font-face { font-family: "Prompt"; src: url("/static/fonts/Prompt-Bold.ttf") format("truetype"); font-weight: 700 900; font-style: normal; font-display: swap; }
+
+:root {
+  /* White surfaces, near-black text, blue accent (buttons, prices, wordmark). */
+  color-scheme: light;
+  --bg: #f2f5fa;
+  --surface: #ffffff;
+  --surface-2: #e9eff8;
+  --border: #d3dce9;
+  --text: #0b1220;
+  --text-dim: #536076;
+  --text-inverse: #ffffff;
+  --accent: #0a63ff;
+  --accent-2: #3d95ff;
+  --accent-soft: rgba(10, 99, 255, 0.1);
+  --price: #d92d20;
+  --danger: #d92d20;
+  --radius: 16px;
+  --font-title: "Prompt", "Leelawadee UI", "Tahoma", sans-serif;
+  --shadow: 0 1px 2px rgba(11, 18, 32, 0.06), 0 8px 24px rgba(11, 18, 32, 0.08);
+  font-family: var(--font-title);
+  line-height: 1.6;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  height: 100%;
+}
+
+body {
+  min-height: 100vh;
+}
+
+a { color: var(--accent); }
+
+button {
+  font-family: inherit;
+  font-size: 0.95rem;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 0.65rem 1.35rem;
+  background: var(--accent);
+  color: var(--text-inverse);
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.1s ease, opacity 0.15s ease, background 0.15s ease;
+}
+button:hover { opacity: 0.92; }
+button:active { transform: scale(0.98); }
+button.secondary {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--border);
+  font-weight: 600;
+}
+button.secondary:hover { background: var(--surface-2); opacity: 1; }
+button.danger { background: transparent; color: var(--danger); border-color: rgba(217, 45, 32, 0.35); font-weight: 600; }
+button.danger:hover { background: rgba(217, 45, 32, 0.08); opacity: 1; }
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+button:focus-visible, a:focus-visible, select:focus-visible {
+  outline: 3px solid var(--accent-2);
+  outline-offset: 2px;
+}
+
+input, textarea, select {
+  font-family: inherit;
+  font-size: 0.95rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 0.6rem 0.8rem;
+  width: 100%;
+}
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+textarea { resize: vertical; }
+label { font-size: 0.85rem; color: var(--text-dim); display: block; margin-bottom: 0.35rem; }
+.field { margin-bottom: 1.1rem; }
+.field-row { display: flex; gap: 1rem; }
+.field-row .field { flex: 1; }
+
+.topnav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  padding: 1rem 1.75rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.topnav .brand {
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  color: var(--text);
+}
+.topnav .brand { display: inline-flex; align-items: center; gap: 0.55rem; }
+.topnav .brand span { color: var(--accent); }
+.brand-logo { height: 2.4rem; width: auto; display: block; }
+.topnav nav { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.topnav nav a {
+  text-decoration: none;
+  color: var(--text-dim);
+  font-weight: 600;
+  font-size: 0.92rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+}
+.topnav nav a:hover { color: var(--text); background: var(--surface-2); }
+.topnav nav a.active { color: var(--text-inverse); background: var(--accent); }
+
+.page { max-width: 1040px; margin: 0 auto; padding: 2rem 1.5rem 3rem; }
+.page > h1 { font-size: 1.6rem; margin: 0 0 0.4rem; }
+.page > h1 + .hint { margin-top: 0; margin-bottom: 1.75rem; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+}
+.card > h2:first-child,
+.card > h3:first-child,
+.card > form > h2:first-child { margin-top: 0; }
+.card h2, .card h3 { font-size: 1.05rem; font-weight: 700; }
+
+.pill {
+  display: inline-block;
+  padding: 0.2rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: var(--surface-2);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+}
+.pill.ok { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+.pill.warn { background: rgba(217, 45, 32, 0.1); color: var(--danger); border-color: transparent; }
+
+/* -------- Kiosk display -------- */
+.kiosk {
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+.kiosk .cam-pane {
+  position: relative;
+  display: flex;
+  background: #000;
+  overflow: hidden;
+}
+.kiosk .cam-stage {
+  position: relative;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #000;
+}
+.kiosk .cam-guide { display: none; }
+/* guide-pane holds cam-guide (the step list) stacked above info-pane, so on
+   wide screens where cam-guide is hidden, info-pane alone fills the column
+   exactly as before; in portrait both are visible and read as one panel. */
+.kiosk .guide-pane {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+/* cam-frame is pinned to a 9:16 portrait box (sized in px by fitCamFrame in
+   kiosk.js, since no CSS-only rule reliably fits a fixed-ratio box on both
+   axes inside a flexible pane) so the customer-facing camera display always
+   reads as a consistent portrait frame regardless of the raw feed's shape —
+   rotate the physical camera via the "ปรับตั้งค่า" page to match it. */
+.kiosk .cam-frame {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #000;
+}
+/* cam-crop always fills cam-frame exactly (not sized from its own content —
+   both children are position:absolute, so relying on aspect-ratio alone
+   here would let it collapse to 0x0). The img's size/position are set from
+   JS (see applyCameraCrop in kiosk.js) to scale the calibrated ROI to
+   uniformly cover this box, so only that region of the raw feed is ever
+   visible to the customer — the rest of the booth (walls, floor, other
+   equipment) stays hidden behind the crop. */
+/* Fills the letterboxed edges around the (possibly short) sharp frame with a
+   blurred, darkened copy of the same live feed instead of flat black — the
+   status badge then always overlays something readable, not a bare void. */
+.kiosk .cam-blur-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(30px) brightness(0.55);
+  transform: scale(1.1);
+  pointer-events: none;
+}
+.kiosk .cam-crop { position: relative; width: 100%; height: 100%; overflow: hidden; }
+.kiosk .cam-crop img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+.kiosk .cam-crop .detect-box { left: 0; top: 0; width: 100%; height: 100%; }
+.kiosk .status-badge {
+  position: absolute;
+  top: 1.25rem;
+  left: 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  background: rgba(8, 14, 24, 0.6);
+  backdrop-filter: blur(6px);
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.01em;
+  color: #fff;
+}
+.kiosk .status-badge::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.kiosk .cam-hint {
+  position: absolute;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  background: rgba(8, 14, 24, 0.6);
+  backdrop-filter: blur(6px);
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.85);
+  white-space: nowrap;
+}
+.kiosk .info-pane {
+  padding: 3rem;
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  overflow-y: auto;
+}
+.kiosk .info-pane > * { max-width: 34rem; }
+.kiosk .info-pane.is-matched { justify-content: center; }
+.kiosk .info-pane.is-matched > * { width: 100%; }
+.kiosk .idle-msg {
+  text-align: center;
+  color: var(--text-dim);
+  margin: auto 0;
+}
+.kiosk .idle-msg .idle-logo { display: block; width: min(22rem, 80%); height: auto; margin: 0 auto 1.5rem; }
+.kiosk .idle-msg .big { font-size: 1.8rem; font-weight: 800; color: var(--text); margin-bottom: 0.5rem; }
+.kiosk .idle-msg .video-cta { margin: 1.75rem 0 0; }
+.idle-steps {
+  list-style: none;
+  display: flex;
+  gap: 1.25rem;
+  justify-content: center;
+  margin: 2rem 0 0;
+  padding: 0;
+  counter-reset: step;
+}
+.idle-steps li {
+  counter-increment: step;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  max-width: 10.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.idle-steps li::before {
+  content: counter(step);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-weight: 800;
+  animation: idle-pulse 3.6s ease-in-out infinite;
+}
+.idle-steps li:nth-child(2)::before { animation-delay: 1.2s; }
+.idle-steps li:nth-child(3)::before { animation-delay: 2.4s; }
+@keyframes idle-pulse {
+  0%, 60%, 100% { background: transparent; color: var(--accent); }
+  20% { background: var(--accent); color: var(--text-inverse); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .idle-steps li::before { animation: none; }
+}
+.kiosk .product-name { font-family: var(--font-title); font-size: 1.6rem; font-weight: 600; margin: 0 0 0.5rem; line-height: 1.4; overflow-wrap: anywhere; text-align: center; }
+.kiosk .price-tag {
+  font-size: 1.9rem;
+  font-weight: 800;
+  padding: 0 0 0.25rem;
+  margin-bottom: 1.25rem;
+}
+.kiosk .product-thumb {
+  width: 100%;
+  height: 260px;
+  max-height: 260px;
+  object-fit: contain;
+  background: var(--surface-2);
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
+}
+.kiosk .meta-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; align-items: center; justify-content: center; }
+.kiosk .video-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: fit-content;
+  margin-bottom: 1.5rem;
+  padding: 0.7rem 1.4rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--text-inverse);
+  font-weight: 700;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: opacity 0.12s ease;
+}
+.kiosk .video-cta:hover { opacity: 0.9; }
+.kiosk .video-cta-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: var(--text-inverse);
+  color: var(--accent);
+  font-size: 0.75rem;
+}
+.kiosk .story { font-size: 1.05rem; line-height: 1.75; color: var(--text); white-space: pre-wrap; }
+.kiosk .field-label {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin-top: 1.1rem;
+  margin-bottom: 0.15rem;
+}
+.kiosk .candidates { margin-top: 1.5rem; }
+.kiosk .candidates .options { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.75rem; }
+
+/* Side-pane "matched" summary — full detail + video live in the popup. */
+.kiosk .info-pane .match-detail-btn { align-self: center; margin-top: 0.75rem; min-height: 3.5rem; font-size: 1.15rem; border-radius: 14px; }
+.kiosk .price-tag { text-align: center; }
+
+/* Portrait kiosk: camera (9:16) on the left, how-to steps on the right. */
+.guide-title { font-size: 1rem; font-weight: 700; color: var(--text-dim); letter-spacing: 0.04em; }
+.guide-steps { list-style: none; margin: 0; padding: 0; counter-reset: guide; display: flex; flex-direction: column; gap: 1rem; }
+.guide-step {
+  counter-increment: guide;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--text-dim);
+}
+.guide-step::before {
+  content: counter(guide);
+  flex: 0 0 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  font-weight: 800;
+  color: var(--text-dim);
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.guide-step.active { color: var(--text); }
+.guide-step.active::before { background: var(--accent); border-color: var(--accent); color: var(--text-inverse); }
+.guide-step.done { color: var(--text-dim); }
+.guide-step.done::before { content: "\2713"; background: var(--accent-soft); border-color: transparent; color: var(--accent); }
+.guide-hint {
+  margin-top: 0.25rem;
+  padding: 0.6rem 1rem;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+/* -------- Customer product showcase (/products) -------- */
+.page-close {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 1rem 0.45rem 0.85rem;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+.page-close span { font-size: 1.2rem; line-height: 1; }
+.page-close:hover { border-color: var(--accent); }
+
+/* Search + category filter above the product grid (stays visible while scrolling). */
+.showcase-tools {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  margin: 0 -1.5rem 1.25rem;
+  padding: 0.75rem 1.5rem 0.9rem;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+.search-input {
+  height: 3.25rem;
+  padding: 0 1.1rem 0 3rem;
+  border-radius: 14px;
+  font-size: 1.1rem;
+  background: #fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='%23536076' stroke-width='2' stroke-linecap='round'><circle cx='11' cy='11' r='7'/><path d='M20 20l-3.5-3.5'/></svg>") no-repeat 1rem center;
+}
+.search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+.chip:hover { border-color: var(--accent-2); opacity: 1; }
+.chip .chip-count { color: var(--text-dim); font-weight: 400; }
+.chip.active { background: var(--accent); border-color: var(--accent); color: var(--text-inverse); }
+.chip.active .chip-count { color: rgba(255, 255, 255, 0.85); }
+.showcase-empty { grid-column: 1 / -1; text-align: center; padding: 3.5rem 1rem; }
+.showcase-empty-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.25rem; }
+.showcase-empty button { margin-top: 1rem; }
+
+.showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.25rem;
+}
+.showcase-card {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  color: var(--text);
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.12s ease;
+}
+.showcase-card:hover { transform: translateY(-2px); border-color: var(--accent); opacity: 1; }
+.showcase-media { position: relative; aspect-ratio: 4 / 3; background: var(--surface-2); }
+.showcase-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.showcase-media-empty {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-dim); font-size: 0.85rem;
+}
+.showcase-badge {
+  position: absolute; left: 0.6rem; bottom: 0.6rem;
+  padding: 0.2rem 0.6rem; border-radius: 999px;
+  background: rgba(8, 14, 24, 0.7); color: #fff;
+  font-size: 0.72rem; font-weight: 700;
+}
+.showcase-body { padding: 0.9rem 1rem 1.1rem; }
+.showcase-name { font-family: var(--font-title); font-weight: 600; font-size: 1rem; line-height: 1.45; overflow-wrap: anywhere; }
+.showcase-meta { color: var(--text-dim); font-size: 0.85rem; margin-top: 0.25rem; min-height: 1.1em; }
+
+/* -------- Product detail popup (portrait sheet, e-commerce style) -------- */
+.product-popup {
+  border: none;
+  padding: 0;
+  width: min(860px, 96vw);
+  max-height: 94vh;
+  border-radius: 28px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 24px 70px rgba(4, 10, 24, 0.45);
+  overflow: hidden;
+}
+.product-popup::backdrop { background: rgba(8, 16, 34, 0.62); backdrop-filter: blur(4px); }
+.popup-content { display: flex; flex-direction: column; max-height: 94vh; }
+.popup-head { flex-shrink: 0; padding: 1.6rem 2rem 0.4rem; }
+.popup-head .pill.brand { margin-bottom: 0.5rem; }
+.popup-media {
+  position: relative;
+  flex-shrink: 0;
+  margin: 0.75rem 1rem 0;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: #fff;
+  overflow: hidden;
+}
+.popup-media img, .popup-media video { display: block; width: 100%; height: 38vh; max-height: 38vh; object-fit: contain; }
+.popup-media iframe { display: block; width: 100%; aspect-ratio: 16 / 9; max-height: 38vh; border: 0; }
+.spin-viewer {
+  position: relative;
+  cursor: grab;
+  touch-action: pan-y pinch-zoom;
+}
+.spin-viewer.dragging { cursor: grabbing; }
+.spin-viewer img {
+  -webkit-user-drag: none;
+  user-select: none;
+  pointer-events: none;
+}
+.spin-hint {
+  position: absolute;
+  top: 0.9rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(11, 18, 32, 0.7);
+  font-size: 0.8rem;
+  color: #fff;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+.spin-hint.hidden { opacity: 0; }
+.popup-thumbs {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem 0.25rem;
+}
+.gallery-thumb {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 4.5rem;
+  aspect-ratio: 1;
+  padding: 0;
+  border-radius: 12px;
+  border: 2px solid var(--border);
+  background: #fff;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.gallery-thumb:hover { border-color: var(--accent-2); opacity: 1; }
+.gallery-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gallery-thumb.is-spin { color: var(--accent); font-size: 1.05rem; }
+.gallery-thumb.active { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+.popup-body { flex: 1; min-height: 0; padding: 1rem 2rem 1rem; overflow-y: auto; }
+.popup-body .meta-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+.pill.brand { background: var(--accent-soft); color: var(--accent); border-color: transparent; font-size: 0.9rem; padding: 0.25rem 0.9rem; }
+.popup-title { font-family: var(--font-title); font-size: 1.5rem; font-weight: 600; margin: 0; line-height: 1.45; overflow-wrap: anywhere; }
+.popup-price {
+  font-size: 2.6rem;
+  font-weight: 800;
+  line-height: 1.2;
+  padding-bottom: 1.1rem;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.spec-row {
+  display: grid;
+  grid-template-columns: 9.5rem 1fr;
+  gap: 1rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 1.05rem;
+}
+.spec-label { color: var(--text-dim); font-weight: 600; }
+.spec-value { color: var(--text); word-break: break-word; }
+.popup-section-title { margin: 1.4rem 0 0.4rem; font-size: 1.1rem; font-weight: 800; }
+.popup-body .story { white-space: pre-wrap; line-height: 1.75; font-size: 1.05rem; }
+.popup-actions { margin: 1rem 0 0.5rem; display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.popup-actions + .spec-row { border-top: 1px solid var(--border); }
+.popup-body .video-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 2.75rem;
+  padding: 0.4rem 1.25rem;
+  border-radius: 12px;
+  border: 1.5px solid var(--accent);
+  background: var(--accent);
+  color: var(--text-inverse);
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.2;
+  text-decoration: none;
+}
+.popup-body .video-cta.outline { background: var(--surface); color: var(--accent); }
+.popup-body .video-cta:hover { opacity: 0.9; }
+.popup-body .video-cta-icon { font-size: 0.9rem; line-height: 1; }
+.popup-footer {
+  flex-shrink: 0;
+  padding: 0.9rem 2rem 1.5rem;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+.popup-done {
+  width: 100%;
+  min-height: 3.75rem;
+  border-radius: 14px;
+  background: var(--text);
+  color: var(--text-inverse);
+  font-size: 1.15rem;
+}
+
+/* Discreet staff-only entry point on the public kiosk display — deliberately
+   quiet (small, muted, corner-anchored) so it doesn't compete with the
+   product being shown, but reachable without knowing the admin URLs. */
+.admin-menu-wrap {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 50;
+}
+.admin-menu-btn {
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  font-size: 1.1rem;
+  font-weight: 400;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+.admin-menu-btn:hover { color: var(--text); opacity: 1; }
+.admin-menu {
+  display: none;
+  flex-direction: column;
+  gap: 0.15rem;
+  position: absolute;
+  bottom: calc(100% + 0.5rem);
+  right: 0;
+  min-width: 150px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  padding: 0.4rem;
+}
+.admin-menu.open { display: flex; }
+.admin-menu a {
+  padding: 0.55rem 0.7rem;
+  border-radius: 8px;
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.admin-menu a:hover, .admin-menu .menu-toggle:hover { background: var(--surface-2); opacity: 1; }
+.admin-menu .menu-toggle {
+  padding: 0.55rem 0.7rem;
+  border: none;
+  border-top: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-dim);
+  text-align: left;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.mute-btn {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 50;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+.mute-btn:hover { color: var(--text); opacity: 1; }
+/* Sound on = filled brand green, same "active" language as the video CTA
+   pill — muted (the default) stays a quiet neutral circle. Stays in sync
+   with the video's own native volume control either direction. */
+.mute-btn.unmuted {
+  background: var(--accent);
+  color: var(--text-inverse);
+  border-color: var(--accent);
+}
+.mute-btn.unmuted:hover { opacity: 0.9; }
+
+/* Price: "ราคา 1,290 บาท" — number in red, label/unit set apart from it. */
+.price-line { display: inline-flex; align-items: baseline; gap: 0.4em; }
+.price-num { color: var(--price); font-weight: 700; }
+.popup-price .price-num, .kiosk .price-tag .price-num { font-weight: 800; }
+.popup-price .price-label, .popup-price .price-unit,
+.kiosk .price-tag .price-label, .kiosk .price-tag .price-unit {
+  color: var(--text-dim);
+  font-size: 0.42em;
+  font-weight: 600;
+}
+
+img.img-missing { object-fit: contain !important; background: var(--surface-2); }
+.media-missing {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+  background: var(--surface-2);
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+
+.spinner {
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  border: 4px solid var(--border);
+  border-top-color: var(--accent);
+  animation: spin 0.9s linear infinite;
+  margin: 0 auto 1rem;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* -------- Enrollment -------- */
+.enroll-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start; }
+.enroll-grid .cam-box, .cam-box { position: relative; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); background: #000; aspect-ratio: 16/9; }
+.enroll-grid .cam-box img, .cam-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.detect-box {
+  position: absolute;
+  border: 3px solid #8a97a8;
+  border-radius: 6px;
+  pointer-events: none;
+  transition: border-color 0.15s ease;
+  display: none;
+}
+.detect-box.status-none, .detect-box.status-blurry, .detect-box.status-ok { display: block; }
+.detect-box.status-none { border-color: #ff5a5a; }
+.detect-box.status-blurry { border-color: #ffcf4d; }
+.detect-box.status-ok { border-color: #4ade9c; }
+.detect-label {
+  position: absolute;
+  top: -1.9rem;
+  left: -3px;
+  padding: 0.2rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+  color: #08131f;
+}
+.detect-box.status-none .detect-label { background: #ff5a5a; color: #fff; }
+.detect-box.status-blurry .detect-label { background: #ffcf4d; }
+.detect-box.status-ok .detect-label { background: #4ade9c; }
+
+/* -------- Calibration -------- */
+.roi-box {
+  position: absolute;
+  border: 2px solid var(--accent);
+  background: rgba(10, 99, 255, 0.12);
+  box-shadow: 0 0 0 2000px rgba(0,0,0,0.35);
+  cursor: move;
+  touch-action: none;
+}
+.roi-handle {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  margin: -9px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid #fff;
+  touch-action: none;
+}
+.roi-handle[data-corner="nw"] { left: 0; top: 0; cursor: nwse-resize; }
+.roi-handle[data-corner="ne"] { left: 100%; top: 0; cursor: nesw-resize; }
+.roi-handle[data-corner="sw"] { left: 0; top: 100%; cursor: nesw-resize; }
+.roi-handle[data-corner="se"] { left: 100%; top: 100%; cursor: nwse-resize; }
+/* previewFrame mirrors cam-frame in style.css's kiosk section: a fixed 9:16
+   box whose inner crop always fully contains the calibrated ROI (letterboxed
+   if needed) — see fitRoiContain in detect-box.js — so admins preview
+   exactly what the customer-facing display will show. */
+.preview-frame {
+  position: relative;
+  width: min(220px, 100%);
+  aspect-ratio: 9 / 16;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: #000;
+}
+.preview-crop { position: absolute; inset: 0; overflow: hidden; }
+.preview-crop img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+.calib-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start; }
+.calib-readout { display: flex; align-items: baseline; gap: 0.75rem; margin: 1rem 0; }
+.calib-readout .ratio-num { font-size: 2.4rem; font-weight: 800; }
+.calib-readout .ratio-num.hot { color: var(--accent-2); }
+.gauge { position: relative; height: 22px; background: var(--surface-2); border-radius: 6px; margin: 1rem 0 1.5rem; overflow: hidden; }
+.gauge .fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--accent); border-radius: 6px; transition: width 0.15s ease; }
+.gauge .mark { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--text); opacity: 0.7; }
+.slider-row { margin-bottom: 1rem; }
+.slider-row .row-head { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-dim); margin-bottom: 0.25rem; }
+.slider-row input[type="range"] { width: 100%; }
+
+/* -------- Product management -------- */
+.product-list { display: flex; flex-direction: column; gap: 1rem; }
+.product-card .row { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; }
+.product-card .thumb {
+  width: 84px; height: 84px; border-radius: 10px; object-fit: cover;
+  border: 1px solid var(--border); background: var(--surface-2); flex-shrink: 0;
+}
+.product-card .thumb.placeholder {
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-dim); font-size: 0.7rem; text-align: center; padding: 0.25rem;
+}
+.product-card .info { flex: 1 1 14rem; min-width: 0; }
+.product-card .info .name { font-weight: 700; font-size: 1.1rem; overflow-wrap: anywhere; }
+.product-card .info .meta { color: var(--text-dim); font-size: 0.85rem; margin-top: 0.2rem; overflow-wrap: anywhere; }
+.product-card .actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.5rem; }
+.product-card .edit-form { margin-top: 1rem; border-top: 1px solid var(--border); padding-top: 1rem; }
+.thumb-preview { width: 100%; border-radius: var(--radius); margin-bottom: 1rem; border: 1px solid var(--border); }
+.hint { color: var(--text-dim); font-size: 0.9rem; margin-top: 0.5rem; }
+
+.frame-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.frame-tile {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 3px solid transparent;
+  cursor: pointer;
+  aspect-ratio: 1;
+  opacity: 0.55;
+  transition: opacity 0.1s ease, border-color 0.1s ease;
+}
+.frame-tile.selected { border-color: var(--accent-2); opacity: 1; }
+.frame-tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.frame-tile .check {
+  position: absolute; top: 4px; right: 4px;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--accent-2); color: #fff;
+  display: none; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 0.8rem;
+}
+.frame-tile.selected .check { display: flex; }
+/* Photo manager on the manage page. */
+.gallery-manager { margin-top: 1rem; border-top: 1px solid var(--border); padding-top: 1rem; }
+.gallery-manager-title { font-weight: 700; margin-bottom: 0.25rem; }
+.gallery-manager-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr)); gap: 0.75rem; margin: 0.75rem 0 1rem; }
+.gallery-manager-tile { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--surface); }
+.gallery-manager-tile img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; }
+.gallery-manager-controls { display: flex; gap: 0.3rem; padding: 0.4rem; justify-content: space-between; }
+.gallery-manager-controls button { padding: 0.25rem 0.55rem; font-size: 0.8rem; }
+
+/* PIN prompt (admin-pin.js) */
+.pin-dialog {
+  border: none;
+  border-radius: 20px;
+  padding: 1.5rem 1.75rem;
+  width: min(26rem, 92vw);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 24px 70px rgba(4, 10, 24, 0.45);
+}
+.pin-dialog::backdrop { background: rgba(8, 16, 34, 0.62); backdrop-filter: blur(4px); }
+.pin-dialog h3 { margin: 0 0 0.5rem; font-size: 1.25rem; }
+.pin-dialog .pin-message { margin: 0 0 1rem; color: var(--text-dim); white-space: pre-wrap; }
+.pin-dialog input { letter-spacing: 0.3em; font-size: 1.2rem; }
+.pin-dialog .pin-error { min-height: 1.4rem; margin-bottom: 0.75rem; color: var(--danger); font-weight: 600; }
+button.danger-solid { background: var(--danger); color: #fff; }
+
+button.small { padding: 0.45rem 0.95rem; font-size: 0.88rem; }
+.button-row { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; }
+.button-row h2, .button-row h3 { margin: 0; margin-right: auto; }
+.button-row a { align-self: center; }
+.toast { margin-top: 1rem; padding: 0.75rem 1rem; border-radius: 8px; }
+.toast:empty { display: none; }
+.toast.ok { background: var(--accent-soft); color: var(--accent); }
+.toast.error { background: rgba(217, 45, 32, 0.1); color: var(--danger); }
+
+/* -------- Dashboard -------- */
+.stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+.stat-card .num { font-size: 2.2rem; font-weight: 800; }
+.stat-card .label { color: var(--text-dim); font-size: 0.9rem; }
+.stat-card .sub { color: var(--text-dim); font-size: 0.78rem; margin-top: 0.15rem; opacity: 0.85; }
+.stat-card .name-num { font-size: 1.4rem; line-height: 1.5; overflow-wrap: anywhere; }
+.dash-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 1.25rem; }
+.range-tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.dash-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.link-button { background: none; border: none; padding: 0; margin: 0; color: var(--accent); font-weight: 700; text-decoration: underline; cursor: pointer; }
+.bar-chart { display: flex; flex-direction: column; gap: 0.6rem; }
+.bar-row { display: grid; grid-template-columns: 140px 1fr 48px; align-items: center; gap: 0.75rem; }
+.bar-row .name { font-size: 0.9rem; color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bar-track { background: var(--surface-2); border-radius: 6px; height: 14px; overflow: hidden; }
+.bar-fill { height: 100%; background: var(--accent); border-radius: 6px; }
+.bar-row .count { font-size: 0.85rem; color: var(--text-dim); text-align: right; }
+.hourly-chart { display: flex; align-items: flex-end; gap: 4px; height: 190px; padding-top: 1.4rem; }
+.hourly-bar { position: relative; flex: 1; background: var(--accent-2); border-radius: 3px 3px 0 0; min-height: 2px; }
+.hourly-bar.peak { background: var(--accent); }
+.hourly-bar .bar-value { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); padding-bottom: 2px; font-size: 0.72rem; font-weight: 600; color: var(--text-dim); white-space: nowrap; }
+.hourly-chart > .hint { align-self: center; margin: 0 auto; }
+.hourly-labels { display: flex; gap: 4px; margin-top: 0.4rem; }
+.hourly-labels span { flex: 1; text-align: center; font-size: 0.65rem; color: var(--text-dim); }
+
+@media (max-width: 900px), (orientation: portrait) {
+  /* Camera on top at 70% height, full width (fitCamFrame still keeps its
+     true 9:16 shape and letterboxes with the blurred backdrop either side).
+     The guide panel takes the bottom 30%, full width: the step list sits in
+     a narrow left rail and the idle/product content fills the rest, side by
+     side, since that band is too short to stack them and still fit. */
+  .kiosk { grid-template-columns: 1fr; grid-template-rows: 70vh 30vh; }
+  .kiosk .guide-pane {
+    flex-direction: row;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+  }
+  .kiosk .cam-guide {
+    display: flex;
+    flex: 0 0 14rem;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 1rem 1.25rem;
+    border-right: 1px solid var(--border);
+  }
+  .kiosk .guide-title { font-size: 0.8rem; }
+  .kiosk .guide-steps { gap: 0.5rem; }
+  .kiosk .guide-step { font-size: 0.9rem; gap: 0.6rem; }
+  .kiosk .guide-step::before { flex-basis: 1.8rem; width: 1.8rem; height: 1.8rem; font-size: 0.8rem; }
+  .kiosk .guide-hint { font-size: 0.75rem; padding: 0.35rem 0.55rem; }
+  .kiosk .info-pane { padding: 1rem 1.5rem; justify-content: center; font-size: 0.85rem; }
+  .kiosk .idle-msg .idle-logo { width: min(7rem, 45%); margin-bottom: 0.5rem; }
+  .kiosk .idle-msg .big { font-size: 1.05rem; margin-bottom: 0.25rem; }
+  .kiosk .idle-msg .video-cta { margin-top: 0.6rem; padding: 0.5rem 1.1rem; font-size: 0.9rem; }
+  .kiosk .product-thumb { height: 110px; margin-bottom: 0.5rem; }
+  .kiosk .product-name { font-size: 1.1rem; margin-bottom: 0.25rem; }
+  .kiosk .price-tag { font-size: 1.2rem; margin-bottom: 0.5rem; }
+  .kiosk .meta-row { margin-bottom: 0.5rem; }
+  .kiosk .info-pane .match-detail-btn { min-height: 2.4rem; font-size: 0.9rem; }
+  .kiosk .cam-hint, .kiosk .idle-steps { display: none !important; }
+}
+@media (max-width: 720px) {
+  .enroll-grid { grid-template-columns: 1fr; }
+  .calib-grid { grid-template-columns: 1fr; }
+  .stat-row { grid-template-columns: 1fr; }
+  .bar-row { grid-template-columns: 96px 1fr 36px; }
+}

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MongDee — Control Center</title>
+<meta name="description" content="ศูนย์กลางเข้าถึงแดชบอร์ดของ MongDee และ MongDee Mini Kiosk">
+<link rel="icon" href="assets/logo.jpg">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <img class="logo" src="assets/logo.jpg" alt="MongDee">
+      <div class="brand-text">
+        <span class="brand-name">MongDee</span>
+        <span class="brand-tag">Control Center</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="hero">
+      <h1>เลือกแดชบอร์ดที่ต้องการเปิด</h1>
+      <p class="hero-sub">
+        เครื่อง AI หลักยังรันอยู่ที่เครื่องเดิมเสมอ — หน้านี้เป็นเพียงทางเข้า
+        ไปยังแดชบอร์ดของแต่ละโปรเจค ดูได้จากที่ไหนก็ได้แบบเรียลไทม์
+        เมื่อตั้งค่าลิงก์สาธารณะไว้แล้ว
+      </p>
+    </section>
+
+    <section class="cards">
+
+      <article class="card" data-project="mongdee">
+        <div class="card-head">
+          <div class="card-icon mongdee-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 7l8-4 8 4v10l-8 4-8-4V7z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M4 7l8 4 8-4M12 11v10" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+          </div>
+          <div>
+            <h2>MongDee</h2>
+            <p class="card-desc">AI Booth OS — วิเคราะห์พฤติกรรมลูกค้าหลายกล้องแบบเรียลไทม์</p>
+          </div>
+          <span class="status" data-status-for="mongdee">
+            <i class="dot" aria-hidden="true"></i><span class="status-label">ยังไม่ตรวจสอบ</span>
+          </span>
+        </div>
+
+        <div class="card-body">
+          <label class="url-row">
+            <span>ลิงก์แดชบอร์ด</span>
+            <input type="url" inputmode="url" data-url-input="mongdee"
+                   placeholder="เช่น https://your-app.vercel.app/dashboard">
+          </label>
+          <div class="card-actions">
+            <button type="button" class="btn-primary" data-open="mongdee">เปิดแดชบอร์ด</button>
+            <button type="button" class="btn-ghost" data-save="mongdee">บันทึกลิงก์</button>
+          </div>
+          <p class="hint">
+            เปิดให้เข้าถึงจากอินเทอร์เน็ตได้โดย deploy หน้าเว็บไปที่ Vercel
+            (ดู <code>docs/vercel-deployment.md</code>) หรือรัน
+            <code>run_public_dashboard.bat</code> แล้วเปิด tunnel เช่น
+            <code>cloudflared tunnel --url http://127.0.0.1:8090</code>
+          </p>
+        </div>
+      </article>
+
+      <article class="card" data-project="kiosk">
+        <div class="card-head">
+          <div class="card-icon kiosk-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><rect x="4" y="3" width="16" height="12" rx="1.6" stroke="currentColor" stroke-width="1.6"/><path d="M9 20h6M12 15v5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </div>
+          <div>
+            <h2>MongDee Mini Kiosk</h2>
+            <p class="card-desc">ระบบสแกนสินค้าหน้าร้าน — รายงานยอดสแกนและสินค้ายอดนิยม</p>
+          </div>
+          <span class="status" data-status-for="kiosk">
+            <i class="dot" aria-hidden="true"></i><span class="status-label">ยังไม่ตรวจสอบ</span>
+          </span>
+        </div>
+
+        <div class="card-body">
+          <label class="url-row">
+            <span>ลิงก์แดชบอร์ด</span>
+            <input type="url" inputmode="url" data-url-input="kiosk"
+                   placeholder="เช่น https://xxxx.trycloudflare.com/dashboard">
+          </label>
+          <div class="card-actions">
+            <button type="button" class="btn-primary" data-open="kiosk">เปิดแดชบอร์ด</button>
+            <button type="button" class="btn-ghost" data-save="kiosk">บันทึกลิงก์</button>
+          </div>
+          <p class="hint">
+            เปิดให้เข้าถึงจากอินเทอร์เน็ตได้โดยรัน
+            <code>start-public-dashboard.bat</code> แล้วเปิด tunnel เช่น
+            <code>cloudflared tunnel --url http://127.0.0.1:8091</code>
+          </p>
+        </div>
+      </article>
+
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>ลิงก์ที่ตั้งค่าไว้จะถูกจำไว้ในเบราว์เซอร์นี้เท่านั้น (localStorage) ไม่ถูกส่งไปที่ใด</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

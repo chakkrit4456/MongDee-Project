@@ -1,0 +1,17 @@
+=== CAP_DSHOW single-camera matrix, indices=[1, 2] ===
+  index=1 backend=DSHOW  profile=native               open=True isOpened=True actual=YUY2/640x480@-1.0 warmup_ok=True sustained=20/20 error=None
+  index=1 backend=DSHOW  profile=MJPG 640x480@10      open=True isOpened=True actual=YUY2/640x480@10.0 warmup_ok=True sustained=20/20 error=None
+  index=1 backend=DSHOW  profile=MJPG 640x480@5       open=True isOpened=True actual=YUY2/640x480@5.0 warmup_ok=True sustained=20/20 error=None
+  index=1 backend=DSHOW  profile=MJPG 320x240@10      open=True isOpened=True actual=YUY2/320x240@10.0 warmup_ok=True sustained=20/20 error=None
+  index=1 backend=DSHOW  profile=MJPG 320x240@5       open=True isOpened=True actual=YUY2/320x240@5.0 warmup_ok=True sustained=20/20 error=None
+  index=1 backend=DSHOW  profile=YUY2 320x240@10      open=True isOpened=True actual=YUY2/320x240@10.0 warmup_ok=True sustained=20/20 error=None
+  index=1 backend=DSHOW  profile=YUY2 320x240@5       open=True isOpened=True actual=YUY2/320x240@5.0 warmup_ok=True sustained=20/20 error=None
+  index=2 backend=DSHOW  profile=native               open=True isOpened=True actual=YUY2/640x480@-1.0 warmup_ok=True sustained=20/20 error=None
+  index=2 backend=DSHOW  profile=MJPG 640x480@10      open=True isOpened=True actual=YUY2/640x480@10.0 warmup_ok=True sustained=20/20 error=None
+  index=2 backend=DSHOW  profile=MJPG 640x480@5       open=True isOpened=True actual=YUY2/640x480@5.0 warmup_ok=True sustained=20/20 error=None
+  index=2 backend=DSHOW  profile=MJPG 320x240@10      open=True isOpened=True actual=YUY2/320x240@10.0 warmup_ok=True sustained=20/20 error=None
+  index=2 backend=DSHOW  profile=MJPG 320x240@5       open=True isOpened=True actual=YUY2/320x240@5.0 warmup_ok=True sustained=20/20 error=None
+  index=2 backend=DSHOW  profile=YUY2 320x240@10      open=True isOpened=True actual=YUY2/320x240@10.0 warmup_ok=True sustained=20/20 error=None
+  index=2 backend=DSHOW  profile=YUY2 320x240@5       open=True isOpened=True actual=YUY2/320x240@5.0 warmup_ok=True sustained=20/20 error=None
+
+Saved tests/manual/dshow_results.json

@@ -1,0 +1,27 @@
+[CAM-A] opened at actual 320x240
+[ WARN:0@2.602] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[t= 15.0s] CAM-A ok=249 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t= 25.0s] CAM-A ok=421 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t= 35.0s] CAM-A ok=592 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t= 45.0s] CAM-A ok=764 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t= 55.0s] CAM-A ok=935 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t= 65.0s] CAM-A ok=1107 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t= 75.0s] CAM-A ok=1279 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t= 85.0s] CAM-A ok=1450 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t= 95.0s] CAM-A ok=1621 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t=105.0s] CAM-A ok=1793 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t=115.0s] CAM-A ok=1964 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t=125.0s] CAM-A ok=2136 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t=135.0s] CAM-A ok=2307 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t=145.0s] CAM-A ok=2479 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t=155.0s] CAM-A ok=2650 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t=165.0s] CAM-A ok=2822 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t=175.0s] CAM-A ok=2993 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t=185.0s] CAM-A ok=3165 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t=195.0s] CAM-A ok=3336 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t=205.0s] CAM-A ok=3508 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t=215.0s] CAM-A ok=3679 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t=225.0s] CAM-A ok=3850 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t=235.0s] CAM-A ok=4022 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t=245.0s] CAM-A ok=4193 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+FINAL: {'CAM-A': {'reads_ok': 4194, 'reads_failed': 0, 'opened': True}, 'CAM-B': {'reads_ok': 0, 'reads_failed': 0, 'opened': False}}

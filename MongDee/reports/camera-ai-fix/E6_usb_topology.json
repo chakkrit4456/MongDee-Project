@@ -1,0 +1,17 @@
+{
+  "devices": "[\n    {\n        \"Name\":  \"USB Camera\",\n        \"Id\":  \"USB\\\\VID_4C4A\\u0026PID_4A55\\u0026MI_00\\\\7\\u00261C4B4380\\u00260\\u00260000\",\n        \"Status\":  \"OK\",\n        \"Loc\":  \"0000.0014.0000.004.004.000.000.000.000\",\n        \"Parent\":  \"USB\\\\VID_4C4A\\u0026PID_4A55\\\\6\\u00263031fcc3\\u00260\\u00264\"\n    },\n    {\n        \"Name\":  \"HD WebCam\",\n        \"Id\":  \"USB\\\\VID_0408\\u0026PID_A060\\u0026MI_00\\\\6\\u0026391C16C1\\u00260\\u00260000\",\n        \"Status\":  \"OK\",\n        \"Loc\":  \"0000.0014.0000.005.000.000.000.000.000\",\n        \"Parent\":  \"USB\\\\VID_0408\\u0026PID_A060\\\\200901010001\"\n    },\n    {\n        \"Name\":  \"USB Camera\",\n        \"Id\":  \"USB\\\\VID_4C4A\\u0026PID_4A55\\u0026MI_00\\\\6\\u0026DB923B8\\u00260\\u00260000\",\n        \"Status\":  \"OK\",\n        \"Loc\":  \"0000.0014.0000.003.000.000.000.000.000\",\n        \"Parent\":  \"USB\\\\VID_4C4A\\u0026PID_4A55\\\\5\\u0026115a75a8\\u00260\\u00263\"\n    }\n]",
+  "usb_selective_suspend": [
+    "Current AC Power Setting Index: 0x00000000",
+    "Current DC Power Setting Index: 0x00000000",
+    "Possible Setting Index: 000",
+    "Possible Setting Index: 001",
+    "Current AC Power Setting Index: 0x00000001",
+    "Current DC Power Setting Index: 0x00000000",
+    "Possible Setting Index: 000",
+    "Possible Setting Index: 001",
+    "Current AC Power Setting Index: 0x00000000",
+    "Current DC Power Setting Index: 0x00000001",
+    "Possible Setting Index: 000",
+    "Possible Setting Index: 001"
+  ]
+}

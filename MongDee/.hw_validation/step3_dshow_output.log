@@ -1,0 +1,19 @@
+[CAM-A] backend=DSHOW opened
+[ WARN:0@12.432] global cap.cpp:477 cv::VideoCapture::open VIDEOIO(DSHOW): backend is generally available but can't be used to capture by index
+[CAM-B] backend=DSHOW OPEN FAILED
+[t= 15.0s backend=DSHOW] CAM-A ok=245 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t= 25.0s backend=DSHOW] CAM-A ok=416 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t= 35.0s backend=DSHOW] CAM-A ok=588 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t= 45.0s backend=DSHOW] CAM-A ok=759 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t= 55.0s backend=DSHOW] CAM-A ok=931 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t= 65.0s backend=DSHOW] CAM-A ok=1102 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t= 75.0s backend=DSHOW] CAM-A ok=1274 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t= 85.0s backend=DSHOW] CAM-A ok=1445 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t= 95.0s backend=DSHOW] CAM-A ok=1617 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t=105.0s backend=DSHOW] CAM-A ok=1788 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t=115.0s backend=DSHOW] CAM-A ok=1960 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t=125.0s backend=DSHOW] CAM-A ok=2131 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t=135.0s backend=DSHOW] CAM-A ok=2303 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t=145.0s backend=DSHOW] CAM-A ok=2473 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+[t=155.0s backend=DSHOW] CAM-A ok=2645 failed=0 opened=True  CAM-B ok=0 failed=0 opened=False
+FINAL: DSHOW {'CAM-A': {'reads_ok': 2645, 'reads_failed': 0, 'opened': True}, 'CAM-B': {'reads_ok': 0, 'reads_failed': 0, 'opened': False}}

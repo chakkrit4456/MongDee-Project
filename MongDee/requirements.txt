@@ -1,0 +1,37 @@
+opencv-python
+ultralytics
+torch         # PyPI's default wheel already bundles CUDA — NVIDIA GPUs (old and new,
+              # anything the driver's CUDA runtime supports) get accelerated automatically,
+              # no separate index-url/build needed. torch-directml (AMD/Intel/onboard GPU
+              # acceleration via DirectML) is deliberately NOT listed here: it hard-pins
+              # torch==2.4.1/torchvision==0.19.1 (see its PyPI Requires-Dist) and has no
+              # wheel at all for Python 3.13+, so adding it unconditionally would downgrade
+              # torch for every Windows user and break installs outright on newer Python.
+              # install.bat's GPU-vendor detection installs it in its own isolated,
+              # version-pinned step instead — see the comment there.
+torchvision
+PySide6
+pyttsx3
+SpeechRecognition
+sounddevice
+numpy
+fastapi
+uvicorn[standard]
+jinja2
+python-multipart
+openpyxl
+requests
+psutil       # core/performance.py: CPU/RAM readings for the Performance Monitor + Adaptive Controller
+pygrabber; sys_platform == "win32"  # core/camera_identity.py: DirectShow device names on Windows — cv2's own
+                                     # VideoCapture index alone can't tell a built-in webcam apart from a USB
+                                     # one, and that index isn't even stable across replug/reboot; only used
+                                     # via try/except ImportError so a non-Windows/no-pygrabber install still
+                                     # runs, just without built-in-camera-by-name exclusion
+
+# testing (camera/, vision/, backend/ test suites)
+pytest
+httpx        # fastapi.testclient (backend/api tests)
+
+# FairFace Age/Gender/Race training (train.py, test_model.py, detect.py)
+tqdm         # per-epoch progress bar in src/train_utils.py (epochs can run several minutes each)
+pyyaml       # config.yaml

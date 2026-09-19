@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MONGDEE — ตั้งค่าบูธ</title>
+<link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32.png">
+<link rel="icon" href="/static/favicon.ico">
+<link rel="apple-touch-icon" href="/static/favicon-180.png">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="top-bar">
+  <a href="/" class="brand-link"><img class="brand-logo" src="/static/logo.png" alt="MongDee"></a>
+  <div class="title"><svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>ตั้งค่าบูธ</div>
+  <div class="spacer"></div>
+  <a class="btn" href="/booth" style="text-decoration:none;"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9h18v11H3z"/><path d="M9 20v-6h6v6"/></svg>Booth</a>
+  <a class="btn" href="/dashboard" style="text-decoration:none;"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="20" x2="5" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="19" y1="20" x2="19" y2="14"/></svg>Dashboard</a>
+  <a class="btn" href="/trainer" style="text-decoration:none;"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l10-5 10 5-10 5-10-5z"/><path d="M6 11.5V17c0 1.5 3 3 6 3s6-1.5 6-3v-5.5"/><path d="M22 9v6"/></svg>AI Trainer</a>
+  <button id="theme-toggle-btn" class="theme-toggle-btn" title="สลับโหมดมืด/สว่าง"></button>
+</div>
+
+<h3>Events</h3>
+<div class="panel" style="max-width:720px;">
+  <table><thead><tr><th>Event ID</th><th>ชื่อ</th><th>จำนวนบูธในกลุ่ม</th><th></th></tr></thead><tbody id="events-body"></tbody></table>
+  <div style="display:flex; gap:8px; margin-top:12px; align-items:flex-end;">
+    <div style="flex:1;">
+      <label>เพิ่ม Event ใหม่</label>
+      <input type="text" id="new-event-name" placeholder="เช่น 1-Day-at-IMPACT">
+    </div>
+    <button id="add-event-btn"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>เพิ่ม Event</button>
+  </div>
+</div>
+
+<h3 style="margin-top:18px;">Booths</h3>
+<div class="panel" style="max-width:720px;">
+  <table><thead><tr><th>Booth ID</th><th>ชื่อ</th><th>สังกัด Event</th><th>เวลาเปิด-ปิดบูธ</th><th>สถานะ</th><th></th></tr></thead><tbody id="booths-body"></tbody></table>
+  <p style="color:var(--text-faint); font-size:12px; margin:6px 0 0;">เว้นว่างทั้งสองช่อง = เปิดตลอด 24 ชม. (ไม่มีตารางเวลา) — ถ้าตั้งเวลาไว้ ระบบจะหยุด/เริ่มกล้องอัตโนมัติตามเวลาที่ตั้ง (ตรวจทุก ~30 วินาที) เพื่อไม่ให้บูธรันทั้งวันทั้งคืนโดยไม่จำเป็น และข้อมูลใน Dashboard จะอยู่ในช่วงเวลาเปิดบูธจริงเท่านั้น</p>
+  <div style="display:flex; gap:8px; margin-top:12px; align-items:flex-end;">
+    <div style="flex:1;">
+      <label>เพิ่มบูธใหม่</label>
+      <input type="text" id="new-booth-name" placeholder="เช่น MONGDEE Demo Booth">
+    </div>
+    <div style="flex:1;">
+      <label>สังกัด Event (ไม่บังคับ)</label>
+      <select id="new-booth-event"><option value="">ไม่มี</option></select>
+    </div>
+    <button id="add-booth-btn"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>เพิ่มบูธ</button>
+  </div>
+  <div id="registry-status" style="color:var(--accent); margin-top:8px;"></div>
+</div>
+
+<h3 style="margin-top:18px;">กล้อง</h3>
+<div class="panel" style="max-width:640px;">
+  <div id="camera-list"></div>
+  <div style="display:flex; gap:8px; margin-top:12px; align-items:flex-end;">
+    <div style="flex:1;">
+      <label>เพิ่มกล้อง (หมายเลข index เช่น 0, 1 หรือ path เช่น /dev/video0)</label>
+      <input type="text" id="new-camera-device" placeholder="0">
+    </div>
+    <button id="add-camera-btn"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>เพิ่มกล้อง</button>
+  </div>
+  <div id="camera-status" style="color:var(--accent); margin-top:8px;"></div>
+</div>
+
+<h3 style="margin-top:18px;">ตัวเร่งความเร็ว (GPU)</h3>
+<div class="panel" style="max-width:640px;">
+  <div id="gpu-status" style="margin-bottom:10px;">กำลังตรวจสอบ...</div>
+  <p style="color:var(--text-faint); font-size:12px; margin:0;">ระบบตรวจการ์ดจอและติดตั้งตัวเร่งความเร็วที่ตรงกับเครื่องนี้ให้อัตโนมัติตั้งแต่ตอนติดตั้ง (NVIDIA ใช้ CUDA, AMD/Intel รวมถึงการ์ดจอออนบอร์ดที่รองรับ DirectX12 ใช้ DirectML) ไม่ต้องตั้งค่าเพิ่ม — เครื่องที่ไม่มีการ์ดจอที่รองรับจะใช้ CPU โดยอัตโนมัติ</p>
+</div>
+
+<h3 style="margin-top:18px; color:var(--danger);">โซนอันตราย</h3>
+<div class="panel danger-zone" style="max-width:640px;">
+  <p style="color:var(--text-dim); font-size:13px;">ลบข้อมูลที่บันทึกไว้ทั้งหมดของบูธนี้ (ประวัติการตรวจพบสินค้า, สถานะอุปกรณ์, การขยับสินค้า, เวลาที่คนอยู่ในกล้อง) การกระทำนี้ย้อนกลับไม่ได้</p>
+  <button id="reset-data-btn" class="btn-danger"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>ลบข้อมูลบูธนี้ทั้งหมด</button>
+</div>
+
+<script src="/static/icons.js"></script>
+<script src="/static/theme.js"></script>
+<script src="/static/settings.js"></script>
+</body>
+</html>

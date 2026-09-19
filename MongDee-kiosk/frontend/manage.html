@@ -1,0 +1,31 @@
+<title>จัดการสินค้า — MONGDEE MINI KIOSK</title>
+<link rel="stylesheet" href="/static/css/style.css">
+
+<div class="topnav">
+  <a class="brand" href="/"><img class="brand-logo" src="/static/img/logo.png" alt="MongDee"> <span>MINI KIOSK</span></a>
+  <nav>
+    <a href="/">จอแสดงผล</a>
+    <a href="/enroll">เพิ่มสินค้า</a>
+    <a href="/manage" class="active">จัดการสินค้า</a>
+    <a href="/dashboard">รายงาน</a>
+    <a href="/calibrate">ปรับตั้งค่า</a>
+  </nav>
+</div>
+
+<div class="page">
+  <div class="button-row" style="margin-bottom:1.5rem;">
+    <a href="/enroll"><button type="button">+ เพิ่มสินค้าใหม่</button></a>
+    <a href="/api/products/export/all"><button type="button" class="secondary">ส่งออกสินค้าทั้งหมด (.zip)</button></a>
+    <button type="button" class="secondary" id="changePinBtn">เปลี่ยนรหัสผ่านแอดมิน</button>
+    <span class="hint" id="pinStatus" role="status" style="margin:0;"></span>
+  </div>
+
+  <div id="productList" class="product-list"></div>
+  <div id="emptyState" class="card hint" style="display:none;">ยังไม่มีสินค้าในระบบ — กด "เพิ่มสินค้าใหม่" เพื่อเริ่ม</div>
+</div>
+
+<script src="/static/js/ui-sound.js"></script>
+<script src="/static/js/media-fallback.js"></script>
+<script src="/static/js/price.js"></script>
+<script src="/static/js/admin-pin.js"></script>
+<script src="/static/js/manage.js"></script>

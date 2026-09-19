@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MongDee Booth Designer</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 13px/1.5 system-ui, "Segoe UI", sans-serif; background: #0f1216; color: #e6e9ef; display: flex; height: 100vh; overflow: hidden; }
+  .panel { width: 260px; padding: 14px; border-right: 1px solid #232a33; overflow-y: auto; flex-shrink: 0; }
+  .panel h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: #8b95a5; margin: 16px 0 8px; }
+  .panel h2:first-child { margin-top: 0; }
+  label { display: block; margin: 6px 0; color: #b6bfce; }
+  input, select { width: 100%; background: #161b22; border: 1px solid #2c353f; color: #e6e9ef; border-radius: 6px; padding: 5px 7px; }
+  button { background: #1f2937; border: 1px solid #374151; color: #e6e9ef; border-radius: 6px; padding: 6px 10px; cursor: pointer; margin: 2px 0; }
+  button:hover { background: #2b3646; }
+  button.primary { background: #1d4ed8; border-color: #1d4ed8; }
+  .palette button { display: block; width: 100%; text-align: left; }
+  main { flex: 1; display: flex; flex-direction: column; }
+  .toolbar { padding: 8px 14px; border-bottom: 1px solid #232a33; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .toolbar .sep { width: 1px; height: 20px; background: #2c353f; }
+  #wrap { flex: 1; overflow: hidden; position: relative; background: #0b0e12; }
+  canvas { position: absolute; top: 0; left: 0; }
+  .hint { color: #6b7280; font-size: 12px; }
+  #status { margin-left: auto; color: #8b95a5; }
+</style>
+</head>
+<body>
+<div class="panel">
+  <h2>Booth</h2>
+  <label>Booth ID <input id="boothId" value="BOOTH-01" /></label>
+  <label>Width (m) <input id="boothW" type="number" value="10" step="0.1" /></label>
+  <label>Length (m) <input id="boothL" type="number" value="6" step="0.1" /></label>
+  <label>Grid (m) <input id="grid" type="number" value="0.5" step="0.1" /></label>
+  <button id="applyBooth">Apply size</button>
+
+  <h2>Add object</h2>
+  <div class="palette" id="palette"></div>
+
+  <h2>Selected</h2>
+  <div id="selEditor" class="hint">nothing selected</div>
+
+  <h2>File</h2>
+  <button id="loadBtn">Load from server</button>
+  <button id="saveBtn" class="primary">Save new version</button>
+  <button id="exportBtn">Export JSON</button>
+  <button id="importBtn">Import JSON</button>
+  <input id="importFile" type="file" accept="application/json" hidden />
+</div>
+
+<main>
+  <div class="toolbar">
+    <button id="undo">Undo</button>
+    <button id="redo">Redo</button>
+    <div class="sep"></div>
+    <button id="dup">Duplicate</button>
+    <button id="del">Delete</button>
+    <button id="rotL">Rotate -15°</button>
+    <button id="rotR">Rotate +15°</button>
+    <div class="sep"></div>
+    <span class="hint">drag = move · scroll = zoom · shift+drag = pan · arrows = nudge</span>
+    <span id="status"></span>
+  </div>
+  <div id="wrap"><canvas id="cv"></canvas></div>
+</main>
+
+<!-- see backend/api/dashboard.html for what config.js / API_BASE resolution do -->
+<script src="config.js" onerror="window.MONGDEE_API_BASE = window.MONGDEE_API_BASE || '';"></script>
+<script>
+const _params = new URLSearchParams(location.search);
+const API_KEY = _params.get("api_key") || "";
+if (_params.has("api")) localStorage.setItem("mongdee_api_base", _params.get("api").replace(/\/$/, ""));
+const _storedBase = localStorage.getItem("mongdee_api_base");
+const API_BASE = _storedBase !== null ? _storedBase : (window.MONGDEE_API_BASE || "").replace(/\/$/, "");
+const H = API_KEY ? { "X-API-Key": API_KEY, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
+const $ = (id) => document.getElementById(id);
+
+const TYPES = ["camera","shelf","product","table","wall","door","entrance","exit","product_zone","point_of_interest","no_entry_zone","sales_point"];
+const COLORS = { camera:"#38bdf8", shelf:"#a78bfa", product:"#f472b6", table:"#94a3b8", wall:"#64748b", door:"#fbbf24",
+  entrance:"#4ade80", exit:"#f87171", product_zone:"#22d3ee", point_of_interest:"#facc15", no_entry_zone:"#ef4444", sales_point:"#34d399" };
+
+let booth = { id: "BOOTH-01", width: 10, length: 6, unit: "m", version: 1, objects: [] };
+let grid = 0.5, sel = null, view = { scale: 60, ox: 40, oy: 40 };
+let undoStack = [], redoStack = [];
+
+const cv = $("cv"), ctx = cv.getContext("2d");
+
+function snapshot() { undoStack.push(JSON.stringify(booth.objects)); if (undoStack.length > 100) undoStack.shift(); redoStack = []; }
+function restore(stack, other) { if (!stack.length) return; other.push(JSON.stringify(booth.objects)); booth.objects = JSON.parse(stack.pop()); sel = null; renderSel(); draw(); }
+
+function resize() { const w = $("wrap"); cv.width = w.clientWidth; cv.height = w.clientHeight; draw(); }
+window.addEventListener("resize", resize);
+
+function w2s(x, y) { return [view.ox + x * view.scale, view.oy + y * view.scale]; }
+function s2w(px, py) { return [(px - view.ox) / view.scale, (py - view.oy) / view.scale]; }
+
+function draw() {
+  ctx.clearRect(0, 0, cv.width, cv.height);
+  // booth outline
+  const [x0, y0] = w2s(0, 0), [x1, y1] = w2s(booth.width, booth.length);
+  ctx.fillStyle = "#11161d"; ctx.fillRect(x0, y0, x1 - x0, y1 - y0);
+  // grid
+  ctx.strokeStyle = "#1c242e"; ctx.lineWidth = 1;
+  for (let gx = 0; gx <= booth.width + 1e-6; gx += grid) { const [sx] = w2s(gx, 0); ctx.beginPath(); ctx.moveTo(sx, y0); ctx.lineTo(sx, y1); ctx.stroke(); }
+  for (let gy = 0; gy <= booth.length + 1e-6; gy += grid) { const [, sy] = w2s(0, gy); ctx.beginPath(); ctx.moveTo(x0, sy); ctx.lineTo(x1, sy); ctx.stroke(); }
+  ctx.strokeStyle = "#3b4654"; ctx.lineWidth = 2; ctx.strokeRect(x0, y0, x1 - x0, y1 - y0);
+  // objects
+  for (const o of booth.objects) {
+    const [cx, cy] = w2s(o.x, o.y);
+    const ww = (o.width || 0.4) * view.scale, hh = (o.height || 0.4) * view.scale;
+    ctx.save(); ctx.translate(cx, cy); ctx.rotate((o.rotation || 0) * Math.PI / 180);
+    ctx.fillStyle = (COLORS[o.object_type] || "#888") + (o === sel ? "cc" : "55");
+    ctx.strokeStyle = COLORS[o.object_type] || "#888"; ctx.lineWidth = o === sel ? 3 : 1.5;
+    ctx.fillRect(-ww / 2, -hh / 2, ww, hh); ctx.strokeRect(-ww / 2, -hh / 2, ww, hh);
+    ctx.fillStyle = "#e6e9ef"; ctx.font = "11px system-ui"; ctx.textAlign = "center";
+    ctx.fillText(o.id, 0, -hh / 2 - 4);
+    ctx.restore();
+  }
+  $("status").textContent = `${booth.objects.length} objects · v${booth.version} · ${booth.width}×${booth.length} ${booth.unit}`;
+}
+
+function renderSel() {
+  const box = $("selEditor");
+  if (!sel) { box.innerHTML = '<span class="hint">nothing selected</span>'; return; }
+  box.innerHTML = `
+    <label>ID <input id="s_id" value="${sel.id}"></label>
+    <label>Type <select id="s_type">${TYPES.map(t => `<option ${t === sel.object_type ? "selected" : ""}>${t}</option>`).join("")}</select></label>
+    <label>X (m) <input id="s_x" type="number" step="0.1" value="${sel.x}"></label>
+    <label>Y (m) <input id="s_y" type="number" step="0.1" value="${sel.y}"></label>
+    <label>Width (m) <input id="s_w" type="number" step="0.1" value="${sel.width || 0}"></label>
+    <label>Height (m) <input id="s_h" type="number" step="0.1" value="${sel.height || 0}"></label>
+    <label>Rotation (°) <input id="s_r" type="number" step="5" value="${sel.rotation || 0}"></label>
+    <label>camera_id (for camera objects) <input id="s_cam" value="${(sel.metadata && sel.metadata.camera_id) || ""}"></label>`;
+  const bind = (id, key, num) => $(id).addEventListener("change", () => {
+    snapshot();
+    if (key === "metadata.camera_id") { sel.metadata = sel.metadata || {}; sel.metadata.camera_id = $(id).value; }
+    else sel[key] = num ? parseFloat($(id).value) : $(id).value;
+    draw();
+  });
+  bind("s_id", "id"); bind("s_type", "object_type"); bind("s_x", "x", 1); bind("s_y", "y", 1);
+  bind("s_w", "width", 1); bind("s_h", "height", 1); bind("s_r", "rotation", 1); bind("s_cam", "metadata.camera_id");
+}
+
+// palette
+$("palette").innerHTML = TYPES.map(t => `<button data-t="${t}">+ ${t}</button>`).join("");
+$("palette").addEventListener("click", (e) => {
+  const t = e.target.dataset.t; if (!t) return;
+  snapshot();
+  const n = booth.objects.filter(o => o.object_type === t).length + 1;
+  const o = { id: `${t.toUpperCase()}-${n}`, object_type: t, x: booth.width / 2, y: booth.length / 2,
+    width: t.includes("zone") ? 1.5 : 0.6, height: t.includes("zone") ? 1.5 : 0.5, rotation: 0, metadata: {}, active: true };
+  booth.objects.push(o); sel = o; renderSel(); draw();
+});
+
+// canvas interaction
+let drag = null;
+cv.addEventListener("mousedown", (e) => {
+  const [wx, wy] = s2w(e.offsetX, e.offsetY);
+  if (e.shiftKey) { drag = { pan: true, sx: e.offsetX, sy: e.offsetY, ox: view.ox, oy: view.oy }; return; }
+  sel = [...booth.objects].reverse().find(o => Math.abs(wx - o.x) <= (o.width || 0.4) / 2 && Math.abs(wy - o.y) <= (o.height || 0.4) / 2) || null;
+  renderSel(); draw();
+  if (sel) { snapshot(); drag = { obj: sel, dx: wx - sel.x, dy: wy - sel.y }; }
+});
+cv.addEventListener("mousemove", (e) => {
+  if (!drag) return;
+  if (drag.pan) { view.ox = drag.ox + (e.offsetX - drag.sx); view.oy = drag.oy + (e.offsetY - drag.sy); draw(); return; }
+  const [wx, wy] = s2w(e.offsetX, e.offsetY);
+  drag.obj.x = Math.round((wx - drag.dx) / grid) * grid;
+  drag.obj.y = Math.round((wy - drag.dy) / grid) * grid;
+  draw();
+});
+window.addEventListener("mouseup", () => { drag = null; renderSel(); });
+cv.addEventListener("wheel", (e) => {
+  e.preventDefault();
+  const [wx, wy] = s2w(e.offsetX, e.offsetY);
+  view.scale = Math.max(15, Math.min(200, view.scale * (e.deltaY < 0 ? 1.1 : 0.9)));
+  const [nx, ny] = w2s(wx, wy);
+  view.ox += e.offsetX - nx; view.oy += e.offsetY - ny;
+  draw();
+}, { passive: false });
+
+document.addEventListener("keydown", (e) => {
+  if (["INPUT", "SELECT"].includes(e.target.tagName)) return;
+  if (!sel) return;
+  const step = e.shiftKey ? grid * 2 : grid;
+  if (e.key === "ArrowLeft") { snapshot(); sel.x -= step; }
+  else if (e.key === "ArrowRight") { snapshot(); sel.x += step; }
+  else if (e.key === "ArrowUp") { snapshot(); sel.y -= step; }
+  else if (e.key === "ArrowDown") { snapshot(); sel.y += step; }
+  else if (e.key === "Delete") { snapshot(); booth.objects = booth.objects.filter(o => o !== sel); sel = null; renderSel(); }
+  else return;
+  e.preventDefault(); draw();
+});
+
+// toolbar
+$("undo").onclick = () => restore(undoStack, redoStack);
+$("redo").onclick = () => restore(redoStack, undoStack);
+$("del").onclick = () => { if (sel) { snapshot(); booth.objects = booth.objects.filter(o => o !== sel); sel = null; renderSel(); draw(); } };
+$("dup").onclick = () => { if (sel) { snapshot(); const c = JSON.parse(JSON.stringify(sel)); c.id += "-copy"; c.x += grid; c.y += grid; booth.objects.push(c); sel = c; renderSel(); draw(); } };
+$("rotL").onclick = () => { if (sel) { snapshot(); sel.rotation = (sel.rotation || 0) - 15; draw(); renderSel(); } };
+$("rotR").onclick = () => { if (sel) { snapshot(); sel.rotation = (sel.rotation || 0) + 15; draw(); renderSel(); } };
+
+$("applyBooth").onclick = () => {
+  snapshot();
+  booth.id = $("boothId").value; booth.width = parseFloat($("boothW").value); booth.length = parseFloat($("boothL").value);
+  grid = parseFloat($("grid").value) || 0.5;
+  draw();
+};
+
+$("loadBtn").onclick = async () => {
+  const id = $("boothId").value;
+  const r = await fetch(`${API_BASE}/api/booths/${id}/layout`, { headers: H });
+  if (!r.ok) { alert("no saved layout for " + id); return; }
+  booth = await r.json(); booth.id = id;
+  $("boothW").value = booth.width; $("boothL").value = booth.length;
+  sel = null; renderSel(); draw();
+};
+
+$("saveBtn").onclick = async () => {
+  const payload = { name: booth.id, width: booth.width, length: booth.length, unit: booth.unit,
+    version: (booth.version || 0) + 1, objects: booth.objects };
+  const r = await fetch(`${API_BASE}/api/booths/${$("boothId").value}/layout`, { method: "POST", headers: H, body: JSON.stringify(payload) });
+  const j = await r.json();
+  if (r.ok) { booth.version = j.version; draw(); alert("saved as version " + j.version); }
+  else alert("save failed: " + (j.detail || r.status));
+};
+
+$("exportBtn").onclick = () => {
+  const blob = new Blob([JSON.stringify(booth, null, 2)], { type: "application/json" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = booth.id + "_layout.json"; a.click();
+};
+$("importBtn").onclick = () => $("importFile").click();
+$("importFile").onchange = (e) => {
+  const f = e.target.files[0]; if (!f) return;
+  const reader = new FileReader();
+  reader.onload = () => { snapshot(); booth = JSON.parse(reader.result); $("boothId").value = booth.id; $("boothW").value = booth.width; $("boothL").value = booth.length; sel = null; renderSel(); draw(); };
+  reader.readAsText(f);
+};
+
+resize();
+</script>
+</body>
+</html>

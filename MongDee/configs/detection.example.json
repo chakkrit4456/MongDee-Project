@@ -1,0 +1,13 @@
+{
+  "detection": {
+    "model_path": "yolo11n.pt",
+    "device": "auto",
+    "confidence_threshold": 0.35,
+    "iou_threshold": 0.45,
+    "imgsz": 640,
+    "processing_width": 960,
+    "processing_height": 540,
+    "target_fps_per_camera": 4.0,
+    "max_detections": 100
+  }
+}

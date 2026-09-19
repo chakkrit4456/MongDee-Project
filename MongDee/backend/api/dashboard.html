@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MongDee Vision Dashboard</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.5 system-ui, "Segoe UI", Roboto, sans-serif; background: #0f1216; color: #e6e9ef; }
+  header { padding: 16px 24px; border-bottom: 1px solid #232a33; display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+  header h1 { font-size: 18px; margin: 0; font-weight: 600; }
+  header .sub { color: #8b95a5; font-size: 12px; }
+  header .conn { margin-left: auto; font-size: 12px; }
+  .conn.ok { color: #4ade80; } .conn.bad { color: #f87171; }
+  #serverBtn { background: #161b22; border: 1px solid #232a33; color: #8b95a5; border-radius: 6px;
+    padding: 4px 10px; font-size: 12px; cursor: pointer; }
+  #serverBtn:hover { color: #e6e9ef; border-color: #3b4654; }
+  .server-modal-backdrop { position: fixed; inset: 0; background: #000a; display: flex;
+    align-items: center; justify-content: center; z-index: 10; }
+  .server-modal { background: #161b22; border: 1px solid #232a33; border-radius: 10px; padding: 20px;
+    width: min(420px, calc(100vw - 32px)); }
+  .server-modal h3 { margin: 0 0 10px; font-size: 14px; }
+  .server-modal p { color: #8b95a5; font-size: 12px; margin: 0 0 12px; }
+  .server-modal input { width: 100%; background: #0f1216; border: 1px solid #232a33; color: #e6e9ef;
+    border-radius: 6px; padding: 8px 10px; font: inherit; margin-bottom: 12px; }
+  .server-modal .row { display: flex; gap: 8px; justify-content: flex-end; }
+  .server-modal button { background: #232a33; border: none; color: #e6e9ef; border-radius: 6px;
+    padding: 7px 14px; font: inherit; cursor: pointer; }
+  .server-modal button.primary { background: #2563eb; }
+  main { padding: 24px; display: grid; gap: 24px; max-width: 1400px; margin: 0 auto; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; }
+  .kpi { background: #161b22; border: 1px solid #232a33; border-radius: 10px; padding: 16px; }
+  .kpi .label { color: #8b95a5; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+  .kpi .value { font-size: 30px; font-weight: 700; margin-top: 4px; }
+  .kpi .value small { font-size: 14px; color: #8b95a5; font-weight: 400; }
+  section h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .05em; color: #8b95a5; margin: 0 0 12px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+  .cam { background: #161b22; border: 1px solid #232a33; border-radius: 10px; padding: 14px; }
+  .cam .name { font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+  .dot.online { background: #4ade80; } .dot.offline, .dot.connecting { background: #fbbf24; } .dot.stopped, .dot.unknown { background: #6b7280; }
+  .cam .meta { color: #8b95a5; font-size: 12px; margin-top: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #232a33; }
+  th { color: #8b95a5; font-weight: 500; font-size: 11px; text-transform: uppercase; }
+  .tag { display: inline-block; padding: 1px 7px; border-radius: 999px; font-size: 11px; background: #232a33; }
+  .tag.NEW_PERSON { background: #1e3a2e; color: #4ade80; }
+  .tag.PERSON_REIDENTIFIED { background: #1e2f4a; color: #7dd3fc; }
+  .tag.POSSIBLE_MATCH { background: #3a331e; color: #fbbf24; }
+  .tag.PERSON_CAMERA_TRANSITION { background: #2f1e4a; color: #c4b5fd; }
+  .muted { color: #6b7280; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>MongDee Vision</h1>
+  <span class="sub" id="subtitle">multi-camera person counting</span>
+  <span class="conn bad" id="conn">connecting…</span>
+  <button id="serverBtn" title="Point this dashboard at a different AI Server">server ⚙</button>
+</header>
+<main>
+  <div class="kpis" id="kpis"></div>
+
+  <section>
+    <h2>Cameras</h2>
+    <div class="grid" id="cameras"></div>
+  </section>
+
+  <section id="mapSection" hidden>
+    <h2>Live Booth Map &nbsp;<a href="/designer" style="font-weight:400;font-size:11px;color:#7dd3fc">open designer →</a></h2>
+    <canvas id="boothMap" width="800" height="480" style="width:100%;max-width:800px;background:#11161d;border:1px solid #232a33;border-radius:10px"></canvas>
+  </section>
+
+  <div class="two-col">
+    <section>
+      <h2>Recent Events</h2>
+      <table><thead><tr><th>Time</th><th>Event</th><th>Person</th><th>Camera</th><th>Score</th></tr></thead>
+        <tbody id="events"></tbody></table>
+    </section>
+    <section>
+      <h2>People (estimated — never certain)</h2>
+      <table><thead><tr><th>Global ID</th><th>Cameras</th><th>Shirt</th><th>Gender*</th><th>Last seen</th></tr></thead>
+        <tbody id="people"></tbody></table>
+    </section>
+  </div>
+</main>
+
+<div class="server-modal-backdrop hidden" id="serverModal">
+  <div class="server-modal">
+    <h3>AI Server</h3>
+    <p>Where this dashboard is served from (e.g. Vercel) is not necessarily
+       where the AI Server runs. Point it at your Remote AI Server's URL —
+       leave blank to use the same origin this page was loaded from.</p>
+    <input id="serverInput" placeholder="https://ai-server.example.com:8100" />
+    <div class="row">
+      <button id="serverCancel">Cancel</button>
+      <button id="serverSave" class="primary">Save &amp; Reload</button>
+    </div>
+  </div>
+</div>
+
+<!-- Self-hosted (python -m backend.main) serves an empty/no-op config.js
+     from the AI Server itself (see backend/api/app.py's /config.js route),
+     so this page works unmodified same-origin out of the box. A Vercel
+     deployment's build step (see scripts/build_web_dashboard.py) writes
+     its own config.js here instead, seeded from the MONGDEE_AI_SERVER_URL
+     build-time env var — either way this is the single source of truth
+     for the *default* API base; the Server Settings dialog above lets a
+     viewer override it per-browser via localStorage without a rebuild. -->
+<script src="config.js" onerror="window.MONGDEE_API_BASE = window.MONGDEE_API_BASE || '';"></script>
+<script>
+const params = new URLSearchParams(location.search);
+const API_KEY = params.get("api_key") || "";
+const keyHeader = API_KEY ? { "X-API-Key": API_KEY } : {};
+const keyQuery = API_KEY ? ("?api_key=" + encodeURIComponent(API_KEY)) : "";
+
+// Resolution order for the AI Server's base URL (MongDee_Cloud_Vercel_
+// Remote_AI_Server_Master_Prompt.md sections 27-28): a ?api= query param
+// (and persists it) > a per-browser override saved earlier > the
+// deployment's build-time default > same-origin (empty string).
+const STORAGE_KEY = "mongdee_api_base";
+if (params.has("api")) {
+  localStorage.setItem(STORAGE_KEY, params.get("api").replace(/\/$/, ""));
+}
+let API_BASE = localStorage.getItem(STORAGE_KEY);
+if (API_BASE === null) API_BASE = (window.MONGDEE_API_BASE || "").replace(/\/$/, "");
+
+const fmtTime = (t) => t ? new Date(t * 1000).toLocaleTimeString() : "—";
+const el = (id) => document.getElementById(id);
+
+async function getJSON(path) {
+  const r = await fetch(API_BASE + path, { headers: keyHeader });
+  if (!r.ok) throw new Error(path + " -> " + r.status);
+  return r.json();
+}
+
+function wsURL(path) {
+  if (API_BASE) {
+    return API_BASE.replace(/^http/, "ws") + path;
+  }
+  const proto = location.protocol === "https:" ? "wss" : "ws";
+  return `${proto}://${location.host}${path}`;
+}
+
+el("serverBtn").addEventListener("click", () => {
+  el("serverInput").value = API_BASE;
+  el("serverModal").classList.remove("hidden");
+});
+el("serverCancel").addEventListener("click", () => el("serverModal").classList.add("hidden"));
+el("serverSave").addEventListener("click", () => {
+  localStorage.setItem(STORAGE_KEY, el("serverInput").value.trim().replace(/\/$/, ""));
+  location.reload();
+});
+
+function renderKpis(stats) {
+  const g = stats.by_gender || {}, a = stats.by_age_group || {}, cs = stats.camera_status || {};
+  const online = cs.online || 0;
+  const offline = (cs.offline || 0) + (cs.connecting || 0) + (cs.stopped || 0) + (cs.unknown || 0);
+  el("kpis").innerHTML = [
+    ["Unique People", stats.unique_persons ?? 0, ""],
+    ["Male / Female (est.)", `${g.male || 0} / ${g.female || 0}`, `${g.unknown || 0} unknown`],
+    ["Child / Adult (est.)", `${a.child || 0} / ${a.adult || 0}`, `${a.unknown || 0} unknown`],
+    ["Cameras Online", online, `${offline} not online`],
+    ["Total Events", stats.total_events ?? 0, ""],
+  ].map(([label, value, sub]) =>
+    `<div class="kpi"><div class="label">${label}</div><div class="value">${value} <small>${sub}</small></div></div>`
+  ).join("");
+}
+
+const _streamedCameraIds = new Set();
+
+function renderCameras(cameras) {
+  el("cameras").innerHTML = cameras.map((c) => {
+    const live = c.live || {};
+    const status = (live.status || c.status || "unknown");
+    return `<div class="cam">
+      <div class="name"><span><span class="dot ${status}"></span>${c.id}</span><span class="muted">${c.location || ""}</span></div>
+      <img class="cam-video" data-cam="${c.id}" src="" alt="${c.id} live feed" loading="lazy"
+           style="width:100%;border-radius:6px;background:#0a0d12;aspect-ratio:4/3;object-fit:cover;margin:8px 0;" />
+      <div class="meta">
+        <span>status</span><span>${status}</span>
+        <span>people now</span><span>${live.tracks ?? live.detections ?? "—"}</span>
+        <span>fps</span><span>${live.fps ?? "—"}</span>
+        <span>latency</span><span>${live.latency_ms ? live.latency_ms.toFixed(0) + " ms" : "—"}</span>
+      </div></div>`;
+  }).join("") || '<div class="muted">no cameras configured</div>';
+
+  // Set <img src> only once per camera (not on every 3s poll) -- the MJPEG
+  // stream itself pushes new frames continuously; re-setting src would
+  // just restart the connection and flicker for no benefit.
+  for (const c of cameras) {
+    if (_streamedCameraIds.has(c.id)) continue;
+    const img = el("cameras").querySelector(`img[data-cam="${CSS.escape(c.id)}"]`);
+    if (!img) continue;
+    _streamedCameraIds.add(c.id);
+    img.src = API_BASE + `/api/cameras/${encodeURIComponent(c.id)}/stream` +
+      (API_KEY ? `?api_key=${encodeURIComponent(API_KEY)}` : "");
+    img.onerror = () => { _streamedCameraIds.delete(c.id); };  // retry on next poll if the stream errors
+  }
+}
+
+function renderEvents(events) {
+  el("events").innerHTML = events.slice(0, 40).map((e) =>
+    `<tr><td class="muted">${fmtTime(e.timestamp)}</td>
+      <td><span class="tag ${e.event_type}">${e.event_type}</span></td>
+      <td>${e.global_person_id || "—"}</td><td>${e.camera_id || "—"}</td>
+      <td>${e.match_score ? e.match_score.toFixed(2) : "—"}</td></tr>`
+  ).join("") || '<tr><td colspan="5" class="muted">no events yet</td></tr>';
+}
+
+function renderPeople(people) {
+  el("people").innerHTML = people.slice(0, 40).map((p) =>
+    `<tr><td>${p.id}</td><td>${(p.cameras_seen || []).join(", ")}</td>
+      <td>${p.shirt_color || "unknown"}</td>
+      <td>${p.estimated_gender || "unknown"} ${p.gender_confidence ? "(" + p.gender_confidence.toFixed(2) + ")" : ""}</td>
+      <td class="muted">${fmtTime(p.last_seen)}</td></tr>`
+  ).join("") || '<tr><td colspan="5" class="muted">nobody seen yet</td></tr>';
+}
+
+let boothLayout = null;
+async function loadLayout() {
+  try {
+    const booths = (await getJSON("/api/booths")).booths;
+    if (!booths.length) return;
+    boothLayout = await getJSON(`/api/booths/${booths[0].id}/layout`);
+    el("mapSection").hidden = false;
+  } catch (e) { /* no booth configured */ }
+}
+
+async function drawMap() {
+  if (!boothLayout) return;
+  let map;
+  try { map = await getJSON("/api/map"); } catch (e) { return; }
+  const cv = el("boothMap"), ctx = cv.getContext("2d");
+  const pad = 30, sx = (cv.width - 2 * pad) / boothLayout.width, sy = (cv.height - 2 * pad) / boothLayout.length;
+  const s = Math.min(sx, sy);
+  const w2p = (x, y) => [pad + x * s, pad + y * s];
+  ctx.clearRect(0, 0, cv.width, cv.height);
+  const [bx, by] = w2p(boothLayout.width, boothLayout.length);
+  ctx.strokeStyle = "#3b4654"; ctx.strokeRect(pad, pad, bx - pad, by - pad);
+  for (const o of (boothLayout.objects || [])) {
+    const [cx, cy] = w2p(o.x, o.y);
+    const ww = (o.width || 0.4) * s, hh = (o.height || 0.4) * s;
+    const isZone = o.object_type.includes("zone");
+    ctx.fillStyle = isZone ? "#22d3ee22" : "#a78bfa33";
+    ctx.strokeStyle = isZone ? "#22d3ee" : "#a78bfa";
+    ctx.fillRect(cx - ww / 2, cy - hh / 2, ww, hh);
+    ctx.strokeRect(cx - ww / 2, cy - hh / 2, ww, hh);
+    ctx.fillStyle = "#8b95a5"; ctx.font = "10px system-ui"; ctx.textAlign = "center";
+    ctx.fillText(o.id, cx, cy - hh / 2 - 3);
+  }
+  for (const p of (map.positions || [])) {
+    const [cx, cy] = w2p(p.x, p.y);
+    ctx.beginPath(); ctx.arc(cx, cy, 6, 0, 7); ctx.fillStyle = "#4ade80"; ctx.fill();
+    ctx.fillStyle = "#e6e9ef"; ctx.font = "10px system-ui"; ctx.fillText(p.global_id, cx, cy - 10);
+  }
+}
+
+async function poll() {
+  try {
+    const [stats, cameras, events, people] = await Promise.all([
+      getJSON("/api/stats"), getJSON("/api/cameras"), getJSON("/api/events?limit=40"), getJSON("/api/persons?limit=40"),
+    ]);
+    renderKpis(stats); renderCameras(cameras.cameras); renderEvents(events.events); renderPeople(people.persons);
+    drawMap();
+    el("conn").className = "conn ok"; el("conn").textContent = "live";
+  } catch (err) {
+    el("conn").className = "conn bad"; el("conn").textContent = "disconnected";
+  }
+}
+
+function connectWS() {
+  try {
+    const ws = new WebSocket(wsURL("/ws/dashboard" + keyQuery));
+    ws.onmessage = (m) => {
+      const d = JSON.parse(m.data);
+      if (d.stats) renderKpis(d.stats);
+      el("conn").className = "conn ok"; el("conn").textContent = "live (ws)";
+    };
+    ws.onclose = () => setTimeout(connectWS, 3000);
+  } catch (e) { /* polling covers it */ }
+}
+
+loadLayout();
+poll();
+setInterval(poll, 3000);
+connectWS();
+</script>
+</body>
+</html>

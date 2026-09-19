@@ -1,0 +1,38 @@
+[
+  {
+    "msmf_hw": 0,
+    "status": "ok",
+    "cams": [
+      {
+        "index": 1,
+        "opened": true,
+        "open_ms": 1937,
+        "frames": 0,
+        "fps": 0.0,
+        "read_fail": 2667,
+        "bad_frames": 0,
+        "bad_reasons": {},
+        "max_gap_ms": 0
+      }
+    ],
+    "log_tail": "72\n[ WARN:1@31.969] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772\n[ WARN:1@31.979] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772\nRESULT_JSON [{\"index\": 1, \"opened\": true, \"open_ms\": 1937, \"frames\": 0, \"fps\": 0.0, \"read_fail\": 2667, \"bad_frames\": 0, \"bad_reasons\": {}, \"max_gap_ms\": 0}]\n"
+  },
+  {
+    "msmf_hw": 1,
+    "status": "ok",
+    "cams": [
+      {
+        "index": 1,
+        "opened": true,
+        "open_ms": 3330,
+        "frames": 0,
+        "fps": 0.0,
+        "read_fail": 2745,
+        "bad_frames": 0,
+        "bad_reasons": {},
+        "max_gap_ms": 0
+      }
+    ],
+    "log_tail": "72\n[ WARN:1@33.348] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772\n[ WARN:1@33.359] global cap_msmf.cpp:1816 CvCapture_MSMF::grabFrame videoio(MSMF): can't grab frame. Error: -1072875772\nRESULT_JSON [{\"index\": 1, \"opened\": true, \"open_ms\": 3330, \"frames\": 0, \"fps\": 0.0, \"read_fail\": 2745, \"bad_frames\": 0, \"bad_reasons\": {}, \"max_gap_ms\": 0}]\n"
+  }
+]
