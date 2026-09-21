@@ -113,6 +113,19 @@ HIST_DIM = HIST_BINS[0] * HIST_BINS[1] * HIST_BINS[2]
 # products -- revisit as more real registration data accumulates.
 HIST_MATCH_FLOOR = 0.55
 
+# Viewpoint-robustness augmentation (see ProductRecognizer._viewpoint_variants): each real
+# registered photo also stores a few synthetic nearby-angle/lighting variants, so the gallery
+# covers a small neighborhood around every angle the operator actually captured instead of only
+# that one exact pixel-for-pixel framing. Kept modest (5 total variants including the original)
+# because add_sample() runs one forward pass per variant -- large enough to meaningfully widen
+# the recognized angle range, small enough to stay fast during live "record from camera" (still
+# well under the guided-recording flow's 500ms per-tick budget on the tiny MobileNetV3-Small
+# backbone this project uses).
+ROTATION_JITTER_DEG = 10.0        # in-plane tilt tolerance (camera/hand angle)
+SHEAR_JITTER = 0.12               # horizontal shear -- approximates a slightly rotated viewpoint
+BRIGHTNESS_CONTRAST_ALPHA = 0.85  # contrast multiplier for the lighting-jitter variant
+BRIGHTNESS_CONTRAST_BETA = -15.0  # brightness offset for the lighting-jitter variant
+
 _embed_lock = threading.Lock()  # serialize forward passes across camera threads
 
 
@@ -352,29 +365,66 @@ class ProductRecognizer:
         norms = np.where(norms == 0, 1.0, norms)
         return centered / norms
 
+    def _viewpoint_variants(self, image_bgr: np.ndarray) -> list[np.ndarray]:
+        """Synthesize a few extra views of `image_bgr` around the ANGLE the operator actually
+        captured, so identify() can still recognize the product from a nearby angle/tilt/distance
+        it never literally saw a training photo of. This is not "inventing" an unseen side of the
+        object (impossible from one 2-D photo) -- it's covering the gap BETWEEN two real captured
+        angles (e.g. the guided 360 recording's own turntable steps), and the ordinary lighting/
+        hand-tilt variation of an object being presented to a live camera versus how it was framed
+        during training.
+
+        Deliberately does NOT touch identify()'s thresholds (MATCH_FLOOR/HIST_MATCH_FLOOR/MARGIN)
+        to get this: every variant here is a geometric/photometric transform of a REAL registered
+        photo, so it only ever adds genuine additional positive evidence for that exact product --
+        it cannot make an unrelated object score higher, and the color-histogram cross-check in
+        identify() still runs against these variants exactly as it would against a real photo.
+        Skips (returns just the original) on a crop too small to warp usefully."""
+        variants = [image_bgr]
+        h, w = image_bgr.shape[:2]
+        if h < 16 or w < 16:
+            return variants
+        center = (w / 2.0, h / 2.0)
+
+        for angle in (-ROTATION_JITTER_DEG, ROTATION_JITTER_DEG):
+            matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
+            variants.append(cv2.warpAffine(image_bgr, matrix, (w, h), borderMode=cv2.BORDER_REFLECT101))
+
+        shear = SHEAR_JITTER
+        shear_matrix = np.array([[1.0, shear, -shear * h / 2.0], [0.0, 1.0, 0.0]], dtype=np.float32)
+        variants.append(cv2.warpAffine(image_bgr, shear_matrix, (w, h), borderMode=cv2.BORDER_REFLECT101))
+
+        variants.append(cv2.convertScaleAbs(image_bgr, alpha=BRIGHTNESS_CONTRAST_ALPHA,
+                                             beta=BRIGHTNESS_CONTRAST_BETA))
+        return variants
+
     # ---------------------------------------------------------------- API
     def add_sample(self, product_key: str, image_bgr: np.ndarray) -> int:
-        """Add one training image for a product. Returns the new sample count.
+        """Add one training image for a product. Returns the new REAL sample count (not the
+        internal gallery row count -- see _viewpoint_variants: each real photo also registers a
+        few synthetic nearby-angle/lighting variants for better matching robustness, but the UI's
+        "N photos" progress guidance must keep counting what the operator actually provided).
         Raises ProductDeleted if the product is not in the catalog (any more) - this is
         what stops a still-running import from resurrecting a deleted product."""
         self._require_active(product_key)        # fail fast before the expensive forward pass
-        combined = self._embed_and_describe(image_bgr)
+        rows = np.stack([self._embed_and_describe(variant)
+                          for variant in self._viewpoint_variants(image_bgr)])
         with self._lock:
             # Re-check atomically with the mutation: a delete that ran while we were
             # embedding has already removed the catalog entry, so we must not write.
             self._require_active(product_key)
             existing = self._gallery.get(product_key)
             self._gallery[product_key] = (
-                np.vstack([existing, combined[None, :]]) if existing is not None
-                else combined[None, :]
+                np.vstack([existing, rows]) if existing is not None else rows
             )
             np.save(self._gallery_path(product_key), self._gallery[product_key])
+            real_count = self._manifest.get(product_key, {}).get("count", 0) + 1
             self._manifest[product_key] = {
-                "count": len(self._gallery[product_key]),
+                "count": real_count,
                 "updated_at": time.time(),
             }
             self._save_manifest()
-            return self._manifest[product_key]["count"]
+            return real_count
 
     def clear_product(self, product_key: str) -> None:
         with self._lock:
