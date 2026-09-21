@@ -411,18 +411,25 @@ function initRecordCamera() {
     }
 }
 
-document.getElementById('record-start-btn').addEventListener('click', startRecording);
+document.getElementById('record-start-btn').addEventListener('click', () => {
+    if (recording) {
+        stopRequested = true;  // operator asked to stop early -- see the recording loop below
+        return;
+    }
+    startRecording();
+});
 
 function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
-// Recording keeps going until DISTINCT_VIEWS_TARGET genuinely different views have been
-// collected (measured server-side via core.training.LiveTrainingSession -- an embedding-based
-// near-duplicate check, the same one import_images/import_video use), not for a fixed duration.
-// A slow rotation reaches the target quickly and stops early; a fast/uneven one keeps going
-// (more ticks land on near-duplicate angles, so fewer of them count) up to MAX_RECORD_TICKS,
-// which exists only as a safety cap for a product that never actually rotates into new views.
+// DISTINCT_VIEWS_TARGET is a MILESTONE, not a stop condition: reaching it just marks the ring
+// "recommended amount reached" so the operator knows it's safe to stop, but recording keeps
+// going for as long as they want (more genuinely distinct views -> better matching accuracy,
+// and there is no cap on how many samples a product's gallery can hold) until they press
+// "หยุดบันทึก" themselves. MAX_RECORD_TICKS is only a safety cap for someone who walks away
+// mid-recording -- not a target duration.
 const DISTINCT_VIEWS_TARGET = RECOMMENDED_SAMPLES;
-const MAX_RECORD_TICKS = 90;  // 90 x 0.5s = 45s safety cap
+const MAX_RECORD_TICKS = 1200;  // 1200 x 0.5s = 10 min safety cap
+let stopRequested = false;
 
 async function startRecording() {
     if (recording || !selectedKey) return;
@@ -432,8 +439,8 @@ async function startRecording() {
         return;
     }
     recording = true;
+    stopRequested = false;
     const btn = document.getElementById('record-start-btn');
-    btn.disabled = true;
 
     const guide = document.getElementById('record-guide');
     const guideLabel = document.getElementById('record-guide-label');
@@ -455,7 +462,8 @@ async function startRecording() {
         }
 
         // Pre-roll countdown: gives the user time to center the product in
-        // the guide frame before any frame is actually captured.
+        // the guide frame before any frame is actually captured. Not stoppable
+        // (stopRequested is only checked once actual capturing starts below).
         guideLabel.textContent = 'เตรียมสินค้าให้อยู่กึ่งกลางกรอบ...';
         countdownEl.classList.remove('hidden');
         for (let s = RECORD_COUNTDOWN_SEC; s > 0; s--) {
@@ -466,9 +474,10 @@ async function startRecording() {
         countdownEl.classList.add('hidden');
 
         guide.classList.add('recording');
-        guideLabel.textContent = 'หมุนสินค้าช้าๆ ให้อยู่ในกรอบนี้ตลอด — ระบบจะเก็บภาพจนกว่าจะครบและหลากหลายพอ';
+        guideLabel.textContent = 'หมุนสินค้าช้าๆ ให้อยู่ในกรอบนี้ตลอด — กด "หยุดบันทึก" เมื่อพอแล้ว';
         ring.classList.add('active');
         ring.style.setProperty('--progress', '0');
+        btn.textContent = 'หยุดบันทึก';
 
         const canvas = document.getElementById('record-canvas');
         const sx = img.naturalWidth * GUIDE_RECT.x;
@@ -479,7 +488,7 @@ async function startRecording() {
         canvas.height = sh;
         const ctx = canvas.getContext('2d');
 
-        for (let tick = 0; tick < MAX_RECORD_TICKS && distinctViews < DISTINCT_VIEWS_TARGET; tick++) {
+        for (let tick = 0; tick < MAX_RECORD_TICKS && !stopRequested; tick++) {
             ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
             const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.9));
             if (blob) {
@@ -496,14 +505,14 @@ async function startRecording() {
                 } catch (e) { /* a dropped frame is not fatal -- the loop just keeps going */ }
             }
 
-            // The ring/angle readout is now a COVERAGE indicator, not a countdown: it fills as
-            // distinct views are actually collected, so it can slow down or pause if the product
-            // stops rotating into new angles, instead of always finishing "on time" regardless of
-            // whether the data is any good.
+            // The ring/angle readout is a COVERAGE indicator against the recommended milestone,
+            // not a countdown to a stop: it fills to 100% once DISTINCT_VIEWS_TARGET is reached
+            // and just stays there while recording continues, since more distinct views beyond
+            // the milestone still keep improving matching accuracy.
             const angle = Math.round(Math.min(1, distinctViews / DISTINCT_VIEWS_TARGET) * 360);
             ring.style.setProperty('--progress', String(angle));
             angleStatus.textContent = distinctViews >= DISTINCT_VIEWS_TARGET
-                ? `เก็บมุมมองที่แตกต่างกันครบแล้ว (${distinctViews}/${DISTINCT_VIEWS_TARGET})`
+                ? `ครบเป้าหมายแนะนำแล้ว (${distinctViews}/${DISTINCT_VIEWS_TARGET}) — บันทึกต่อได้เพื่อความแม่นยำเพิ่มเติม หรือกด "หยุดบันทึก"`
                 : `เก็บได้ ${distinctViews}/${DISTINCT_VIEWS_TARGET} มุมที่แตกต่างกัน — หมุนสินค้าต่อไปเรื่อยๆ`;
             statusEl.textContent = `กำลังบันทึก... ประมวลผลแล้ว ${attempted} เฟรม, ใช้ได้จริง ${distinctViews} มุม`;
             await sleep(RECORD_TICK_MS);
@@ -514,6 +523,7 @@ async function startRecording() {
         guideLabel.textContent = 'วางสินค้าในกรอบนี้';
         ring.classList.remove('active');
         angleStatus.textContent = '';
+        btn.textContent = 'เริ่มบันทึก 360° (~15 วินาที)';
         btn.disabled = false;
         recording = false;
     }
@@ -529,8 +539,8 @@ async function startRecording() {
         await fetchProducts();
         selectProduct(selectedKey);
         statusEl.textContent = distinctViews >= DISTINCT_VIEWS_TARGET
-            ? `บันทึกสำเร็จ: เก็บมุมมองที่แตกต่างกัน ${result.added} มุม จาก ${result.attempted} เฟรม`
-            : `หยุดบันทึก (ครบเวลาสูงสุด): เก็บได้ ${result.added} มุมจาก ${DISTINCT_VIEWS_TARGET} ที่แนะนำ ` +
+            ? `บันทึกสำเร็จ: เก็บมุมมองที่แตกต่างกัน ${result.added} มุม จาก ${result.attempted} เฟรม — บันทึกเพิ่มได้อีกเรื่อยๆ เพื่อความแม่นยำสูงสุด`
+            : `หยุดบันทึก: เก็บได้ ${result.added} มุมจาก ${DISTINCT_VIEWS_TARGET} ที่แนะนำ ` +
               `— ลองบันทึกเพิ่มหรืออัปโหลดรูป/วิดีโอเพิ่มเติมเพื่อความแม่นยำ`;
     } catch (e) {
         statusEl.textContent = 'ล้มเหลว: ไม่สามารถสรุปผลการบันทึกได้';
