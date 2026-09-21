@@ -142,7 +142,16 @@ PRODUCT_CONFIRM_HITS = 2                  # an embedding-matched product must be
 # never passed through for a box at or above full-trust size -- see the "> CUSTOM_RECOGNITION_
 # BASE_FLOOR" check at the call site).
 CUSTOM_RECOGNITION_BASE_FLOOR = 0.45
-CUSTOM_RECOGNITION_EVERY_N_AI_PASSES = 2  # embedding-based custom recognition runs at half the YOLO/AI pass rate
+# Was 2 (custom recognition ran at half the YOLO/AI pass rate). Product recognition is gated
+# behind a cheap background-subtraction proposal first (see core/localizer.py), so the expensive
+# embedding match only ever runs when something actually changed in frame -- there is no "wasted"
+# full-rate cost the way there would be for an unconditional per-frame pass. Running it at the
+# full AI pass rate halves real-world detection latency (both first-sighting and re-confirmation
+# after a miss) without weakening accuracy: PRODUCT_CONFIRM_HITS/MATCH_FLOOR/HIST_MATCH_FLOOR are
+# unchanged, so a product still needs the same number of genuinely agreeing sightings -- they
+# just arrive twice as fast in wall-clock time, which also halves the on-screen box's lag behind
+# a moving product between confirmations.
+CUSTOM_RECOGNITION_EVERY_N_AI_PASSES = 1
 MIN_CROP_SIDE_PX = 24        # ignore foreground blobs too small to embed meaningfully
 AI_RECOVERY_SUCCESS_COUNT = 3  # successful passes required before clearing an AI error
 STOP_JOIN_TIMEOUT_SEC = 3.0
