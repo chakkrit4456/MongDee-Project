@@ -262,10 +262,16 @@ function renderViewers() {
     // broken-image icon on a random one of the panels, not always the same
     // camera). The <img> tags are created with no `src` above specifically
     // so this can stagger the actual connection starts a beat apart instead
-    // of firing them all in the same JS tick.
+    // of firing them all in the same JS tick. The cache-busting `?t=` param
+    // (already used by every *reconnect* below) is added here too: two
+    // panels whose connections happen to land on the exact same
+    // "/stream/{id}" string with no unique suffix are otherwise a request
+    // a browser/proxy is free to coalesce into one shared connection,
+    // which is a second, independent way for one panel to end up showing
+    // another panel's camera.
     imgs.forEach((img, i) => {
         setTimeout(() => {
-            if (img.isConnected) img.src = `/stream/${img.dataset.cam}`;
+            if (img.isConnected) img.src = `/stream/${img.dataset.cam}?t=${Date.now()}`;
         }, i * 250);
     });
     updateCamFullscreenIcons();

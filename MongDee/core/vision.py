@@ -52,8 +52,9 @@ from core.attributes import attenuate_confidence, face_min_confidence
 from core.box_motion import BoxFollower
 from core.face import FaceService
 from core.frame_integrity import FrameIntegrity
-from core.localizer import ForegroundProposer, crop_box
-from core.product_confirm import ProductConfirmer
+from core.localizer import ForegroundProposer, crop_box, exclude_human_region
+from core.person_segmenter import get_person_segmenter
+from core.product_confirm import ProductConfirmer, product_confirm_hits_for, product_min_confidence
 from core.text_render import blit as blit_label, render_label
 from core.tracker import PersonTracker
 
@@ -64,6 +65,18 @@ FAIL_THRESHOLD = 12          # consecutive failed reads before a camera is flagg
 # worker thread forever while the tile keeps showing the last frame as "online". A watchdog (see
 # CameraWorker.recover_from_hung_read) treats a read that has not returned for this long as a hang.
 CAPTURE_READ_STALL_SEC = 3.0
+# recover_from_hung_read() releases the capture from the watchdog thread, which unblocks a stuck
+# read on backends that honour a release from another thread — the fast path, proven in
+# tests/core/test_camera_unplug_replug.py::test_a_hung_read_is_recovered_without_blocking_the_watchdog.
+# But that same test also shows the underlying native call itself does not always return even after
+# release() (a genuinely wedged DirectShow/MSMF graph): when that happens, this worker's OWN thread
+# stays parked inside the OS driver call forever, and nothing short of killing the process can
+# reclaim it (see core/capture_process.py's module docstring). After this many consecutive hang
+# recoveries with no good frame in between, this camera permanently switches to process-isolated
+# capture (core.capture_process.CaptureProcess) for the rest of this run: reads go through shared
+# memory and never block this thread again, and a wedged child is killed/respawned by its own
+# watchdog instead of leaking this camera's worker. 0 disables escalation (old behaviour only).
+HANG_ESCALATION_THRESHOLD = int(os.environ.get("MONGDEE_CAPTURE_ESCALATE_AFTER", "3"))
 # A USB camera that stops delivering GOOD frames (unplugged, frozen buffer, torn/noise burst, hung read)
 # is reported offline after this long - the tile then shows the "reconnecting" card at once instead of a
 # frozen or garbled picture. Shortened to STREAM_STALE_SUSPECT_SEC for SUSPECT_WINDOW_SEC after the
@@ -119,6 +132,16 @@ DEFAULT_AI_IMGSZ_CPU = 320
 AI_BASE_FPS = 30.0            # matches the FPS requested from the camera in _open() — used to turn
                                # detect_every_n_frames into a wall-clock AI cadence (see AIWorker/run_ai_pass)
 PRODUCT_CONFIRM_HITS = 2                  # an embedding-matched product must be seen in this many passes
+# Reference floor for product_min_confidence's size-based scaling in _run_custom_recognition
+# (below) -- an independent constant, not a live read of core.recognizer.MATCH_FLOOR, since
+# CameraWorker deliberately never imports core.recognizer (the recognizer is a duck-typed
+# constructor argument, not a concrete dependency). Set to MATCH_FLOOR's own default value; if an
+# operator tunes recognizer.identify()'s floor separately, only the SIZE-BASED extra requirement
+# below is affected, never the recognizer's own unscaled floor for full-trust-size boxes (this
+# constant is only ever used to compute how much HIGHER a small box's floor should be, and is
+# never passed through for a box at or above full-trust size -- see the "> CUSTOM_RECOGNITION_
+# BASE_FLOOR" check at the call site).
+CUSTOM_RECOGNITION_BASE_FLOOR = 0.45
 CUSTOM_RECOGNITION_EVERY_N_AI_PASSES = 2  # embedding-based custom recognition runs at half the YOLO/AI pass rate
 MIN_CROP_SIDE_PX = 24        # ignore foreground blobs too small to embed meaningfully
 AI_RECOVERY_SUCCESS_COUNT = 3  # successful passes required before clearing an AI error
@@ -140,7 +163,16 @@ PERSON_FEMALE_COLOR = (102, 102, 255)  # BGR red   — คนที่ระบ�
 PERSON_MALE_COLOR = (255, 179, 94)     # BGR blue  — คนที่ระบบจำแนกว่าเป็นผู้ชาย
 PRODUCT_COLOR = (0, 200, 0)       # BGR green — สินค้า (รู้จักแล้ว)
 FACE_COLOR = (255, 200, 0)        # BGR cyan-blue — ใบหน้า (face detection overlay)
-UNKNOWN_COLOR = (150, 150, 150)   # BGR gray — พบวัตถุแต่ยังไม่รู้จัก (ยังไม่ได้เทรน) — สำหรับ "สินค้า" เท่านั้น
+# STRICT UNKNOWN DETECTION rule (PRODUCTS ONLY, see _run_custom_recognition):
+# an unmatched product candidate is never rendered at all -- a box promises
+# the viewer "this is a real registered product", so an unresolved candidate
+# gets no box, not a placeholder. This does NOT apply to people: a detected
+# person is always shown (PERSON_UNKNOWN_COLOR / "PERSON NN%") the moment
+# they're tracked, even before gender evidence is sufficient -- hiding the
+# person track until classified would contradict detect-first tracking
+# (person-gender evidence master prompt, "PERSON must be detected before
+# gender is known"). Only products get the render-nothing-until-confident
+# treatment; a pending person keeps a stable box and label.
 TRIPWIRE_LINE_COLOR = (0, 165, 255)     # BGR orange — เส้นนับคน (Virtual Tripwire)
 TRIPWIRE_TEXT_COLOR = (255, 255, 255)   # BGR white — ตัวเลข IN/OUT บนเส้น
 BOX_THICKNESS = 2
@@ -475,6 +507,17 @@ from core.camera_identity import DIRECTSHOW_LOCK
 _open_lock = DIRECTSHOW_LOCK
 OPEN_LOCK_TIMEOUT_SEC = 5.0
 
+# See core.capture_process.CROSS_PROCESS_OPEN_LOCK's own docstring: this additionally serializes
+# _open_capture against an escalated camera's own open, which happens in a different OS process and
+# so cannot be reached by the in-process _open_lock above. Importing it here (module load time, in
+# whichever process runs this code) is correct for every *normal* caller in this process — the
+# parent only ever has one such lock instance for its whole lifetime. An escalated camera's child
+# process must NOT rely on a fresh import of this to get "the same" lock (a spawned child's fresh
+# import creates an unrelated instance); make_negotiated_capture_for_process below is always called
+# with the parent's actual instance passed explicitly instead, for exactly that reason.
+import core.capture_process as _capture_process
+from core.capture_process import CROSS_PROCESS_OPEN_LOCK as _CROSS_PROCESS_OPEN_LOCK
+
 # The (codec, width, height, fps) profiles _open_capture negotiates, in
 # order — None means "leave the camera's own native/default format alone".
 # Compressed formats first and shrinking resolution/FPS before ever falling
@@ -635,7 +678,45 @@ def _forbidden_device_name(device) -> str | None:
     return None
 
 
-def _open_capture(device, label: str | None = None, low_bandwidth_only: bool = False) -> cv2.VideoCapture:
+def _release_capture_safely(cap: cv2.VideoCapture, label: str) -> threading.Event:
+    """Release `cap` on its own daemon thread and wait up to
+    RELEASE_JOIN_TIMEOUT_SEC for it to finish, returning the completion
+    Event either way -- never blocks the caller past that timeout.
+
+    cap.release() can itself block forever on a wedged DirectShow graph --
+    real, observed behaviour on this project's own hardware (see
+    RELEASE_JOIN_TIMEOUT_SEC's own comment); CameraWorker._release_capture()
+    already guards against it for a worker's own long-lived capture. This
+    is the same guard as a free function, for every OTHER place a capture
+    from _open_capture() gets released -- which matters even more there:
+    a wedge inside _open_capture()'s own candidate-rejection loop (called
+    while holding the shared _open_lock) would hold that lock forever and
+    silently stop every camera in the process from ever opening again;
+    a wedge inside discover_cameras() (which BoothManager's Hot-Plug Scan
+    calls forever, every 5-30s, for the entire life of the process -- by
+    far its most frequent caller) would permanently kill hot-plug
+    recovery. Both match this project's own reported failure mode exactly
+    ("works fine for a while, then one or all cameras get stuck
+    'connecting' until the process is restarted") and neither used to go
+    through this protection -- every release of an _open_capture() result
+    must, from here on."""
+    done = threading.Event()
+
+    def _do_release():
+        try:
+            cap.release()
+        except Exception:
+            pass
+        finally:
+            done.set()
+
+    threading.Thread(target=_do_release, daemon=True, name=f"mongdee-release-{label}").start()
+    done.wait(RELEASE_JOIN_TIMEOUT_SEC)
+    return done
+
+
+def _open_capture(device, label: str | None = None, low_bandwidth_only: bool = False,
+                   cross_process_lock=None) -> cv2.VideoCapture:
     """Open under a bounded process-wide lock and require one real frame.
 
     isOpened() alone isn't proof a backend works — MSMF (and, on other
@@ -675,6 +756,21 @@ def _open_capture(device, label: str | None = None, low_bandwidth_only: bool = F
     got_lock = _open_lock.acquire(timeout=OPEN_LOCK_TIMEOUT_SEC)
     if not got_lock:
         logger.debug("[%s] open skipped: initializer lock busy, will retry", tag)
+        return cv2.VideoCapture()
+    cp_lock = cross_process_lock if cross_process_lock is not None else _CROSS_PROCESS_OPEN_LOCK
+    # An explicit cross_process_lock (an escalated camera's own child, see
+    # make_negotiated_capture_for_process) always serializes -- it is only ever passed once a
+    # second OS process genuinely exists. Otherwise, skip this real OS semaphore entirely until
+    # note_process_capture_starting() reports that some camera, somewhere, has actually escalated:
+    # before that, every open in the whole process's history has come from this one process, so
+    # there is nothing to serialize against and paying a multiprocessing.Lock's per-call cost
+    # (meaningfully higher than the plain in-process RLock above) on every single camera open
+    # would be pure overhead for what is, in the overwhelming common case, its entire lifetime.
+    need_cp_lock = cross_process_lock is not None or _capture_process.cross_process_lock_active()
+    got_cp_lock = cp_lock.acquire(timeout=OPEN_LOCK_TIMEOUT_SEC) if need_cp_lock else True
+    if not got_cp_lock:
+        logger.debug("[%s] open skipped: cross-process initializer lock busy, will retry", tag)
+        _open_lock.release()
         return cv2.VideoCapture()
     attempts: list[tuple[str, str, bool, bool]] = []
     try:
@@ -752,7 +848,12 @@ def _open_capture(device, label: str | None = None, low_bandwidth_only: bool = F
                         "OK" if opened else "FAILED", "OK" if read_ok else "FAILED",
                     )
                     if not accepted:
-                        cap.release()
+                        # Async + bounded (see _release_capture_safely's docstring): this runs
+                        # while still holding _open_lock, so a wedged release here -- most likely
+                        # exactly for a candidate that just failed to open/stream, i.e. this one --
+                        # would otherwise hold that lock forever and stop every camera in the
+                        # process from opening again, not just this one.
+                        _release_capture_safely(cap, f"{tag}-reject")
                 if not opened:
                     # isOpened() is False before any format is even requested, so the profile cannot be the
                     # cause: the device is absent or busy. Retrying it with every other profile only repeats
@@ -765,8 +866,30 @@ def _open_capture(device, label: str | None = None, low_bandwidth_only: bool = F
         )
         return cv2.VideoCapture()
     finally:
+        if need_cp_lock and got_cp_lock:
+            cp_lock.release()
         if got_lock:
             _open_lock.release()
+
+
+def make_negotiated_capture_for_process(device=None, label: str | None = None, cross_process_lock=None):
+    """core.capture_process.CaptureProcess factory for an escalated camera's own OS process (see
+    CameraWorker._ensure_process_capture). Runs the exact same backend/resolution negotiation as
+    every other camera's open (_open_capture above) -- an escalated camera keeps the hard-won
+    MJPG/YUY2/low-bandwidth fallback behaviour instead of falling back to a naive, unnegotiated
+    cv2.VideoCapture(index) that would silently regress to whatever format the device defaults to.
+
+    `cross_process_lock` is CROSS_PROCESS_OPEN_LOCK, passed in explicitly by the parent (see that
+    lock's own docstring for why a plain import here would not be the same lock instance). Raises
+    when every candidate fails, which is what CaptureProcess._child_main expects: it marks the
+    shared-memory slot STATE_FAIL and returns, and the parent's watchdog kills+respawns this child
+    on its own bounded backoff -- so an escalated camera's failed opens are retried exactly like a
+    thread-mode camera's, just one level further out.
+    """
+    cap = _open_capture(device, label=label, cross_process_lock=cross_process_lock)
+    if not cap.isOpened():
+        raise RuntimeError(f"escalated capture: cannot open device={device!r}")
+    return cap
 
 
 # How much higher a frame's local pixel-to-pixel roughness is allowed to be
@@ -892,6 +1015,17 @@ def _read_with_warmup(cap, attempts: int = OPEN_WARMUP_READS) -> bool:
     return False
 
 
+DISCOVERY_INDEX_SAFETY_MARGIN = 2   # always probe this many indices past `known`'s own reported
+                                     # max, in case that DirectShow enumeration snapshot is
+                                     # incomplete (see discover_cameras' docstring). Deliberately
+                                     # small, not a large floor: the whole point of consulting
+                                     # `known` at all is avoiding a heavy blind sweep's open/close
+                                     # churn (itself a cause of USB camera "cooldown"), so this
+                                     # hedges against a *plausible* small enumeration undercount
+                                     # (one race, one still-initializing driver) without giving up
+                                     # most of that benefit the way a large fixed floor would.
+
+
 def discover_cameras(max_index: int = 16, max_found: int = 16, warmup_reads: int = 5,
                       skip: frozenset[int] = frozenset()) -> list[int]:
     """Probe camera indices 0..max_index and return the ones that actually
@@ -922,6 +1056,24 @@ def discover_cameras(max_index: int = 16, max_found: int = 16, warmup_reads: int
     # ~1 s failed open; heavy open/close churn is itself what leaves a USB camera in its 15-30 s
     # "cooldown" (E7) and hurts the following real open. Enumeration failing/unavailable (non-Windows,
     # no pygrabber) keeps the old blind sweep.
+    #
+    # CONFIRMED ROOT CAUSE (MongDee missing-cameras investigation): this used to trust `known`'s max
+    # index as an exact, complete count and clamp the probe range to it (`max(known) + 1`). But
+    # list_directshow_devices()'s own docstring already discloses that pygrabber's COM enumeration
+    # can fail/be unavailable outright (handled -- an empty `known` keeps the full blind sweep,
+    # below) -- it does NOT guarantee a *non-empty* result is complete. A DirectShow enumeration
+    # snapshot taken while a USB camera's driver is still finishing initialization (very plausible
+    # at startup with several cameras, or right after a hot-plug event -- exactly when this
+    # function is called) can legitimately report fewer devices than physically exist right now.
+    # Before this fix, any index beyond that incomplete count was never even attempted -- not
+    # retried, not logged as missing, simply never probed -- which matches "Windows sees cameras
+    # A/B/C/D but MongDee only shows a subset" exactly: not a per-camera open failure (that would at
+    # least log something), but indices this function silently never tried in the first place.
+    # DISCOVERY_MIN_PROBE_INDEX keeps a "handful or more" floor regardless of how few devices
+    # `known` currently reports, and DISCOVERY_INDEX_SAFETY_MARGIN probes a few indices past
+    # DirectShow's own reported max, so a momentarily-incomplete enumeration no longer permanently
+    # hides a real camera -- while still skipping the pointless dead-index probes this
+    # optimization exists to avoid when `known` genuinely is complete.
     try:
         from core.camera_identity import list_directshow_devices
 
@@ -929,7 +1081,7 @@ def discover_cameras(max_index: int = 16, max_found: int = 16, warmup_reads: int
     except Exception:
         known = {}
     if known:
-        max_index = min(max_index, max(known) + 1)
+        max_index = min(max_index, max(known) + 1 + DISCOVERY_INDEX_SAFETY_MARGIN)
     for i in range(max_index):
         if i in skip:
             continue
@@ -938,7 +1090,11 @@ def discover_cameras(max_index: int = 16, max_found: int = 16, warmup_reads: int
             if cap.isOpened() and _read_with_warmup(cap, attempts=warmup_reads):
                 found.append(i)
         finally:
-            cap.release()
+            # Async + bounded (see _release_capture_safely's docstring) -- this function is
+            # called forever by BoothManager's Hot-Plug Scan, so a wedged synchronous release
+            # here used to be able to permanently hang that thread and kill hot-plug recovery
+            # for the rest of the process's life.
+            _release_capture_safely(cap, f"discover-{i}")
         if len(found) >= max_found:
             break
     return found
@@ -960,7 +1116,7 @@ class CameraWorker(threading.Thread):
 
     def __init__(self, camera_id: str, device, model, allowed_classes: list[str],
                  recognizer=None, conf_threshold: float = 0.45, device_target="cpu",
-                 show_unknown: bool = True, on_frame=None, on_detections=None, on_status=None,
+                 on_frame=None, on_detections=None, on_status=None,
                  on_person_tracks=None, gender_age_backend=None, performance_monitor=None,
                  ai_worker: "AIWorker | None" = None, global_id_resolver=None,
                  global_attribute_resolver=None, is_product_live=None, face_detector=None,
@@ -978,6 +1134,15 @@ class CameraWorker(threading.Thread):
         self.hang_recoveries = 0
         self.stale_recoveries = 0
         self.stuck_releases = 0
+        # See HANG_ESCALATION_THRESHOLD's docstring. _consecutive_hang_recoveries resets to 0 on
+        # every good frame (thread mode only -- see run()); once it reaches the threshold this
+        # camera escalates permanently to process-isolated capture for the rest of this run.
+        self._consecutive_hang_recoveries = 0
+        self._escalate_to_process = False
+        self._process_capture = None   # core.capture_process.CaptureProcess, only once escalated
+        self._pump_thread: "threading.Thread | None" = None  # see _run_process_capture_pump
+        self._fail_count = 0
+        self._last_reason_code = "OK"  # see _classify_reason
         self._frame_integrity = FrameIntegrity(freeze_sec=FROZEN_STREAM_SEC, freeze_min_frames=10)
         self._last_good_frame_ts: float | None = None   # monotonic time of the last frame that passed every check
         self._good_streak = 0
@@ -1035,11 +1200,11 @@ class CameraWorker(threading.Thread):
         self.global_attribute_resolver = global_attribute_resolver
         # Optional (camera_id, track_id) -> ("male"|"female", confidence) | None: the ONE gender this person is shown
         # with, decided per Global Person (BoothManager wires it), so the same person never appears as two different
-        # genders on two cameras. When set, a person with no evidence yet is drawn as "PERSON" - never "UNKNOWN".
+        # genders on two cameras. An unclassified person is still drawn (as "PERSON NN%", PERSON_UNKNOWN_COLOR)
+        # regardless of whether this is set -- only the label/gender it shows once classified depends on it.
         self.gender_resolver = gender_resolver
         self.conf_threshold = conf_threshold
         self.device_target = device_target
-        self.show_unknown = show_unknown
         # Optional core.performance.PerformanceMonitor (duck-typed, not
         # imported, matching gender_age_backend's pattern below): when set,
         # every capture/drop/display/AI event is reported to it so a
@@ -1056,6 +1221,7 @@ class CameraWorker(threading.Thread):
         self._ai_pass_count = 0
         self._latest_capture_frame = None
         self._latest_capture_seq = -1
+        self._latest_capture_ts: float | None = None
         self._frame_seq = 0
         # Moves the drawn boxes with the picture between AI passes (core/box_motion.py). None = draw the last
         # AI boxes as they are (the old behaviour).
@@ -1107,6 +1273,7 @@ class CameraWorker(threading.Thread):
         ]
 
         self._proposer = ForegroundProposer()
+        self._person_segmenter = get_person_segmenter(device_target)
         self._stop_event = threading.Event()
         self._running = False
         self._enabled = True
@@ -1173,13 +1340,13 @@ class CameraWorker(threading.Thread):
             low_bandwidth_only=force_low or (_low_bandwidth_open_preferred() and preferred_capture_profile() is None),
         )
         if not cap.isOpened():
-            cap.release()
+            _release_capture_safely(cap, self.camera_id)
             return False
 
         # _open_capture already configured and validated this exact stream.
         # Reapplying properties here can restart capture and invalidate it.
         if self._stop_event.is_set():
-            cap.release()
+            _release_capture_safely(cap, self.camera_id)
             return False
         with self._cap_lock:
             self._cap = cap
@@ -1325,22 +1492,48 @@ class CameraWorker(threading.Thread):
             cap, self._cap = self._cap, None
         if cap is None:
             return
-        # cap.release() on a wedged DirectShow graph can block forever. Run it on a helper thread so the
-        # capture loop and (more importantly) the shared watchdog thread never hang with it; a reopen waits
-        # for the release to finish (see _open) because the same device cannot be opened twice.
-        done = threading.Event()
-        self._release_done = done
+        # See _release_capture_safely's docstring: cap.release() on a wedged DirectShow graph can
+        # block forever, so this runs on a helper thread instead of the capture loop (or, worse,
+        # the shared watchdog thread); a reopen waits for self._release_done up to
+        # RELEASE_WAIT_BEFORE_REOPEN_SEC (see _open) because the same device cannot be opened twice.
+        self._release_done = _release_capture_safely(cap, self.camera_id)
 
-        def _do_release():
-            try:
-                cap.release()
-            except Exception:
-                pass
-            finally:
-                done.set()
+    def _process_capture_spec(self) -> tuple[str, dict]:
+        """(factory, kwargs) for this camera's escalated CaptureProcess — a separate method
+        purely so tests can substitute core.capture_sim's fault-injection factories for the real
+        negotiated-capture one below, the same way core.capture_process's own test suite does,
+        without needing real camera hardware to prove the escalation wiring itself is correct
+        end-to-end (see tests/core/test_camera_process_escalation.py)."""
+        from core.capture_process import CROSS_PROCESS_OPEN_LOCK
+        return ("core.vision:make_negotiated_capture_for_process",
+                {"device": self.device, "label": self.camera_id, "cross_process_lock": CROSS_PROCESS_OPEN_LOCK})
 
-        threading.Thread(target=_do_release, daemon=True, name=f"mongdee-release-{self.camera_id}").start()
-        done.wait(RELEASE_JOIN_TIMEOUT_SEC)
+    def _ensure_process_capture(self) -> None:
+        """Idempotent: starts this camera's CaptureProcess once, on first entry after escalation
+        (see HANG_ESCALATION_THRESHOLD). Every later call while already escalated is a no-op --
+        CaptureProcess's own watchdog thread handles that child's whole lifecycle from here on
+        (stale/dead detection, kill, bounded-backoff respawn), same as core.vision.CameraWorker
+        does for a thread-mode camera, just one process further out."""
+        if self._process_capture is not None:
+            return
+        from core.capture_process import CaptureProcess
+        factory, kwargs = self._process_capture_spec()
+        self._process_capture = CaptureProcess(factory, kwargs, name=str(self.camera_id))
+        self._process_capture.start()
+
+    def get_capture_mode(self) -> str:
+        """'process' once this camera has escalated (see HANG_ESCALATION_THRESHOLD), else
+        'thread' -- exposed to BoothManager for the per-camera diagnostics panel (spec section 30:
+        callers should not have to reach into private attributes to tell the two apart)."""
+        return "process" if self._escalate_to_process else "thread"
+
+    def get_worker_pid(self) -> int | None:
+        """OS pid of this camera's own capture process once escalated, else None (thread-mode
+        capture runs inside this process, under this worker's thread id, not a pid of its own)."""
+        return self._process_capture.pid if self._process_capture is not None else None
+
+    def get_hang_escalations(self) -> int:
+        return 1 if self._escalate_to_process else 0
 
     def _note_fault(self) -> None:
         """Record a stream fault that forced a release. Two within FAULT_WINDOW_SEC -> reopen with the
@@ -1351,7 +1544,38 @@ class CameraWorker(threading.Thread):
         if len(self._fault_times) >= FAULTS_BEFORE_LOW_BANDWIDTH:
             self._low_bandwidth_until = now + LOW_BANDWIDTH_HOLD_SEC
 
+    # Spec-required machine-filterable failure classification (see module docstring for the full
+    # set this project's own root-cause reports motivated). Free-text Thai messages stay the
+    # human-facing UI copy; this is the companion code BoothManager exposes via get_state()/
+    # get_camera_snapshot() for anything that needs to group/alert/dashboard on failure kind
+    # instead of parsing localized strings. Best-effort: derived from the same message text and
+    # instance state this worker already produces, not a second parallel source of truth.
+    def _classify_reason(self, status: str, message: str) -> str:
+        if status in ("online", "connecting", "degraded"):
+            return "OK"
+        if status == "disabled":
+            return "DISABLED"
+        present = self.device_present_fn(self.device) if self.device_present_fn else None
+        if present is False:
+            return "PHYSICAL_DISCONNECT"
+        if "อ่านภาพค้าง" in message:
+            return "BLOCKED_READ"
+        if "หยุดหรือเสียหาย" in message:
+            return "FROZEN_FRAME" if self._frame_integrity.frozen_for(time.time()) > 0 else "CORRUPT_FRAME"
+        if "เปิดกล้อง" in message and "ไม่สำเร็จ" in message:
+            return "OPEN_FAILED"
+        if "ไม่ได้ต่อเนื่อง" in message:
+            recent_corrupt = sum(v for k, v in self._integrity_counts.items() if k != "frozen")
+            return "CORRUPT_FRAME" if recent_corrupt > 0 else "READ_FAILED"
+        if "AI" in message:
+            return "BACKEND_FAILURE"
+        return "UNKNOWN"
+
+    def get_last_reason_code(self) -> str:
+        return self._last_reason_code
+
     def _emit_status(self, status: str, message: str = ""):
+        self._last_reason_code = self._classify_reason(status, message)
         if status != self._last_status:
             self._last_status = status
             self.on_status(self.camera_id, status, message)
@@ -1402,8 +1626,15 @@ class CameraWorker(threading.Thread):
             if (class_name != PERSON_CLASS_NAME and self.is_product_live is not None
                     and not self.is_product_live(class_name)):
                 continue  # deleted from the catalog after this worker was built
-            if class_name != PERSON_CLASS_NAME and conf < self.conf_threshold:
-                continue  # the lowered detector threshold is for people only
+            if class_name != PERSON_CLASS_NAME:
+                # A small, low-detail box far from the camera must clear a HIGHER bar than a
+                # close, sharp one before it is trusted as a specific product -- otherwise a
+                # distant, ambiguous detection is reported with exactly the same confidence as an
+                # unambiguous close-up one (see core.product_confirm's module docstring, which
+                # mirrors core.attributes.face_min_confidence's identical reasoning for faces).
+                box_px = min(bbox[2] - bbox[0], bbox[3] - bbox[1])
+                if conf < product_min_confidence(box_px, self.conf_threshold):
+                    continue  # the lowered detector threshold is for people only
             claimed_boxes.append(bbox)
             if class_name == PERSON_CLASS_NAME:
                 person_boxes.append(bbox)
@@ -1510,29 +1741,71 @@ class CameraWorker(threading.Thread):
         Skipped entirely (no proposer/embedding work at all) when there is
         no trained product to match against yet — the catalog starts empty
         (see GUIDE.md), so for a fresh install this is otherwise pure
-        wasted CPU on every single AI pass for no possible result."""
+        wasted CPU on every single AI pass for no possible result.
+
+        Pipeline per proposal, in order: current-frame foreground proposal
+        -> current-frame human-region segmentation/exclusion -> embedding
+        match against the registered gallery -> temporal confirmation. A
+        candidate is never matched against the gallery using pixels this
+        pass's own current frame shows as human (hand/arm/sleeve) — that
+        exclusion runs before recognition, not after, so a bare hand can
+        never itself be identified as a product no matter what it happens
+        to score.
+
+        A candidate that does not clear identify()'s bar is dropped
+        outright -- never drawn as "UNKNOWN". A rendered box promises the
+        viewer "this is a real, specific thing"; an unresolved candidate is
+        not one, so the correct UI state for it is no box at all, not a
+        generic placeholder box (hard rule: STRICT UNKNOWN DETECTION)."""
         detections = []
         if self.recognizer is None or not self.recognizer.has_any_gallery():
             self._product_confirmer.reset()
             return detections
-        self._product_confirmer.forget_stale(time.time())
+        now = time.time()
+        self._product_confirmer.forget_stale(now)
+        confirmed_this_pass: set[str] = set()
         proposals = self._proposer.propose(frame, exclude_boxes=claimed_boxes, max_regions=2)
+        human_mask = self._person_segmenter.person_mask(frame) if proposals else None
         for bbox in proposals:
-            crop = crop_box(frame, bbox)
+            refined = exclude_human_region(bbox, human_mask)
+            if refined is None:
+                continue  # mostly hand/arm in the current frame -- never a product candidate
+            crop = crop_box(frame, refined)
             if crop.shape[0] < MIN_CROP_SIDE_PX or crop.shape[1] < MIN_CROP_SIDE_PX:
                 continue
+            box_px = min(refined[2] - refined[0], refined[3] - refined[1])
+            # See core.product_confirm's module docstring: a small/far candidate must score higher
+            # than recognizer.identify()'s own default floor before it is even considered a match
+            # at all. product_min_confidence returns CUSTOM_RECOGNITION_BASE_FLOOR unchanged for a
+            # full-trust-size box, so identify() only gets an explicit (stricter) floor when this
+            # candidate is actually small -- never changes behaviour for the common case.
+            required_floor = product_min_confidence(box_px, CUSTOM_RECOGNITION_BASE_FLOOR)
+            identify_kwargs = {"floor": required_floor} if required_floor > CUSTOM_RECOGNITION_BASE_FLOOR else {}
             try:
-                product_key, score = self.recognizer.identify(crop)
+                product_key, score = self.recognizer.identify(crop, **identify_kwargs)
             except Exception as exc:
                 raise RuntimeError(f"custom recognizer failed: {exc}") from exc
             if product_key:
-                if not self._product_confirmer.confirm(product_key, bbox, time.time()):
+                required_hits = product_confirm_hits_for(box_px, PRODUCT_CONFIRM_HITS)
+                if not self._product_confirmer.confirm(product_key, refined, now, min_hits=required_hits,
+                                                        score=score):
                     continue  # first sighting: could be background clutter - wait for a second pass
+                confirmed_this_pass.add(product_key)
                 label = f"{self._product_display_name(product_key, _ascii_label(product_key))} {score:.0%}"
-                draw_boxes.append((bbox, label, PRODUCT_COLOR))
-                detections.append({"class_name": product_key, "conf": score, "bbox": bbox})
-            elif self.show_unknown:
-                draw_boxes.append((bbox, f"UNKNOWN {score:.0%}", UNKNOWN_COLOR))
+                draw_boxes.append((refined, label, PRODUCT_COLOR))
+                detections.append({"class_name": product_key, "conf": score, "bbox": refined})
+            # else: no registered product matched this candidate confidently enough --
+            # dropped silently, never rendered (see docstring above).
+        # A product confirmed on a recent pass but not re-matched on THIS one (a momentary
+        # embedding-score dip from motion blur, a hand briefly crossing it, a lighting flicker)
+        # keeps its last box (and last real score, not a placeholder) for a short grace window
+        # instead of blinking off and back on -- see
+        # core.product_confirm.ProductConfirmer.coasting's own docstring for why this mirrors
+        # core.tracker.PersonTracker.coasting_tracks rather than being a new idea.
+        for product_key, bbox, score in self._product_confirmer.coasting(now, exclude=confirmed_this_pass):
+            label = f"{self._product_display_name(product_key, _ascii_label(product_key))} {score:.0%}"
+            draw_boxes.append((list(bbox), label, PRODUCT_COLOR))
+            detections.append({"class_name": product_key, "conf": score, "bbox": list(bbox)})
         return detections
 
     def _should_run_custom_recognition(self) -> bool:
@@ -1654,24 +1927,50 @@ class CameraWorker(threading.Thread):
         else:
             self._emit_status("offline", f"เปิดกล้อง {self.device} ไม่สำเร็จ")
 
-        fail_count = 0
+        self._fail_count = 0
 
         while self._running:
+            if self._escalate_to_process:
+                # Handed off to _run_process_capture_pump, started directly by
+                # recover_from_hung_read the moment escalation was decided (see that method and
+                # HANG_ESCALATION_THRESHOLD) -- this thread's job is done. Note this is *not*
+                # self._running = False: the camera itself stays up, just served by a different
+                # thread from here on. If this thread is the one that's genuinely, permanently
+                # wedged inside cap.read() (the whole reason escalation exists), it will never
+                # reach this check at all -- the pump thread already took over regardless, and
+                # this one is simply abandoned (a leaked daemon thread, reclaimed at process
+                # exit; see stop()'s own docstring for why that's an acceptable trade).
+                break
             if not self._enabled:
                 # Camera toggled off from the UI: release the device (so an
                 # unused camera doesn't keep holding the OS handle/USB
                 # bandwidth) and idle instead of trying to reopen it, until
-                # set_enabled(True) is called again.
+                # set_enabled(True) is called again. _release_capture() (not
+                # a bare self._cap.release()) so a wedged release can't hang
+                # this camera's own capture/display loop forever either.
                 if self._cap is not None:
-                    self._cap.release()
-                    self._cap = None
+                    self._release_capture()
                 self._emit_status("disabled", "ปิดใช้งานกล้องนี้")
                 time.sleep(0.2)
                 continue
 
             if self._cap is None or not self._cap.isOpened():
-                if self._attempt_reopen():
-                    fail_count = 0
+                try:
+                    reopened = self._attempt_reopen()
+                except Exception:
+                    # Same backstop as cap.read()/_process_captured_frame above: _attempt_reopen()
+                    # calls into _open()/_open_capture()/device-identity lookups, none of which are
+                    # guaranteed exception-free, and an uncaught raise here used to kill this
+                    # worker's thread permanently -- silently, since a dead thread never re-enters
+                    # this loop to try again. Treat a failed reopen attempt as just that (False),
+                    # so it falls through to the same backoff wait below instead of ending the loop.
+                    logger.exception(
+                        "[%s] _attempt_reopen raised -- treating as a failed reopen instead of "
+                        "letting it kill this camera's worker thread", self.camera_id,
+                    )
+                    reopened = False
+                if reopened:
+                    self._fail_count = 0
                 self._stop_event.wait(0.2)
                 continue
 
@@ -1682,7 +1981,7 @@ class CameraWorker(threading.Thread):
             try:
                 self._read_started = time.monotonic()
                 ok, frame = cap.read()
-            except cv2.error:
+            except Exception:
                 # A native OpenCV/DirectShow exception here (observed live:
                 # "cv2.error: Unknown C++ exception from OpenCV code" during
                 # concurrent multi-camera capture) previously propagated
@@ -1698,110 +1997,203 @@ class CameraWorker(threading.Thread):
                 # that already-tested recovery path instead of killing the
                 # worker thread -- no change to backoff timing, the
                 # DIRECTSHOW_LOCK, or any physical-identity/reconnect logic.
+                # Broadened from `except cv2.error` to `except Exception`: a
+                # bare cv2.error catch left every OTHER exception type (seen
+                # live: a stuck camera whose read() eventually raises
+                # something backend-specific, not always cv2.error) free to
+                # kill this thread exactly the same way -- and once dead, no
+                # watchdog can tell, because recover_from_hung_read() only
+                # detects a read that is still IN PROGRESS (_read_started
+                # set), never a thread that has already exited, and
+                # check_stream_health() only acts on the online->offline
+                # transition, never again once status is already "offline".
+                # The camera then shows the "หยุดหรือเสียหาย" reconnecting
+                # card forever, with frame_sequence/captured_frames frozen
+                # and reconnect_count never advancing -- exactly the
+                # permanently-stuck symptom this broadening closes.
                 logger.warning(
-                    "[%s] cap.read() raised a native OpenCV exception (device=%s) "
-                    "-- treating as a failed read instead of letting it kill "
-                    "this camera's worker thread",
-                    self.camera_id, self.device,
+                    "[%s] cap.read() raised %s (device=%s) -- treating as a "
+                    "failed read instead of letting it kill this camera's worker thread",
+                    self.camera_id, type(sys.exc_info()[1]).__name__ if sys.exc_info()[1] else "an exception",
+                    self.device,
                 )
                 ok, frame = False, None
             finally:
                 self._read_started = None
             if self._stop_event.is_set():
                 break
-            # A camera that's silently disconnected mid-stream (unplugged,
-            # or a driver/USB glitch) can keep returning ok=True with
-            # whatever garbage is left in a stale buffer instead of
-            # cleanly failing — this is exactly as broken as a failed
-            # read() and must not reach the UI or AI detection as if it
-            # were a real frame (see _looks_like_noise's docstring).
-            is_noise = ok and frame is not None and frame.size and _looks_like_noise(frame)
-            integrity_reasons: list[str] = []
-            if ok and frame is not None and frame.size and not is_noise:
-                try:
-                    integrity_reasons = self._frame_integrity.check(frame, time.time()).reasons
-                except Exception:
-                    integrity_reasons = []   # a bug in the checker must never take a camera down
-                for reason in integrity_reasons:
-                    self._integrity_counts[reason] = self._integrity_counts.get(reason, 0) + 1
-            if not ok or frame is None or frame.size == 0 or is_noise or integrity_reasons:
-                fail_count += 1
-                if self._performance_monitor is not None:
-                    self._performance_monitor.record_dropped(self.camera_id)
-                if fail_count >= FAIL_THRESHOLD:
-                    logger.warning(
-                        "[%s] Camera stream failed (device=%s, reason=%s, "
-                        "consecutive_failures=%d)",
-                        self.camera_id, self.device,
-                        ("frame_looked_like_noise" if is_noise else
-                         "frame_corrupt:" + ",".join(integrity_reasons) if integrity_reasons else "frame_read_failed"),
-                        fail_count,
-                    )
-                    self._emit_status("offline", "อ่านภาพจากกล้องไม่ได้ต่อเนื่อง")
-                    self._note_fault()
-                    self._release_capture()
-                self._good_streak = 0
+            try:
+                frame_accepted = self._process_captured_frame(ok, frame)
+            except Exception:
+                # _process_captured_frame's own docstring promises it "never raises" -- this is the
+                # backstop for that promise, not a reason to rely on it: on_frame() (the
+                # BoothManager/Qt-bridge callback), the box follower, and the frame-slot publish are
+                # all called from here without their own try/except, and any one of them raising
+                # would otherwise kill this thread exactly like the bare cap.read() exception above
+                # used to (see that comment). Same treatment: log it, count it as a failed frame, and
+                # let the existing fail_count/_attempt_reopen recovery path handle it instead of the
+                # worker silently vanishing.
+                logger.exception(
+                    "[%s] _process_captured_frame raised -- treating as a failed frame instead of "
+                    "letting it kill this camera's worker thread", self.camera_id,
+                )
+                frame_accepted = False
+            if not frame_accepted:
                 self._stop_event.wait(0.03)
                 continue
 
-            fail_count = 0
-            self._last_good_frame_ts = time.monotonic()
-            self._good_streak += 1
-            # "connecting" is included here because the very first open at
-            # the top of run() never itself emits "online" (only the
-            # reconnect branch above does, on a *subsequent* open after a
-            # drop) — without it, a camera that connects successfully on
-            # its first try stays reported as "connecting" forever even
-            # though frames are flowing, which get_latest_jpeg() (see
-            # web/booth_manager.py) takes as "not really online yet" and
-            # keeps serving the reconnecting placeholder instead of the
-            # real video.
-            if (self._last_status in (None, "offline", "connecting") and self._good_streak >= ONLINE_GOOD_STREAK
-                    and self._frame_integrity.frozen_for(time.time()) < FROZEN_STREAM_SUSPECT_SEC):
-                self._emit_status("online", "ปกติ")
-            capture_ts = time.time()
-            if self._performance_monitor is not None:
-                self._performance_monitor.record_capture(self.camera_id, capture_ts=capture_ts)
-
-            # Draw + deliver this frame, then hand the raw frame off for
-            # AIWorker to pick up whenever this camera is next due (see
-            # run_ai_pass) — capture/display never waits on AI in any way
-            # any more, regardless of how slow inference is or how many
-            # other cameras are also waiting their turn (see module
-            # docstring). Boxes drawn here are whatever the last completed
-            # AI pass produced; self._last_boxes is only ever replaced
-            # wholesale by run_ai_pass (never appended to piecemeal here),
-            # so reading it concurrently with that replace is safe without
-            # a lock.
-            overlay = self._tripwire_overlay  # local snapshot — see module-level lock-free comment
-            self._frame_seq += 1
-            frame_seq = self._frame_seq
-            follower = self._box_follower
-            if follower is not None:
-                try:
-                    follower.push_frame(frame_seq, frame)
-                    shown_boxes = follower.boxes()
-                except Exception:
-                    logger.debug("[%s] box follower failed", self.camera_id, exc_info=True)
-                    shown_boxes = self._last_boxes
-            else:
-                shown_boxes = self._last_boxes
-            display_frame = frame.copy() if (shown_boxes or overlay) else frame
-            for bbox, label, color in shown_boxes:
-                _draw_box(display_frame, bbox, label, color)
-            if overlay is not None:
-                _draw_tripwire(display_frame, overlay)
-            self.on_frame(self.camera_id, display_frame)
-            if self._performance_monitor is not None:
-                self._performance_monitor.record_display(self.camera_id, capture_ts=capture_ts)
-
-            with self._frame_slot_lock:
-                self._latest_capture_frame = frame
-                self._latest_capture_seq = frame_seq
-
+        if self._escalate_to_process:
+            # See the top-of-loop comment above: _run_process_capture_pump (already running, kept
+            # going the whole time this thread was stuck) owns AI registration, self._running, and
+            # self._process_capture from here on -- this thread has nothing left to clean up.
+            return
         self._ai_worker.unregister(self.camera_id)
         self._release_capture()
         self._running = False
+
+    def _process_captured_frame(self, ok: bool, frame) -> bool:
+        """Everything after a frame is obtained that is identical regardless of whether it came
+        from a thread-owned cv2.VideoCapture (run(), above) or an escalated camera's
+        CaptureProcess (_run_process_capture_pump, below): noise/corruption/freeze checks, the
+        online/offline state machine, the foreground-proposer update, box drawing/delivery, and
+        publishing the latest-frame slot the AI pipeline and the stream endpoint both read from.
+        Returns True for a frame that was accepted (state advanced to good), False for one that
+        was rejected or missing (state advanced to failed) -- callers use this to decide how long
+        to wait before trying again; it never raises and never blocks."""
+        # A camera that's silently disconnected mid-stream (unplugged,
+        # or a driver/USB glitch) can keep returning ok=True with
+        # whatever garbage is left in a stale buffer instead of
+        # cleanly failing — this is exactly as broken as a failed
+        # read() and must not reach the UI or AI detection as if it
+        # were a real frame (see _looks_like_noise's docstring).
+        is_noise = ok and frame is not None and frame.size and _looks_like_noise(frame)
+        integrity_reasons: list[str] = []
+        if ok and frame is not None and frame.size and not is_noise:
+            try:
+                integrity_reasons = self._frame_integrity.check(frame, time.time()).reasons
+            except Exception:
+                integrity_reasons = []   # a bug in the checker must never take a camera down
+            for reason in integrity_reasons:
+                self._integrity_counts[reason] = self._integrity_counts.get(reason, 0) + 1
+        if not ok or frame is None or frame.size == 0 or is_noise or integrity_reasons:
+            self._fail_count += 1
+            if self._performance_monitor is not None:
+                self._performance_monitor.record_dropped(self.camera_id)
+            if self._fail_count >= FAIL_THRESHOLD:
+                logger.warning(
+                    "[%s] Camera stream failed (device=%s, reason=%s, "
+                    "consecutive_failures=%d)",
+                    self.camera_id, self.device,
+                    ("frame_looked_like_noise" if is_noise else
+                     "frame_corrupt:" + ",".join(integrity_reasons) if integrity_reasons else "frame_read_failed"),
+                    self._fail_count,
+                )
+                self._emit_status("offline", "อ่านภาพจากกล้องไม่ได้ต่อเนื่อง")
+                self._note_fault()
+                self._release_capture()   # a no-op once escalated -- self._cap is already None
+            self._good_streak = 0
+            return False
+
+        self._fail_count = 0
+        self._last_good_frame_ts = time.monotonic()
+        self._good_streak += 1
+        self._consecutive_hang_recoveries = 0
+        # "connecting" is included here because the very first open at
+        # the top of run() never itself emits "online" (only the
+        # reconnect branch above does, on a *subsequent* open after a
+        # drop) — without it, a camera that connects successfully on
+        # its first try stays reported as "connecting" forever even
+        # though frames are flowing, which get_latest_jpeg() (see
+        # web/booth_manager.py) takes as "not really online yet" and
+        # keeps serving the reconnecting placeholder instead of the
+        # real video.
+        if (self._last_status in (None, "offline", "connecting") and self._good_streak >= ONLINE_GOOD_STREAK
+                and self._frame_integrity.frozen_for(time.time()) < FROZEN_STREAM_SUSPECT_SEC):
+            self._emit_status("online", "ปกติ")
+        capture_ts = time.time()
+        if self._performance_monitor is not None:
+            self._performance_monitor.record_capture(self.camera_id, capture_ts=capture_ts)
+
+        # Keep the foreground-proposer's background model warm on every
+        # captured frame (full capture fps), not just the sparse subset
+        # that reaches a custom-recognition AI pass. A model fed only at
+        # the throttled AI-pass rate lags real scene changes by seconds,
+        # so ordinary motion (a person walking through, a lighting
+        # shift, camera shake) reads as a large, confident, spurious
+        # "foreground" blob against a stale background photo -- the
+        # leading suspected cause of product detections with no real
+        # product in frame. Gated on having a trained gallery at all
+        # (see _run_custom_recognition's own gate) so this costs nothing
+        # on a fresh install with no products trained yet.
+        if self.recognizer is not None and self.recognizer.has_any_gallery():
+            try:
+                self._proposer.update(frame)
+            except Exception:
+                logger.debug("[%s] proposer.update failed", self.camera_id, exc_info=True)
+
+        # Draw + deliver this frame, then hand the raw frame off for
+        # AIWorker to pick up whenever this camera is next due (see
+        # run_ai_pass) — capture/display never waits on AI in any way
+        # any more, regardless of how slow inference is or how many
+        # other cameras are also waiting their turn (see module
+        # docstring). Boxes drawn here are whatever the last completed
+        # AI pass produced; self._last_boxes is only ever replaced
+        # wholesale by run_ai_pass (never appended to piecemeal here),
+        # so reading it concurrently with that replace is safe without
+        # a lock.
+        overlay = self._tripwire_overlay  # local snapshot — see module-level lock-free comment
+        self._frame_seq += 1
+        frame_seq = self._frame_seq
+        follower = self._box_follower
+        if follower is not None:
+            try:
+                follower.push_frame(frame_seq, frame)
+                shown_boxes = follower.boxes()
+            except Exception:
+                logger.debug("[%s] box follower failed", self.camera_id, exc_info=True)
+                shown_boxes = self._last_boxes
+        else:
+            shown_boxes = self._last_boxes
+        display_frame = frame.copy() if (shown_boxes or overlay) else frame
+        for bbox, label, color in shown_boxes:
+            _draw_box(display_frame, bbox, label, color)
+        if overlay is not None:
+            _draw_tripwire(display_frame, overlay)
+        self.on_frame(self.camera_id, display_frame)
+        if self._performance_monitor is not None:
+            self._performance_monitor.record_display(self.camera_id, capture_ts=capture_ts)
+
+        with self._frame_slot_lock:
+            self._latest_capture_frame = frame
+            self._latest_capture_seq = frame_seq
+            self._latest_capture_ts = capture_ts
+        return True
+
+    def _run_process_capture_pump(self) -> None:
+        """Runs this camera's whole capture+publish loop from a SEPARATE thread once escalated
+        (see HANG_ESCALATION_THRESHOLD) -- started directly by recover_from_hung_read (the
+        watchdog's thread), not by run()'s own loop, because run()'s thread may itself be the one
+        permanently wedged inside a native cap.read() call that will never return: nothing in
+        this process can preempt that thread, so the only way to make this camera recoverable
+        again is to serve it from a different thread entirely and simply abandon (never join) the
+        stuck one -- see run()'s own top-of-loop comment. CaptureProcess.read() never blocks (see
+        its own docstring/tests), so this loop can never itself get stuck the same way; a wedged
+        child process is killed and respawned entirely inside CaptureProcess's own watchdog."""
+        while self._running:
+            if not self._enabled:
+                if self._process_capture is not None:
+                    self._process_capture.stop()
+                    self._process_capture = None
+                time.sleep(0.2)
+                continue
+            self._ensure_process_capture()
+            ok, frame, _proc_seq, _proc_ts = self._process_capture.read()
+            self._process_captured_frame(ok, frame)
+            time.sleep(0.01 if ok else 0.03)
+        self._ai_worker.unregister(self.camera_id)
+        if self._process_capture is not None:
+            self._process_capture.stop()
+            self._process_capture = None
 
     def ai_due(self, now: float) -> bool:
         """AIWorker asks every registered camera this on each scan pass —
@@ -1875,18 +2267,42 @@ class CameraWorker(threading.Thread):
         unblocks a stuck DirectShow read on backends that honour it; the capture loop then
         reopens through the normal backoff. Returns True when a recovery was triggered. Repeats
         after another stall window if the read is still blocked (a truly stuck native call)."""
+        if self._escalate_to_process:
+            return False    # process-isolated reads never block -- nothing here to recover
         started = self._read_started
         if started is None or time.monotonic() - started < stall_sec:
             return False
         self.hang_recoveries += 1
+        self._consecutive_hang_recoveries += 1
         logger.warning(
-            "[%s] cap.read() blocked for %.1fs (device=%s, recovery #%d) -- releasing the capture "
-            "from the watchdog and reopening", self.camera_id, time.monotonic() - started,
-            self.device, self.hang_recoveries)
+            "[%s] cap.read() blocked for %.1fs (device=%s, recovery #%d, consecutive #%d) -- "
+            "releasing the capture from the watchdog and reopening", self.camera_id,
+            time.monotonic() - started, self.device, self.hang_recoveries,
+            self._consecutive_hang_recoveries)
         self._emit_status("offline", "กล้องไม่ตอบสนอง (อ่านภาพค้าง) — กำลังรีเซ็ตการเชื่อมต่อ")
         self._note_fault()
         self._release_capture()
         self._read_started = time.monotonic()   # next escalation only after another full window
+        if (HANG_ESCALATION_THRESHOLD > 0
+                and self._consecutive_hang_recoveries >= HANG_ESCALATION_THRESHOLD):
+            logger.warning(
+                "[%s] %d consecutive hang recoveries with no good frame in between -- escalating "
+                "to process-isolated capture (a wedged native read can no longer freeze this "
+                "camera's worker thread)", self.camera_id, self._consecutive_hang_recoveries)
+            self._escalate_to_process = True
+            self._read_started = None
+            # Started here, from the watchdog's own thread, not left for run()'s loop to notice --
+            # if THIS worker's own run() thread is the one genuinely, permanently wedged inside
+            # cap.read(), it will never get back to the top of its loop to start anything itself
+            # (see _run_process_capture_pump's docstring). Guarded so a second consecutive-hang
+            # burst after a successful escalation (HANG_ESCALATION_THRESHOLD is never reached
+            # again once _consecutive_hang_recoveries stops incrementing post-escalation, but this
+            # stays defensive against any future path that re-enters here) never starts a second
+            # pump thread for the same camera.
+            if self._pump_thread is None:
+                self._pump_thread = threading.Thread(
+                    target=self._run_process_capture_pump, daemon=True, name=f"pump-{self.camera_id}")
+                self._pump_thread.start()
         return True
 
     def _is_usb_like(self) -> bool:
@@ -1936,6 +2352,43 @@ class CameraWorker(threading.Thread):
     def get_integrity_stats(self) -> dict[str, int]:
         """How many frames this camera's corrupt-frame gate rejected, by reason (since start)."""
         return dict(self._integrity_counts)
+
+    def get_frame_sequence(self) -> int:
+        """Monotonically increasing count of frames captured (this process's lifetime, from this
+        open of the device -- not persisted across a reconnect). Lets a caller (the performance
+        API) tell "genuinely new frames still arriving" apart from "the same status, no progress",
+        which the status string alone cannot: a stalled camera can stay reported "online" for a
+        watchdog window before check_stream_health notices."""
+        return self._latest_capture_seq
+
+    def get_last_capture_ts(self) -> float | None:
+        """Wall-clock time.time() of the last frame that passed capture (not necessarily AI-
+        processed) — spec section 12's freshness contract: paired with get_frame_sequence(), lets
+        a caller tell a genuinely fresh frame from a stale one on its own, without trusting the
+        status string alone."""
+        return self._latest_capture_ts
+
+    def get_diagnostics(self) -> dict:
+        """Everything spec section 30 asks a camera to expose beyond the status/message BoothManager
+        already tracks in camera_status — one call so BoothManager doesn't have to know this
+        worker's internal attribute names."""
+        frozen_reasons = {"frozen"}
+        return {
+            "capture_mode": self.get_capture_mode(),
+            "worker_pid": self.get_worker_pid(),
+            "worker_thread_alive": self.is_alive(),
+            "frame_sequence": self._latest_capture_seq,
+            "capture_timestamp": self._latest_capture_ts,
+            "hang_recoveries": self.hang_recoveries,
+            "consecutive_hang_recoveries": self._consecutive_hang_recoveries,
+            "stale_recoveries": self.stale_recoveries,
+            "stuck_releases": self.stuck_releases,
+            "corrupt_frame_count": sum(v for k, v in self._integrity_counts.items() if k not in frozen_reasons),
+            "frozen_frame_count": self._integrity_counts.get("frozen", 0),
+            "worker_restart_count": (self.hang_recoveries + self.stale_recoveries
+                                      + (self._process_capture.respawns if self._process_capture else 0)),
+            "reason_code": self._last_reason_code,
+        }
 
     def get_face_count(self) -> int:
         return len(self._latest_faces)
@@ -2124,6 +2577,16 @@ class CameraWorker(threading.Thread):
         self._release_capture()
         if self.is_alive() and threading.current_thread() is not self:
             self.join(timeout=STOP_JOIN_TIMEOUT_SEC)
+        # Once escalated (see HANG_ESCALATION_THRESHOLD), _run_process_capture_pump -- not this
+        # thread -- owns self._process_capture; it stops it as part of its own exit once it
+        # observes self._running is False, above. This thread's own join, just above, can time
+        # out without the ORIGINAL run() thread ever actually dying if it is the one permanently
+        # wedged inside a native cap.read() call -- an already-tolerated, pre-existing trade-off
+        # for a stuck camera at shutdown (a leaked daemon thread never blocks process exit), not a
+        # regression introduced by escalation.
+        pump = self._pump_thread
+        if pump is not None and pump.is_alive() and threading.current_thread() is not pump:
+            pump.join(timeout=STOP_JOIN_TIMEOUT_SEC)
 
     def set_enabled(self, enabled: bool) -> None:
         """Turn this camera on/off without tearing down its thread — for a
@@ -2139,7 +2602,12 @@ class CameraWorker(threading.Thread):
         already released its capture — offline/reconnecting — since nothing
         else has it open right now) from which must stay untouched (a live
         capture the Hot-Plug Scan must never also open — see _open_capture's
-        own module-level comment on why)."""
+        own module-level comment on why). Once escalated (see
+        HANG_ESCALATION_THRESHOLD), self._cap stays None forever but the
+        physical device is still very much held open, just by this
+        camera's own CaptureProcess child instead."""
+        if self._process_capture is not None and self._process_capture.alive:
+            return True
         with self._cap_lock:
             return self._cap is not None
 

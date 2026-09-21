@@ -31,6 +31,7 @@ from core.device_presence import DevicePresenceMonitor, PresenceEvent
 from core.face_identity import DEFAULT_SFACE_MODEL, FaceIdentity
 from core.interest_tracker import ProductInterestTracker
 from core.performance import AdaptiveConfig, AdaptiveController, PerformanceMonitor, detect_hardware
+from core.person_segmenter import get_person_segmenter
 from core.attributes import AttributeSampler, GlobalPersonAttributeSmoother
 from core.body_cues import BODY_FEATURE_DIM, COLOR_DESCRIPTOR_DIM, body_features, hair_descriptor
 from core.body_gender import BodyGenderLearner, BodyGenderModel
@@ -360,6 +361,12 @@ class BoothManager:
         self.camera_status: dict[str, dict] = {
             cid: {"status": "unknown", "message": ""} for cid in self.camera_ids
         }
+        # Recovery observability (spec: "recovery latency must be measured", not just claimed) --
+        # keyed by camera_id, read/written only from _on_status under self._lock.
+        self._camera_failure_started: dict[str, float] = {}   # monotonic time the camera last left "online"
+        self._camera_reconnect_count: dict[str, int] = {}     # completed offline/reconnecting -> online cycles
+        self._camera_last_error: dict[str, str] = {}          # most recent offline/error message
+        self._camera_last_recovery_latency_sec: dict[str, float] = {}
         self._latest_jpeg: dict[str, bytes] = {}
         self._camera_enabled: dict[str, bool] = {cid: True for cid in self.camera_ids}
         self._person_tracks: dict[str, list[dict]] = {cid: [] for cid in self.camera_ids}
@@ -383,6 +390,7 @@ class BoothManager:
         self.product_seq = 0
         self.recent_alerts: list[dict] = []
         self.import_progress: dict[str, dict] = {}
+        self._live_training_sessions: dict[str, "training.LiveTrainingSession"] = {}
 
         self._next_camera_num = len(self.camera_ids) + 1
         # USB device indices the operator explicitly removed via /settings
@@ -721,8 +729,8 @@ class BoothManager:
         thread because a blocked capture thread cannot rescue itself."""
         while not stop_event.wait(CAPTURE_WATCHDOG_INTERVAL_SEC):
             with self._lock:
-                workers = list(self.workers.values())
-            for worker in workers:
+                workers = list(self.workers.items())
+            for camera_id, worker in workers:
                 for name in ("recover_from_hung_read", "check_stream_health"):
                     check = getattr(worker, name, None)
                     if callable(check):
@@ -730,6 +738,47 @@ class BoothManager:
                             check()
                         except Exception:
                             logger.exception("capture watchdog: %s failed", name)
+                self._replace_worker_if_dead(camera_id, worker)
+
+    def _replace_worker_if_dead(self, camera_id: str, worker: CameraWorker) -> None:
+        """Last-resort safety net for a CameraWorker thread that has exited on its own, outside
+        every recovery path above -- recover_from_hung_read() only detects a read still IN
+        PROGRESS, and check_stream_health() only fires once, on the online->offline transition,
+        never again once a camera is already reported offline. Neither can rescue a thread that
+        has simply died: an uncaught exception anywhere in CameraWorker.run() (cap.read() itself,
+        _process_captured_frame() -- on_frame()/box-drawing/frame-slot-publish, none of which used
+        to have their own guard -- or _attempt_reopen()) used to kill the whole thread silently,
+        leaving the camera permanently stuck showing "ภาพจากกล้องหยุดหรือเสียหาย — กำลังเชื่อมต่อใหม่"
+        with frame_sequence/captured_frames frozen and reconnect_count never advancing, exactly
+        the live symptom this closes. core/vision.py's own exception handling around those three
+        call sites should now make a dead thread rare, not impossible -- this is the backstop for
+        whatever still isn't covered, not a replacement for fixing the actual exception sites.
+
+        `worker._running` is only ever True once run() has actually started (see CameraWorker
+        .__init__, where it starts False) and is set back to False by run()'s own normal-exit
+        cleanup before that thread returns -- so `_running and not is_alive()` never true-positives
+        on a worker that simply hasn't been .start()ed yet (staggered startup) or one that exited
+        the ordinary way. `_escalate_to_process` is excluded because that path deliberately
+        abandons this exact thread while a separate pump thread keeps serving the camera (see
+        CameraWorker.run()'s own top-of-loop comment) -- an intentional "dead" original thread,
+        not a failure."""
+        if not (getattr(worker, "_running", False) and not getattr(worker, "_escalate_to_process", False)
+                and not worker.is_alive()):
+            return
+        with self._lock:
+            if not self._running or self.workers.get(camera_id) is not worker:
+                return  # booth stopped, or already replaced/removed since the check above
+            device = self.camera_devices.get(camera_id)
+            if device is None:
+                return
+            logger.error(
+                "[%s] capture watchdog: worker thread exited unexpectedly (not escalated, not "
+                "stopped) -- replacing it with a fresh worker so this camera can recover instead "
+                "of staying stuck offline forever", camera_id,
+            )
+            new_worker = self._make_worker(camera_id, device)
+            self.workers[camera_id] = new_worker
+        new_worker.start()
 
     def _heartbeat_loop(self):
         while not self._heartbeat_stop.wait(HEARTBEAT_INTERVAL_SEC):
@@ -905,6 +954,16 @@ class BoothManager:
         event = self.aggregator.update(camera_id, detections)
         if event:
             self._handle_product_recognized(event)
+        elif self.aggregator.current_product is None and getattr(self, "current_product", None) is not None:
+            # The aggregator just timed out its own confirmed product (no camera has
+            # sighted it for IDLE_RESET_SEC -- see core/aggregator.py's _decide()) but
+            # only ever tells us about a NEW confirmation via `event`, never about
+            # going idle. Without this, self.current_product (and therefore
+            # /api/state's current_product the UI polls) stayed permanently stuck on
+            # the last product ever seen, even minutes after it was removed from
+            # every camera -- a real stale-detection bug, not just a UI nicety: an
+            # empty booth could show a product on screen indefinitely.
+            self._clear_current_product()
 
         for hold in self.interest_tracker.update(camera_id, detections, person_tracks):
             if hold["event"] == "confirmed":
@@ -1370,9 +1429,34 @@ class BoothManager:
         }
 
     def _on_status(self, camera_id, status, message):
+        now = time.monotonic()
         with self._lock:
             previous = self.camera_status[camera_id]["status"]
-            self.camera_status[camera_id] = {"status": status, "message": message}
+            if previous == "online" and status != "online":
+                # first step away from a healthy stream -- start the recovery clock. Repeated
+                # offline<->reconnecting churn during one outage does not reset it: only leaving
+                # "online" starts it, only reaching "online" again stops it (see below), so the
+                # latency measures the whole outage, not just its last leg.
+                self._camera_failure_started[camera_id] = now
+            if status in ("offline", "error"):
+                self._camera_last_error[camera_id] = message
+            if status == "online" and previous != "online":
+                started = self._camera_failure_started.pop(camera_id, None)
+                if started is not None:
+                    self._camera_last_recovery_latency_sec[camera_id] = now - started
+                    self._camera_reconnect_count[camera_id] = self._camera_reconnect_count.get(camera_id, 0) + 1
+            workers = getattr(self, "workers", None)
+            worker = workers.get(camera_id) if isinstance(workers, dict) else None
+            self.camera_status[camera_id] = {
+                "status": status,
+                "message": message,
+                "reconnect_count": self._camera_reconnect_count.get(camera_id, 0),
+                "last_error": self._camera_last_error.get(camera_id, ""),
+                "last_recovery_latency_sec": self._camera_last_recovery_latency_sec.get(camera_id),
+                # Machine-filterable companion to `message` (spec section 32) — see
+                # core.vision.CameraWorker._classify_reason for what maps to what.
+                "reason_code": worker.get_last_reason_code() if worker is not None else "UNKNOWN",
+            }
             if status not in ("online", "degraded"):
                 self._person_tracks[camera_id] = []
                 self._product_detections[camera_id] = []
@@ -1412,13 +1496,14 @@ class BoothManager:
         never touches person_tracks — it's purely a "the AI side of this
         camera is struggling, watch it" signal for the operator."""
         with self._lock:
-            current = self.camera_status.get(camera_id, {}).get("status")
+            existing = self.camera_status.get(camera_id, {})
+            current = existing.get("status")
             if degraded and current == "online":
                 self.camera_status[camera_id] = {
-                    "status": "degraded", "message": "AI ประมวลผลไม่ทัน กำลังลดภาระอัตโนมัติ",
+                    **existing, "status": "degraded", "message": "AI ประมวลผลไม่ทัน กำลังลดภาระอัตโนมัติ",
                 }
             elif not degraded and current == "degraded":
-                self.camera_status[camera_id] = {"status": "online", "message": "ปกติ"}
+                self.camera_status[camera_id] = {**existing, "status": "online", "message": "ปกติ"}
             else:
                 return
         if degraded:
@@ -1468,6 +1553,10 @@ class BoothManager:
                             product["name"], event["confidence"])
         self._push_alert("product_found", f"พบสินค้า: {product['name']} ({source})")
 
+    def _clear_current_product(self) -> None:
+        with self._lock:
+            self.current_product = None
+
     # ------------------------------------------------------------- readers
     def get_latest_jpeg(self, camera_id: str) -> bytes | None:
         with self._lock:
@@ -1499,6 +1588,25 @@ class BoothManager:
                 self._person_tracks[camera_id] = []
                 self._product_detections[camera_id] = []
 
+    def _camera_status_with_freshness(self) -> dict:
+        """camera_status plus per-camera frame freshness (spec section 12/23's contract:
+        camera_id, frame_sequence, capture_timestamp alongside state) — pulled live from each
+        worker rather than cached on camera_status, since these change every frame, not just on
+        the status transitions that update camera_status itself. Callers (both get_state(), which
+        every client already polls every 1.5s, and get_camera_diagnostics()) must never present a
+        cached frame as current without also being able to see how stale it actually is."""
+        out = {}
+        workers = getattr(self, "workers", None)
+        for cid, status in self.camera_status.items():
+            worker = workers.get(cid) if isinstance(workers, dict) else None
+            out[cid] = {
+                **status,
+                "camera_id": cid,
+                "frame_sequence": worker.get_frame_sequence() if worker else None,
+                "capture_timestamp": worker.get_last_capture_ts() if worker else None,
+            }
+        return out
+
     def get_state(self) -> dict:
         booth_row = db.get_booth(self.db_path, self.booth_id) or {}
         with self._lock:
@@ -1509,7 +1617,7 @@ class BoothManager:
                 "running": self._running,
                 "open_time": booth_row.get("open_time"),
                 "close_time": booth_row.get("close_time"),
-                "cameras": {cid: dict(v) for cid, v in self.camera_status.items()},
+                "cameras": self._camera_status_with_freshness(),
                 "current_product": dict(self.current_product) if self.current_product else None,
                 "product_seq": self.product_seq,
                 "recent_alerts": list(self.recent_alerts[:20]),
@@ -1541,6 +1649,7 @@ class BoothManager:
                 "status": status,
                 "detect_every_n_frames": worker.get_detect_every_n_frames() if worker else None,
                 "ai_imgsz": worker.get_ai_imgsz() if worker else None,
+                "frame_sequence": worker.get_frame_sequence() if worker else None,
             })
         cameras.sort(key=lambda c: c["camera_id"])
         return {
@@ -1586,6 +1695,21 @@ class BoothManager:
             "products_detected": len(detections),
             "faces": self._face_count_for(camera_id),
         }
+
+    def get_camera_diagnostics(self, camera_id: str) -> dict:
+        """Full per-camera diagnostic record (spec section 30) — capture mode (thread/process),
+        worker pid once escalated, hang/stale/restart counters, corrupt/frozen frame counts,
+        current failure reason_code. Separate from get_camera_snapshot (people/product counts)
+        and get_state (status/message/reconnect_count for the whole fleet at once) because this is
+        the "why is this specific camera unhealthy" panel, not the "what does it currently see"
+        or "is it up" ones — see MULTI_CAMERA_ROOT_CAUSE_REPORT.md for why those three questions
+        need to stay independently answerable."""
+        worker = self.workers.get(camera_id)
+        if worker is None:
+            raise ValueError(f"ไม่พบกล้อง {camera_id}")
+        with self._lock:
+            status = dict(self.camera_status.get(camera_id, {}))
+        return {"camera_id": camera_id, **status, **worker.get_diagnostics()}
 
     @staticmethod
     def _load_face_identity():
@@ -1879,7 +2003,8 @@ class BoothManager:
                     )
 
                 added = training.import_images(paths, product_key, self.recognizer,
-                                                self.model, self.model_device, progress_cb)
+                                                self.model, self.model_device, progress_cb,
+                                                person_segmenter=get_person_segmenter(self.model_device))
                 self._set_import_progress(
                     product_key, {"done": added, "total": added, "status": "done"}
                 )
@@ -1914,7 +2039,8 @@ class BoothManager:
                     )
 
                 added = training.import_video(str(path), product_key, self.recognizer,
-                                               self.model, self.model_device, progress_cb)
+                                               self.model, self.model_device, progress_cb,
+                                               person_segmenter=get_person_segmenter(self.model_device))
                 self._set_import_progress(
                     product_key, {"done": added, "total": added, "status": "done"}
                 )
@@ -1936,6 +2062,44 @@ class BoothManager:
             return dict(self.import_progress.get(
                 product_key, {"done": 0, "total": 0, "status": "idle"}
             ))
+
+    # ------------------------------------------------- live "record from camera" training
+    def start_live_training(self, product_key: str) -> None:
+        """Begins (or restarts) a guided-rotation recording session for one product -- see
+        core.training.LiveTrainingSession. One session per product at a time; starting again
+        (e.g. the operator clicked "record" a second time after a failed attempt) simply replaces
+        it, discarding whatever partial coverage the previous attempt had."""
+        if not self.catalog.get(product_key):
+            raise ValueError(f"ไม่พบสินค้า {product_key}")
+        with self._lock:
+            self._live_training_sessions[product_key] = training.LiveTrainingSession(
+                product_key, self.recognizer, self.model, self.model_device,
+                person_segmenter=get_person_segmenter(self.model_device),
+            )
+
+    def feed_live_training_frame(self, product_key: str, jpeg_bytes: bytes) -> dict:
+        """One captured tick from the guided-rotation UI. Returns LiveTrainingSession.feed()'s
+        dict so the frontend can show a live distinct-view count and decide whether to keep
+        recording -- see that method's own docstring for exactly what "accepted" means here."""
+        with self._lock:
+            session = self._live_training_sessions.get(product_key)
+        if session is None:
+            raise ValueError("ยังไม่ได้เริ่มบันทึกสำหรับสินค้านี้")
+        frame = cv2.imdecode(np.frombuffer(jpeg_bytes, dtype=np.uint8), cv2.IMREAD_COLOR)
+        if frame is None:
+            return {"accepted": False, "distinct_views": session.added,
+                    "attempted": session.attempted, "reason": "unreadable"}
+        return session.feed(frame)
+
+    def finish_live_training(self, product_key: str) -> dict:
+        """Ends the session (see LiveTrainingSession.finish -- raises the same "found nothing
+        usable" error as a batch image/video import if the whole recording produced zero usable
+        views) and forgets it either way, so a later start_live_training begins fresh."""
+        with self._lock:
+            session = self._live_training_sessions.pop(product_key, None)
+        if session is None:
+            raise ValueError("ยังไม่ได้เริ่มบันทึกสำหรับสินค้านี้")
+        return session.finish()
 
     # ---------------------------------------------------------- GPU status
     # Acceleration is installed automatically at setup time now (see

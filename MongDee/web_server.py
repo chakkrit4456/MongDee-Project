@@ -160,6 +160,13 @@ def parse_args():
                          help="Path to a performance.json (see configs/performance.example.json) "
                               "tuning the Adaptive Controller's thresholds. Omit to use built-in "
                               "defaults.")
+    parser.add_argument("--camera-layout", default=None,
+                         help="Path to a booth_layout.json (see configs/booth_layout.example.json) "
+                              "with real camera x/y positions. When given, Re-ID's cross-camera "
+                              "transition-time window for every camera pair is computed from the "
+                              "physical distance between them instead of the topology-blind "
+                              "default (any camera to any camera within 0-30s). Omit to keep the "
+                              "default -- this is optional, not required to run.")
     parser.add_argument("--benchmark", type=float, default=None, metavar="SECONDS",
                          help="Run cameras + AI headlessly for SECONDS (no HTTP server, no browser), "
                               "then print a Camera Benchmark report (see "
@@ -319,6 +326,19 @@ def main():
         face_detector=face_detector,
     )
     booth.activate_booth(booth_id)  # persist active_booth_id (covers a freshly bootstrapped/new booth)
+
+    if args.camera_layout:
+        import json as _json
+
+        from core.reid import apply_camera_layout
+
+        layout = _json.loads(Path(args.camera_layout).read_text(encoding="utf-8"))
+        configured = apply_camera_layout(booth.reid_registry, layout)
+        if configured:
+            print(f"[WEB] โหลดผังกล้อง {args.camera_layout}: ตั้งค่าช่วงเวลาการเดินระหว่างกล้อง {configured} คู่")
+        else:
+            print(f"[WEB] คำเตือน: {args.camera_layout} ไม่มีตำแหน่งกล้องที่ใช้ได้ "
+                  f"(ตรวจสอบ object_type=\"camera\" และ camera_id ให้ตรงกับ {list(booth.camera_ids)})")
 
     if args.benchmark is not None:
         run_benchmark(booth, args.benchmark)

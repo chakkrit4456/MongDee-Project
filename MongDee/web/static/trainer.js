@@ -5,7 +5,6 @@ let recording = false;
 
 const GUIDE_RECT = { x: 0.25, y: 0.20, w: 0.50, h: 0.60 };  // fraction of natural image size
 const RECORD_TICK_MS = 500;
-const RECORD_TICKS = 30;  // 30 x 0.5s = 15s — enough time for one slow, full 360° turn
 const RECORD_COUNTDOWN_SEC = 3;  // pause before capture starts, so there's time to place the product
 const LAST_CAMERA_KEY = 'mongdee_trainer_last_camera';
 
@@ -416,6 +415,15 @@ document.getElementById('record-start-btn').addEventListener('click', startRecor
 
 function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
+// Recording keeps going until DISTINCT_VIEWS_TARGET genuinely different views have been
+// collected (measured server-side via core.training.LiveTrainingSession -- an embedding-based
+// near-duplicate check, the same one import_images/import_video use), not for a fixed duration.
+// A slow rotation reaches the target quickly and stops early; a fast/uneven one keeps going
+// (more ticks land on near-duplicate angles, so fewer of them count) up to MAX_RECORD_TICKS,
+// which exists only as a safety cap for a product that never actually rotates into new views.
+const DISTINCT_VIEWS_TARGET = RECOMMENDED_SAMPLES;
+const MAX_RECORD_TICKS = 90;  // 90 x 0.5s = 45s safety cap
+
 async function startRecording() {
     if (recording || !selectedKey) return;
     const img = document.getElementById('record-camera-img');
@@ -434,8 +442,18 @@ async function startRecording() {
     const angleStatus = document.getElementById('record-angle-status');
     const statusEl = document.getElementById('record-status');
 
-    let blobs = [];
+    let distinctViews = 0;
+    let attempted = 0;
+    let startFailed = false;
     try {
+        const startRes = await fetch(`/api/products/${selectedKey}/training_session/start`, { method: 'POST' });
+        if (!startRes.ok) {
+            const err = await startRes.json().catch(() => ({ detail: 'เริ่มบันทึกไม่สำเร็จ' }));
+            statusEl.textContent = `ล้มเหลว: ${err.detail}`;
+            startFailed = true;
+            return;
+        }
+
         // Pre-roll countdown: gives the user time to center the product in
         // the guide frame before any frame is actually captured.
         guideLabel.textContent = 'เตรียมสินค้าให้อยู่กึ่งกลางกรอบ...';
@@ -448,7 +466,7 @@ async function startRecording() {
         countdownEl.classList.add('hidden');
 
         guide.classList.add('recording');
-        guideLabel.textContent = 'หมุนสินค้าช้าๆ ให้อยู่ในกรอบนี้ตลอด';
+        guideLabel.textContent = 'หมุนสินค้าช้าๆ ให้อยู่ในกรอบนี้ตลอด — ระบบจะเก็บภาพจนกว่าจะครบและหลากหลายพอ';
         ring.classList.add('active');
         ring.style.setProperty('--progress', '0');
 
@@ -461,23 +479,34 @@ async function startRecording() {
         canvas.height = sh;
         const ctx = canvas.getContext('2d');
 
-        for (let tick = 0; tick < RECORD_TICKS; tick++) {
+        for (let tick = 0; tick < MAX_RECORD_TICKS && distinctViews < DISTINCT_VIEWS_TARGET; tick++) {
             ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
             const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.9));
-            if (blob) blobs.push(blob);
+            if (blob) {
+                const form = new FormData();
+                form.append('file', blob, `record-${tick}.jpg`);
+                try {
+                    const res = await fetch(`/api/products/${selectedKey}/training_session/frame`,
+                        { method: 'POST', body: form });
+                    if (res.ok) {
+                        const result = await res.json();
+                        distinctViews = result.distinct_views;
+                        attempted = result.attempted;
+                    }
+                } catch (e) { /* a dropped frame is not fatal -- the loop just keeps going */ }
+            }
 
-            // Assume an even rotation speed across the whole take, so the ring
-            // sweep and angle readout double as a pacing guide: reaching ~360°
-            // right as the last frame is captured means "about right" speed.
-            const fraction = (tick + 1) / RECORD_TICKS;
-            const angle = Math.round(fraction * 360);
+            // The ring/angle readout is now a COVERAGE indicator, not a countdown: it fills as
+            // distinct views are actually collected, so it can slow down or pause if the product
+            // stops rotating into new angles, instead of always finishing "on time" regardless of
+            // whether the data is any good.
+            const angle = Math.round(Math.min(1, distinctViews / DISTINCT_VIEWS_TARGET) * 360);
             ring.style.setProperty('--progress', String(angle));
-            angleStatus.textContent = angle >= 355
-                ? `หมุนครบรอบแล้ว (~360°) — เก็บภาพเกือบครบแล้ว`
-                : `หมุนสินค้าต่อไปเรื่อยๆ — ประมาณ ${angle}° / 360°`;
-            statusEl.textContent =
-                `กำลังบันทึก... ${tick + 1}/${RECORD_TICKS} ภาพ (${((RECORD_TICKS - tick - 1) * RECORD_TICK_MS / 1000).toFixed(1)} วินาทีที่เหลือ)`;
-            if (tick < RECORD_TICKS - 1) await sleep(RECORD_TICK_MS);
+            angleStatus.textContent = distinctViews >= DISTINCT_VIEWS_TARGET
+                ? `เก็บมุมมองที่แตกต่างกันครบแล้ว (${distinctViews}/${DISTINCT_VIEWS_TARGET})`
+                : `เก็บได้ ${distinctViews}/${DISTINCT_VIEWS_TARGET} มุมที่แตกต่างกัน — หมุนสินค้าต่อไปเรื่อยๆ`;
+            statusEl.textContent = `กำลังบันทึก... ประมวลผลแล้ว ${attempted} เฟรม, ใช้ได้จริง ${distinctViews} มุม`;
+            await sleep(RECORD_TICK_MS);
         }
     } finally {
         countdownEl.classList.add('hidden');
@@ -488,15 +517,23 @@ async function startRecording() {
         btn.disabled = false;
         recording = false;
     }
+    if (startFailed) return;
 
-    if (!blobs.length) {
-        statusEl.textContent = 'บันทึกภาพไม่สำเร็จ กรุณาลองใหม่';
-        return;
+    try {
+        const finishRes = await fetch(`/api/products/${selectedKey}/training_session/finish`, { method: 'POST' });
+        const result = await finishRes.json();
+        if (!finishRes.ok) {
+            statusEl.textContent = `ล้มเหลว: ${result.detail || 'ไม่พบภาพสินค้าที่ใช้ได้'}`;
+            return;
+        }
+        statusEl.textContent = distinctViews >= DISTINCT_VIEWS_TARGET
+            ? `บันทึกสำเร็จ: เก็บมุมมองที่แตกต่างกัน ${result.added} มุม จาก ${result.attempted} เฟรม`
+            : `หยุดบันทึก (ครบเวลาสูงสุด): เก็บได้ ${result.added} มุมจาก ${DISTINCT_VIEWS_TARGET} ที่แนะนำ ` +
+              `— ลองบันทึกเพิ่มหรืออัปโหลดรูป/วิดีโอเพิ่มเติมเพื่อความแม่นยำ`;
+        fetchProducts();
+    } catch (e) {
+        statusEl.textContent = 'ล้มเหลว: ไม่สามารถสรุปผลการบันทึกได้';
     }
-    statusEl.textContent = `บันทึกครบ ${blobs.length} ภาพ (รอบตัว 360°) กำลังส่งประมวลผล...`;
-    const form = new FormData();
-    blobs.forEach((blob, i) => form.append('files', blob, `record-${i}.jpg`));
-    await startImport(`/api/products/${selectedKey}/upload_images`, form);
 }
 
 initRecordCamera();

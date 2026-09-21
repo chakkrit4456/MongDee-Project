@@ -33,6 +33,37 @@ _HDR = struct.Struct("<QdiiI")  # seq, ts, h, w, state
 _HDR_SIZE = 64
 STATE_INIT, STATE_RUN, STATE_FAIL = 0, 1, 2
 
+# Shared with core.vision._open_capture's cross-process serialization (see that function's
+# docstring): a plain in-process threading.RLock (core.camera_identity.DIRECTSHOW_LOCK) cannot
+# serialize a DirectShow/MSMF open happening in THIS module's child process against one happening
+# in the parent (or another child) — they are different OS processes with independent memory. This
+# multiprocessing.Lock is created once, here, at import time in the parent process and passed
+# explicitly (via CaptureProcess kwargs, pickled through Process(args=...) at spawn time, not by a
+# fresh child-side import of this module) to every escalated camera's real-capture factory, so an
+# escalated camera's open and every other camera's open — thread- or process-isolated alike — still
+# serialize against each other exactly as they did before any camera was ever escalated.
+CROSS_PROCESS_OPEN_LOCK = mp.get_context("spawn").Lock()
+
+# Whether any camera has EVER escalated to process isolation in this run. A multiprocessing.Lock
+# is a real OS semaphore -- meaningfully slower per acquire/release than the plain in-process
+# threading.RLock _open_capture already used -- so _open_capture only pays that cost once a second
+# OS process genuinely exists to serialize against. Before the first escalation (the overwhelming
+# common case: a healthy camera fleet that never needs process isolation at all), every open is
+# exactly as fast as it was before CROSS_PROCESS_OPEN_LOCK existed. Set once escalation happens and
+# never cleared: an escalated camera is never de-escalated (see core.vision.CameraWorker's own
+# docstring on that design choice), so there is no point this flag would need to go back to False.
+_cross_process_lock_needed = threading.Event()
+
+
+def note_process_capture_starting() -> None:
+    """Called by CaptureProcess.start() -- the exact moment a second OS process comes into
+    existence that could open a camera concurrently with this one. See _cross_process_lock_needed."""
+    _cross_process_lock_needed.set()
+
+
+def cross_process_lock_active() -> bool:
+    return _cross_process_lock_needed.is_set()
+
 
 def _load(spec: str):
     mod, _, fn = spec.partition(":")
@@ -113,6 +144,7 @@ class CaptureProcess:
     def start(self):
         if self._running:
             return
+        note_process_capture_starting()
         self._shm = shared_memory.SharedMemory(create=True, size=_HDR_SIZE + self._cap_bytes)
         self._running = True
         self._spawn()
@@ -198,3 +230,7 @@ class CaptureProcess:
     @property
     def alive(self) -> bool:
         return bool(self._proc and self._proc.is_alive())
+
+    @property
+    def pid(self) -> Optional[int]:
+        return self._proc.pid if self._proc is not None else None

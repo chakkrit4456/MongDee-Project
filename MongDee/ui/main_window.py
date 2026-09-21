@@ -396,6 +396,14 @@ class MainWindow(QWidget):
         event = self.aggregator.update(camera_id, detections)
         if event:
             self._handle_product_recognized(event)
+        elif self.aggregator.current_product is None and self.current_product_key is not None:
+            # Same stale-detection bug as web/booth_manager.py's _on_detections: the
+            # aggregator times out its own confirmed product (IDLE_RESET_SEC of no
+            # sightings from any camera) but only ever notifies via a NEW-product
+            # `event`, never on going idle -- without this, the product panel kept
+            # showing the last product seen indefinitely, even after it was long gone
+            # from every camera.
+            self._clear_current_product()
 
     def _on_status_changed(self, camera_id, status, message):
         previous = self.camera_status.get(camera_id)
@@ -471,6 +479,14 @@ class MainWindow(QWidget):
             product["name"], event["confidence"],
         )
         self._add_history(f"🟢 พบสินค้า: {product['name']} ({source})")
+
+    def _clear_current_product(self) -> None:
+        self.current_product_key = None
+        self.product_name_label.setText("ยังไม่พบสินค้า — วางสินค้าในกรอบกล้องเพื่อเริ่มต้น")
+        self.product_tagline_label.setText("")
+        self.product_desc_label.setText("")
+        self.product_source_label.setText("")
+        self.answer_label.setText("")
 
     def _on_ask(self):
         question = self.question_input.text().strip()

@@ -4,7 +4,10 @@ import cv2
 import pytest
 
 from core.attributes import GlobalPersonAttributeSmoother
-from core.body_cues import BODY_FEATURE_DIM, COLOR_DESCRIPTOR_DIM, body_features, color_descriptor
+from core.body_cues import (
+    BODY_FEATURE_DIM, BODY_FEATURE_NAMES, COLOR_DESCRIPTOR_DIM, HAIR_DESCRIPTOR_DIM,
+    body_features, color_descriptor, hair_descriptor,
+)
 from core.body_gender import BodyGenderLearner, BodyGenderModel, MIN_PER_CLASS
 
 
@@ -39,6 +42,43 @@ def test_body_features_have_a_fixed_length_and_reject_unusable_crops():
     assert body_features(np.zeros((5, 5, 3), np.uint8)) is None
     assert body_features(None) is None
     assert color_descriptor(img).shape == (COLOR_DESCRIPTOR_DIM,)
+
+
+def test_body_features_end_with_the_hair_descriptor_not_a_hardcoded_rule():
+    """body_features() must fold in hair_descriptor()'s richer (illumination-normalised) cue as
+    six more learned-model inputs, not as a rule anywhere in this file: the last HAIR_DESCRIPTOR_DIM
+    entries must equal hair_descriptor(crop) exactly, and nothing here maps them to a label."""
+    rng = np.random.default_rng(1)
+    img = synth_person("female", rng)
+    f = body_features(img)
+    assert BODY_FEATURE_NAMES[-HAIR_DESCRIPTOR_DIM:] == [
+        "hair_dark_norm", "hair_width_norm", "hair_side_norm", "hair_below_norm", "hair_sat", "hair_val"]
+    np.testing.assert_allclose(f[-HAIR_DESCRIPTOR_DIM:], hair_descriptor(img))
+
+
+def test_long_and_short_hair_produce_different_hair_features():
+    """The new hair dims must actually carry signal (differ with hairstyle) -- otherwise wiring
+    hair_descriptor into body_features would be dead weight, not a real improvement."""
+    rng = np.random.default_rng(2)
+    short = synth_person("male", rng)
+    while True:                                    # synth_person() only makes long hair 80% of the time per rng draw
+        rng2 = np.random.default_rng(rng.integers(0, 1_000_000))
+        long = synth_person("female", rng2)
+        if hair_descriptor(long)[3] > hair_descriptor(short)[3]:   # hair_below_norm: long hair falls below the neck
+            break
+    assert not np.allclose(hair_descriptor(short), hair_descriptor(long), atol=0.02)
+
+
+def test_hair_signal_alone_cannot_make_the_body_model_decide():
+    """However informative the new hair dims are, they flow through the SAME competence-gated
+    model as every other body feature: BodyGenderModel.predict() must still refuse to answer
+    until it has measured, on held-out predictions, that it beats chance -- an extreme hair
+    feature on its own (with the model otherwise untrained) must not bypass that gate."""
+    model = BodyGenderModel(dim=BODY_FEATURE_DIM)
+    extreme_long_hair = np.zeros(BODY_FEATURE_DIM, dtype=np.float32)
+    extreme_long_hair[-2:] = [0.05, 0.05]           # very dark, low-brightness "hair" reading
+    assert model.predict(extreme_long_hair) is None
+    assert model.ready() is False
 
 
 def test_colour_descriptor_tells_clothing_colours_apart():

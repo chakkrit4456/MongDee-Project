@@ -730,3 +730,109 @@ anything under `tests/manual/` before re-running the full suite.
 wall-clock time (315s vs. §M's 210s) reflects this run sharing the machine
 with other processes at the time, not a code-caused slowdown — no test
 logic changed speed-sensitively.)
+
+---
+
+## R. Long-running stability fix: an unprotected `cap.release()` could hang the shared lock or the Hot-Plug Scan forever — fifth investigation, later session
+
+**Reported symptom** (from live production use, not this session's own
+reproduction): after the booth runs continuously for a while, one or
+sometimes all cameras stop connecting — the UI shows the existing
+`_offline_message()` hub-contention text (§I.1's known, still-unconfirmed
+hardware ceiling) and stays stuck in "connecting" indefinitely. Recovers
+only after restarting the camera server process. This is a *different*
+shape of failure than §I.1's "CAM-2 simply can never open concurrently
+from the very first attempt" — it works fine for a while first, then
+degrades, and can eventually take down cameras that were previously
+healthy.
+
+### R.1 — CONFIRMED (by code inspection): every `cap.release()` on a
+capture from `_open_capture()` except one went through a **synchronous,
+unprotected** call, despite this exact codebase already knowing better
+
+`CameraWorker._release_capture()` already documents, from real prior
+experience (§O.2 above is the same class of finding, for a hang inside
+`_open_capture()`'s own candidate loop rather than at the point of
+release): *"cap.release() on a wedged DirectShow graph can block
+forever"* — and already guards against it by releasing on a background
+daemon thread with a bounded wait (`RELEASE_JOIN_TIMEOUT_SEC`). Reading
+every other `.release()` call site in `core/vision.py` found **four**
+that did not go through this same protection:
+
+1. `_open_capture()`'s own candidate-rejection loop (`if not accepted:
+   cap.release()`) — called **while still holding the shared `_open_lock`**
+   (the same lock `DIRECTSHOW_LOCK` from §A/§C serializes every camera's
+   open/reconnect through). A wedge here does not just leak one handle —
+   it holds that lock forever, and since every other camera's
+   `_open_capture()` call also needs that lock (with only a bounded
+   `acquire(timeout=...)`, so they fail fast rather than hang, but they do
+   fail), **every camera in the process stops being able to open at all**,
+   indefinitely, until the process is restarted. This is a complete,
+   mechanistic explanation for the reported "one or sometimes all cameras"
+   symptom, and for why only a restart recovers it — nothing in-process
+   can un-stick a genuinely wedged native call.
+2. `discover_cameras()` — called once at startup, but also called
+   *forever*, every `HOTPLUG_SCAN_INTERVAL_SEC`-to-`HOTPLUG_SCAN_MAX_INTERVAL_SEC`
+   (5-?s, backing off when idle) by `BoothManager._hotplug_loop`, for the
+   entire lifetime of the process (`web/booth_manager.py`). A wedge here
+   doesn't hold `_open_lock` past the return of the inner
+   `_open_capture()` call, but it does hang the Hot-Plug Scan thread
+   itself forever, permanently disabling hot-plug recovery for the rest
+   of the process's life — a real, separate availability regression, and
+   a much higher-frequency exposure than #1 (this runs unattended for
+   hours, #1 only fires on an actual reconnect attempt).
+3. Two call sites inside `CameraWorker._open()` (`if not cap.isOpened():
+   cap.release()` and `if self._stop_event.is_set(): cap.release()`) —
+   the second of these releases a capture that DID successfully open and
+   negotiate a working profile (exactly the kind of live, in-use capture
+   `_release_capture()`'s own docstring is about), just discarded because
+   the worker happened to be stopping at that moment.
+4. `CameraWorker.run()`'s "camera disabled from the UI" branch
+   (`self._cap.release()`) — releases a real, potentially long-lived,
+   actively-streaming capture directly on the camera's own capture/
+   display thread; a wedge here would freeze that camera's own thread
+   (not the shared lock), but forever, with no watchdog covering this
+   specific path.
+
+This is **confirmed by reading the code's actual control flow** (the same
+`RELEASE_JOIN_TIMEOUT_SEC` comment already on record for
+`_release_capture()` applies identically to all four), not reproduced by
+holding real hardware in a wedged state for hours — doing that
+deliberately was not attempted this session (see R.3).
+
+### R.2 — Fix applied
+
+`core/vision.py`: extracted the exact same "release on a daemon thread,
+wait up to `RELEASE_JOIN_TIMEOUT_SEC`, never block the caller past that"
+logic `_release_capture()` already had into a new free function,
+`_release_capture_safely(cap, label)`, returning the completion `Event`.
+`_release_capture()` itself now just calls it (no behavior change there —
+pure deduplication). All four gaps in R.1 now route through it:
+`_open_capture()`'s candidate-rejection release, `discover_cameras()`'s
+release, both releases inside `CameraWorker._open()`, and the "disabled"
+branch in `run()` (which now just calls `self._release_capture()` instead
+of duplicating the release inline).
+
+### R.3 — What was and wasn't verified
+
+| Question | Status |
+|---|---|
+| Do the four call sites in R.1 use a synchronous, unprotected `cap.release()` before this fix? | **CONFIRMED** (code inspection) |
+| Does a wedged release in `_open_capture()`'s loop hold `_open_lock` forever, before the fix? | **CONFIRMED** (code inspection — the release call is textually inside the same `try/finally` that holds the lock for the whole function) |
+| Regression test: does a wedged candidate release now stay bounded and leave `_open_lock` free afterward? | **PASS** — `tests/core/test_camera_open.py::test_open_capture_does_not_hang_when_a_rejected_candidates_release_wedges` (fault-injects a `release()` that blocks on a gate; asserts elapsed time stays bounded and a second, unrelated `_open_lock.acquire()` succeeds immediately afterward) |
+| Regression test: does a wedged release inside `discover_cameras()` now stay bounded? | **PASS** — `test_discover_cameras_does_not_hang_when_a_candidates_release_wedges` |
+| Reproduced the *reported* real-world degradation (hours of continuous booth operation, real USB hub, real eventual wedge) on real hardware? | **NOT ATTEMPTED this session** — inducing a genuine multi-hour wedge on demand is not practical within this session's time budget; the fix is verified against the exact mechanism (a release call that blocks), not against a live multi-hour soak reproducing the original symptom end to end |
+| Does this fix change `RELEASE_JOIN_TIMEOUT_SEC`/`RELEASE_WAIT_BEFORE_REOPEN_SEC` behavior for the pre-existing, already-covered `_release_capture()` path? | **NO** — pure extraction, same constants, same tests (`tests/core/test_camera_unplug_replug.py`) still pass unchanged |
+| Full pytest suite after this fix | `964 passed` (plus this session's other, unrelated work in the same run) / a handful of failures, all reproducing this document's own already-documented OBS-Virtual-Camera-index and thread-timing-under-load flakiness (§ throughout this doc), confirmed via isolated reruns, unrelated to this fix |
+
+### R.4 — Remaining, disclosed limitation
+
+This fix removes a *mechanism* that could turn a single transient
+hub/driver hiccup into a permanent, all-cameras-stuck failure requiring a
+restart. It does **not** touch, and does not claim to fix, §I.1's
+still-unconfirmed underlying hardware question (whether this dev
+machine's two USB cameras can ever share one hub's bandwidth
+concurrently at all) — if the hub genuinely cannot serve both cameras,
+individual reconnect attempts will still fail and retry on backoff as
+before; what changes is that a failure can no longer cascade into
+*every* camera being stuck *forever*.

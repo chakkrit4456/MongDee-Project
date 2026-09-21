@@ -11,7 +11,11 @@ providing no real protection against a false match.
 These tests bypass the real MobileNetV3 embedding pipeline (monkeypatching
 _centered to a no-op and embed() to return a chosen vector) so similarity
 scores are exact and deterministic, instead of depending on real image
-content.
+content. They also bypass the color-histogram cross-check added later
+(_histogram_agrees) -- these fake gallery vectors carry no real histogram
+data, and this file's whole point is to isolate and test the embedding
+floor/margin logic on its own; the histogram signal has its own dedicated,
+real-image tests in test_recognizer.py.
 """
 
 from __future__ import annotations
@@ -27,6 +31,7 @@ def _recognizer_with_deterministic_scores(tmp_path, monkeypatch, gallery: dict, 
     monkeypatch.setattr(recognizer, "_centered", lambda v: v)  # skip calibration centering
     recognizer._gallery = {k: np.array(v, dtype=np.float64) for k, v in gallery.items()}
     monkeypatch.setattr(recognizer, "embed", lambda image_bgr: np.array(query_vec, dtype=np.float64))
+    monkeypatch.setattr(recognizer, "_histogram_agrees", lambda *a, **k: True)  # see module docstring
     return recognizer
 
 

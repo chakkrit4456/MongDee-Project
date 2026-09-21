@@ -178,6 +178,15 @@ def create_app(booth: BoothManager) -> FastAPI:
             raise HTTPException(404, "ไม่พบกล้องนี้")
         return booth.get_camera_snapshot(camera_id)
 
+    @app.get("/api/booth/cameras/{camera_id}/diagnostics")
+    def api_camera_diagnostics(camera_id: str):
+        """Per-camera failure diagnostics (capture mode, worker pid once escalated to process
+        isolation, hang/stale/restart counters, corrupt/frozen frame counts, reason_code) — see
+        BoothManager.get_camera_diagnostics. Separate from /snapshot (people/product counts)."""
+        if camera_id not in booth.camera_ids:
+            raise HTTPException(404, "ไม่พบกล้องนี้")
+        return booth.get_camera_diagnostics(camera_id)
+
     @app.get("/api/performance")
     def api_performance():
         return booth.get_performance_snapshot()
@@ -435,6 +444,36 @@ def create_app(booth: BoothManager) -> FastAPI:
     @app.get("/api/products/{key}/import_progress")
     def api_import_progress(key: str):
         return booth.get_import_progress(key)
+
+    # ----------------------------------------------- live "record from camera" training session
+    # One frame per HTTP call (not a batch upload) so the frontend gets an immediate, real
+    # distinct-view count back from every captured tick -- see core.training.LiveTrainingSession
+    # and web/static/trainer.js's guided-rotation recording loop, which uses this to keep
+    # recording until the data is actually comprehensive instead of stopping at a fixed timer.
+    @app.post("/api/products/{key}/training_session/start")
+    def api_start_live_training(key: str):
+        try:
+            booth.start_live_training(key)
+        except ValueError as exc:
+            raise HTTPException(404, str(exc))
+        return {"status": "started"}
+
+    @app.post("/api/products/{key}/training_session/frame")
+    async def api_live_training_frame(key: str, file: UploadFile = File(...)):
+        content = await _read_upload_limited(file, MAX_IMAGE_BYTES)
+        try:
+            return booth.feed_live_training_frame(key, content)
+        except ValueError as exc:
+            raise HTTPException(409, str(exc))
+
+    @app.post("/api/products/{key}/training_session/finish")
+    def api_finish_live_training(key: str):
+        try:
+            return booth.finish_live_training(key)
+        except ValueError as exc:
+            raise HTTPException(409, str(exc))
+        except RuntimeError as exc:
+            raise HTTPException(422, str(exc))
 
     @app.post("/api/products/{key}/clear_samples")
     def api_clear_samples(key: str):

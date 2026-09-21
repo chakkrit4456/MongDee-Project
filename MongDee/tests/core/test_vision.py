@@ -12,6 +12,7 @@ from __future__ import annotations
 import numpy as np
 
 from core.vision import (
+    CUSTOM_RECOGNITION_BASE_FLOOR,
     MIN_GENDER_CONFIDENCE,
     PERSON_FEMALE_COLOR,
     PERSON_MALE_COLOR,
@@ -142,6 +143,13 @@ def test_only_male_female_unknown_and_product_have_box_colours():
 
 def test_gender_confidence_floor_is_strict_enough_to_reject_a_coin_flip():
     assert MIN_GENDER_CONFIDENCE >= 0.7
+
+
+def test_frame_sequence_starts_below_zero_and_tracks_captures():
+    worker = _make_worker()
+    assert worker.get_frame_sequence() == -1   # nothing captured yet
+    worker._latest_capture_seq = 42
+    assert worker.get_frame_sequence() == 42
 
 
 # --------------------------------------------------------------- deleted COCO-named product
@@ -357,10 +365,10 @@ class _ScriptedPersonModel:
         return [_Result(boxes)]
 
 
-def _flicker_worker(script):
+def _flicker_worker(script, gender_age_backend=None):
     seen = []
     worker = CameraWorker(camera_id="T", device=0, model=_ScriptedPersonModel(script), allowed_classes=["person"],
-                          conf_threshold=0.45,
+                          conf_threshold=0.45, gender_age_backend=gender_age_backend,
                           on_person_tracks=lambda cam, vis, ev, w, h, frame: seen.append(([t["track_id"] for t in vis],
                                                                                         [t["track_id"] for t in ev])))
     worker._latest_capture_frame = np.zeros((120, 160, 3), dtype=np.uint8)
@@ -373,7 +381,13 @@ def test_detector_runs_at_the_low_threshold_so_dips_can_be_rescued():
     assert worker.model.confs == [0.25]
 
 
-def test_confidence_dips_do_not_change_the_track_id_or_blink_the_box():
+def test_confidence_dips_do_not_change_the_track_id_or_cause_a_rebirth():
+    """Tracking/Re-ID continuity must survive a confidence dip. This worker
+    has no gender_age_backend, so the person's category stays "unknown" --
+    but an unclassified person is still drawn (as a pending "PERSON"/"UNKNOWN"
+    box, never hidden: a person must be shown before gender is known). See
+    test_confidence_dips_do_not_blink_a_classified_persons_box below for the
+    same scenario once the person is actually classified."""
     box = [10.0, 10.0, 50.0, 100.0]
     script = [[(0.9, box)], [(0.32, box)], [(0.30, box)], None, [(0.9, box)]]
     worker, seen = _flicker_worker(script)
@@ -384,10 +398,207 @@ def test_confidence_dips_do_not_change_the_track_id_or_blink_the_box():
     ids = {i for vis, _ev in seen for i in vis}
     assert ids == {1}                                   # one person, one track, all along
     assert all(ev == [] for _vis, ev in seen)           # no eviction / rebirth
-    assert all(n >= 1 for n in drawn)                   # a box is drawn on every pass (real, low-score or coasted)
+    assert all(n >= 1 for n in drawn[1:])               # unclassified but still shown, on every reported pass
+
+
+def test_confidence_dips_do_not_blink_a_classified_persons_box():
+    """Same scenario as above, but with a confident gender backend so the
+    person actually clears the render bar -- this is what the original
+    "box stays drawn" guarantee this file used to check now looks like.
+    Two confident frames up front (see test_worker_tracker_needs_two_
+    agreeing_frames_before_labelling_a_person) so the track's category is
+    already confirmed "female" before the dip -- otherwise the dip
+    assertion below would really be testing classification-under-
+    uncertainty, not "does an already-classified box blink"."""
+    box = [10.0, 10.0, 50.0, 100.0]
+    script = [[(0.9, box)], [(0.9, box)], [(0.32, box)], [(0.30, box)], None, [(0.9, box)]]
+    worker, seen = _flicker_worker(script, gender_age_backend=_FakeGenderBackend("female", 0.95))
+    drawn = []
+    for _ in script:
+        worker.run_ai_pass()
+        drawn.append(len(worker._last_boxes))
+    ids = {i for vis, _ev in seen for i in vis}
+    assert ids == {1}
+    assert all(ev == [] for _vis, ev in seen)
+    assert all(n >= 1 for n in drawn[1:])   # once classified (pass 2 on), the box is drawn on every remaining pass
 
 
 def test_a_lone_low_confidence_detection_is_neither_reported_nor_drawn():
     worker, seen = _flicker_worker([[(0.31, [10.0, 10.0, 50.0, 100.0])]])
     worker.run_ai_pass()
     assert seen == [([], [])] and worker._last_boxes == []
+
+
+# --------------------------------------------- _run_custom_recognition
+class _FakeProposer:
+    def __init__(self, boxes):
+        self._boxes = boxes
+
+    def propose(self, frame, exclude_boxes=None, max_regions=2):
+        return list(self._boxes)
+
+
+class _FakeCustomRecognizer:
+    def __init__(self, match=None, has_gallery=True):
+        self._match = match  # (product_key, score) or None
+        self._has_gallery = has_gallery
+
+    def has_any_gallery(self):
+        return self._has_gallery
+
+    def identify(self, crop, floor=None, margin=None):
+        return self._match if self._match is not None else (None, 0.0)
+
+
+class _FakeSegmenter:
+    def __init__(self, mask):
+        self._mask = mask
+
+    def person_mask(self, frame, conf=0.35):
+        return self._mask
+
+
+def test_hand_only_candidate_never_becomes_a_product():
+    """A proposal fully covered by the current-frame human mask must never
+    reach recognition at all, no matter how well it would otherwise match
+    -- hand/arm exclusion runs before the embedding lookup, not after."""
+    worker = _make_worker()
+    worker.recognizer = _FakeCustomRecognizer(match=("prod-1", 0.9))
+    worker._proposer = _FakeProposer([[10.0, 10.0, 60.0, 60.0]])
+    worker._person_segmenter = _FakeSegmenter(np.ones((100, 100), dtype=bool))
+    draw = []
+    detections = worker._run_custom_recognition(_frame(), claimed_boxes=[], draw_boxes=draw)
+    assert detections == []
+    assert draw == []
+
+
+def test_clean_candidate_needs_two_passes_before_it_is_reported():
+    # A full-trust-size box (>= PRODUCT_FULL_TRUST_PX, core/product_confirm.py): this test is
+    # about the base two-pass confirmation rule, not the extra-hits-for-a-small-box scaling
+    # covered by test_a_small_far_candidate_needs_more_passes_than_a_close_one below.
+    worker = _make_worker()
+    worker.recognizer = _FakeCustomRecognizer(match=("prod-1", 0.9))
+    worker._proposer = _FakeProposer([[10.0, 10.0, 100.0, 100.0]])
+    worker._person_segmenter = _FakeSegmenter(np.zeros((100, 100), dtype=bool))
+
+    first = worker._run_custom_recognition(_frame(), claimed_boxes=[], draw_boxes=[])
+    assert first == []  # one-off match: could be background clutter
+
+    second = worker._run_custom_recognition(_frame(), claimed_boxes=[], draw_boxes=[])
+    assert [d["class_name"] for d in second] == ["prod-1"]
+
+
+def test_a_small_far_candidate_needs_more_passes_than_a_close_one():
+    """A box well under PRODUCT_FULL_TRUST_PX (core/product_confirm.py) must need MORE confirming
+    passes before being reported than the full-trust-size case above -- see
+    product_confirm_hits_for. Uses the same 50x50 box size that, before this size-aware scaling
+    existed, needed only the base two passes."""
+    worker = _make_worker()
+    worker.recognizer = _FakeCustomRecognizer(match=("prod-1", 0.9))
+    worker._proposer = _FakeProposer([[10.0, 10.0, 60.0, 60.0]])   # 50x50: below PRODUCT_FULL_TRUST_PX
+    worker._person_segmenter = _FakeSegmenter(np.zeros((100, 100), dtype=bool))
+
+    results = [worker._run_custom_recognition(_frame(), claimed_boxes=[], draw_boxes=[]) for _ in range(3)]
+    assert results[0] == [] and results[1] == []          # two passes is no longer enough at this size
+    assert [d["class_name"] for d in results[2]] == ["prod-1"]
+
+
+def test_a_small_far_candidate_requires_a_higher_identify_floor():
+    """identify() must be asked for a stricter floor when the candidate box is small; a close,
+    full-trust-size box must not have its floor touched at all (recognizer's own default floor
+    applies unmodified) -- no behaviour change for the common case."""
+    class _RecordingRecognizer:
+        def __init__(self):
+            self.calls = []
+
+        def has_any_gallery(self):
+            return True
+
+        def identify(self, crop, floor=None, margin=None):
+            self.calls.append(floor)
+            return None, 0.0
+
+    worker = _make_worker()
+    rec = _RecordingRecognizer()
+    worker.recognizer = rec
+    worker._proposer = _FakeProposer([[10.0, 10.0, 60.0, 60.0], [10.0, 10.0, 100.0, 100.0]])
+    worker._person_segmenter = _FakeSegmenter(np.zeros((100, 100), dtype=bool))
+    worker._run_custom_recognition(_frame(), claimed_boxes=[], draw_boxes=[])
+    small_floor, full_trust_floor = rec.calls
+    assert full_trust_floor is None                # unscaled -- recognizer's own default applies
+    assert small_floor is not None and small_floor > CUSTOM_RECOGNITION_BASE_FLOOR
+
+
+def test_no_gallery_skips_proposer_and_segmenter_entirely():
+    worker = _make_worker()
+    worker.recognizer = _FakeCustomRecognizer(has_gallery=False)
+
+    class _BoomProposer:
+        def propose(self, *a, **k):
+            raise AssertionError("propose() must not be called with no trained gallery")
+
+    worker._proposer = _BoomProposer()
+    detections = worker._run_custom_recognition(_frame(), claimed_boxes=[], draw_boxes=[])
+    assert detections == []
+
+
+def test_unmatched_candidate_is_never_drawn_as_unknown():
+    """STRICT UNKNOWN DETECTION rule: a candidate that doesn't clear
+    identify()'s bar must be dropped outright, never drawn/reported as
+    UNKNOWN (there is deliberately no show_unknown flag any more)."""
+    worker = _make_worker()
+    worker.recognizer = _FakeCustomRecognizer(match=None)
+    worker._proposer = _FakeProposer([[10.0, 10.0, 60.0, 60.0]])
+    worker._person_segmenter = _FakeSegmenter(np.zeros((100, 100), dtype=bool))
+    draw = []
+    detections = worker._run_custom_recognition(_frame(), claimed_boxes=[], draw_boxes=draw)
+    assert detections == []
+    assert draw == []
+    assert not hasattr(worker, "show_unknown")
+
+
+# ------------------------------------- real ProductRecognizer end-to-end regression
+def test_registered_product_plus_unrelated_object_in_the_same_frame():
+    """Permanent regression test for the exact reported failure: Product A
+    is registered, and later a completely different, never-registered
+    object is shown alongside it in the same frame. Product A must be
+    detected; the unrelated object must be ignored, not labelled Product A.
+    Uses the real ProductRecognizer/MobileNetV3 pipeline (not a fake), and
+    a real two-candidate frame -- core.localizer.ForegroundProposer and
+    core.person_segmenter are still faked, since this test is about
+    recognition identity, not foreground proposal or human exclusion
+    (both already have their own dedicated tests)."""
+    import cv2
+
+    from core.recognizer import ProductRecognizer
+
+    def make_obj(color, seed):
+        rng = np.random.default_rng(seed)
+        img = np.zeros((200, 200, 3), dtype=np.uint8)
+        img[:, :] = (40, 40, 40)
+        cv2.rectangle(img, (40, 40), (160, 160), color, -1)
+        noise = rng.integers(-15, 15, (200, 200, 3))
+        return np.clip(img.astype(int) + noise, 0, 255).astype(np.uint8)
+
+    import tempfile
+    from pathlib import Path
+    with tempfile.TemporaryDirectory() as d:
+        recognizer = ProductRecognizer(gallery_dir=Path(d) / "gallery", device="cpu")
+        for i in range(6):
+            recognizer.add_sample("product-a", make_obj((30, 30, 220), 100 + i))  # red = Product A
+
+        frame = np.zeros((200, 400, 3), dtype=np.uint8)
+        frame[:, :200] = make_obj((30, 30, 220), 900)          # left half: Product A (registered)
+        frame[:, 200:] = make_obj((40, 200, 40), 901)  # right half: unrelated green object
+
+        worker = _make_worker()
+        worker.recognizer = recognizer
+        worker._proposer = _FakeProposer([[0.0, 0.0, 200.0, 200.0], [200.0, 0.0, 400.0, 200.0]])
+        worker._person_segmenter = _FakeSegmenter(np.zeros((200, 400), dtype=bool))
+
+        # Needs two agreeing passes to confirm (ProductConfirmer, see core/product_confirm.py).
+        worker._run_custom_recognition(frame, claimed_boxes=[], draw_boxes=[])
+        detections = worker._run_custom_recognition(frame, claimed_boxes=[], draw_boxes=[])
+
+        classes = [d["class_name"] for d in detections]
+        assert classes == ["product-a"]  # Product A detected exactly once, unrelated object ignored

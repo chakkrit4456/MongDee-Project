@@ -19,6 +19,17 @@ function addHistoryLine(iconName, text) {
     while (list.children.length > 100) list.removeChild(list.lastChild);
 }
 
+const IDLE_PRODUCT_TEXT = 'ยังไม่พบสินค้า — วางสินค้าในกรอบกล้องเพื่อเริ่มต้น';
+
+function clearProductInfo() {
+    document.getElementById('product-name').textContent = IDLE_PRODUCT_TEXT;
+    document.getElementById('product-tagline').textContent = '';
+    document.getElementById('product-price').textContent = '';
+    document.getElementById('product-desc').textContent = '';
+    document.getElementById('product-source').textContent = '';
+    document.getElementById('faq-list').innerHTML = '';
+}
+
 function renderProductInfo(p) {
     document.getElementById('product-name').textContent = p.name;
     document.getElementById('product-tagline').textContent = p.tagline || '';
@@ -59,7 +70,7 @@ function panelHtml(camId) {
           <button class="cam-icon-btn" data-action="fullscreen" data-cam="${camId}" title="ดูกล้องนี้แบบเต็มจอ">${iconHtml('maximize', { size: 14, className: 'icon-inline' })}</button>
         </div>
       </div>
-      <img src="/stream/${camId}" alt="${camId}" id="img-${camId}" data-cam="${camId}">
+      <img alt="${camId}" id="img-${camId}" data-cam="${camId}">
       <div class="status-text" id="status-${camId}">กำลังเชื่อมต่อ...</div>
     </div>`;
 }
@@ -80,7 +91,26 @@ function syncCameraGrid(cameraIds) {
     grid.innerHTML = cameraIds.length
         ? cameraIds.map(panelHtml).join('')
         : '<div class="panel cam-panel"><div class="status-text">ยังไม่พบกล้อง — เชื่อมต่อเว็บแคมแล้วรอสักครู่ ระบบจะตรวจพบอัตโนมัติ</div></div>';
-    grid.querySelectorAll('img[id^="img-"]').forEach(attachImgRecovery);
+    const imgs = grid.querySelectorAll('img[id^="img-"]');
+    imgs.forEach(attachImgRecovery);
+    // See booth.js's renderViewers for the full rationale: several <img src>
+    // assignments landing in the exact same JS tick each open their own
+    // multipart/x-mixed-replace connection to the SAME origin at once, and a
+    // browser can corrupt or cross-deliver the first frame of whichever ones
+    // lose that race -- observed as a broken-image icon OR, worse, one
+    // panel's stream showing a different camera's video than its own <img>
+    // was pointed at. This page rebuilt every panel's <img> with its `src`
+    // already set in the HTML string above, opening every connection at
+    // once -- the exact bug class booth.js's viewer windows were already
+    // fixed against. A unique cache-busting suffix on every connection (not
+    // only reconnects) additionally stops a browser/proxy from coalescing
+    // two identical "/stream/{id}" request strings into one shared
+    // connection if this ever runs twice for the same camera id.
+    imgs.forEach((img, i) => {
+        setTimeout(() => {
+            if (img.isConnected) img.src = `/stream/${img.dataset.cam}?t=${Date.now()}`;
+        }, i * 250);
+    });
 }
 
 function renderCameraStatus(cameras) {
@@ -115,6 +145,14 @@ async function pollState() {
                 addHistoryLine('box', `พบสินค้า: ${p.name} (${p.cameras})`);
                 speak(p.speak_text);
             }
+        } else if (lastProductSeq !== -1) {
+            // The booth just went idle (product removed / no longer visible on any
+            // camera) -- clear the panel instead of leaving the last-seen product
+            // displayed forever. Guarded on lastProductSeq so this doesn't fire (and
+            // isn't drawn) on the very first poll of a fresh page load, which is
+            // already showing the idle placeholder from the server-rendered template.
+            clearProductInfo();
+            lastProductSeq = -1;
         }
     } catch (e) { /* transient network hiccup — next poll will retry */ }
     setTimeout(pollState, 1500);

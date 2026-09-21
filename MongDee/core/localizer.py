@@ -37,11 +37,25 @@ class ForegroundProposer:
                 max_regions: int = 2) -> list[list[float]]:
         """Return up to `max_regions` [x1,y1,x2,y2] boxes for foreground blobs
         that don't already overlap `exclude_boxes` (e.g. YOLO boxes already
-        claimed by a person or a known COCO-class product)."""
+        claimed by a person or a known COCO-class product).
+
+        Reads the background model with learningRate=0 (no further
+        adaptation here) -- the model is kept warm by a separate, much more
+        frequent stream of update() calls (see CameraWorker.run()'s capture
+        loop). Mixing a training update into a read call here as well would
+        double-count whichever frame happens to be both captured and
+        AI-passed, and -- far more importantly -- previously meant the
+        background model only ever adapted on the sparse subset of frames
+        that reached a custom-recognition AI pass, so it lagged reality by
+        seconds. A stale model measures "foreground" against a background
+        photo of a moment long past, so ordinary scene change (a person
+        walking through, a lighting shift, camera shake) shows up as a
+        large, confident, completely spurious blob -- the leading suspected
+        cause of "ghost" product detections with no product in frame."""
         h, w = frame_bgr.shape[:2]
         frame_area = h * w
 
-        mask = self._bg_subtractor.apply(frame_bgr, learningRate=-1)
+        mask = self._bg_subtractor.apply(frame_bgr, learningRate=0)
         mask = cv2.threshold(mask, 200, 255, cv2.THRESH_BINARY)[1]  # drop shadow pixels (127)
         mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, self._kernel)
         mask = cv2.dilate(mask, self._kernel, iterations=2)
@@ -75,6 +89,48 @@ def _iou(box_a, box_b) -> float:
     area_b = (bx2 - bx1) * (by2 - by1)
     union = area_a + area_b - inter
     return inter / union if union > 0 else 0.0
+
+
+HUMAN_OVERLAP_REJECT_FRAC = 0.60  # candidate is mostly a hand/arm, not a product -> reject outright
+HUMAN_OVERLAP_TRIM_FRAC = 0.02    # below this, the box is basically clean already -- skip retightening
+
+
+def exclude_human_region(box, human_mask: np.ndarray | None) -> list[float] | None:
+    """Tighten `box` to exclude pixels `human_mask` marks as a detected
+    person (see core.person_segmenter.PersonSegmenter -- one instance mask
+    per person, so it covers hand/arm/sleeve/torso alike, not just the
+    whole-body bounding box). Returns None when the candidate is mostly
+    human (a hand or arm waved through frame with no product at all) and
+    should not become a product candidate.
+
+    Deliberately geometry-based (bounding rect of the surviving non-human
+    pixels within `box`) rather than a pixel-accurate silhouette: the
+    downstream consumer is recognizer.py's rectangular-crop embedding
+    either way, so a tighter human-free box is what actually improves the
+    match -- a pixel mask would only matter for a renderer drawing the
+    mask itself, which this project doesn't do."""
+    if human_mask is None:
+        return [float(v) for v in box]
+    h, w = human_mask.shape[:2]
+    x1, y1, x2, y2 = (int(round(v)) for v in box)
+    x1, y1 = max(0, x1), max(0, y1)
+    x2, y2 = min(w, x2), min(h, y2)
+    if x2 <= x1 or y2 <= y1:
+        return None
+    region = human_mask[y1:y2, x1:x2]
+    if region.size == 0:
+        return None
+    human_frac = float(region.sum()) / region.size
+    if human_frac >= HUMAN_OVERLAP_REJECT_FRAC:
+        return None
+    if human_frac < HUMAN_OVERLAP_TRIM_FRAC:
+        return [float(x1), float(y1), float(x2), float(y2)]
+    ys, xs = np.nonzero(~region)
+    if ys.size == 0:
+        return None
+    ny1, ny2 = int(ys.min()), int(ys.max()) + 1
+    nx1, nx2 = int(xs.min()), int(xs.max()) + 1
+    return [float(x1 + nx1), float(y1 + ny1), float(x1 + nx2), float(y1 + ny2)]
 
 
 def crop_box(frame_bgr, box, padding_frac: float = 0.08) -> np.ndarray:

@@ -32,6 +32,28 @@ photos) — the mean collapses to ~that product's own embedding and wipes out
 its signal entirely. A fixed external calibration vector has no such
 failure mode and works identically whether the catalog has 1 product or
 50.
+
+Important detail #2 — the embedding alone is not discriminative enough on
+its own, even after centering. MobileNetV3-Small's global-average-pooled
+feature is dominated by coarse layout/shape/proportion, not fine color or
+texture identity: empirically (measured with this exact code, see the
+implementation history), a same-shaped rectangle in a DIFFERENT color than
+a registered product scored a centered similarity of 0.96 against it --
+well above MATCH_FLOOR, indistinguishable from a genuine ~0.997 same-
+product match. Two other clearly unrelated shapes (a circle, a triangle)
+still scored 0.76-0.77 -- comfortably above SINGLE_PRODUCT_MATCH_FLOOR on a
+single-product catalog. Raising the floor further would only push out more
+true positives; it does not fix the underlying problem (an unrelated
+object should never depend on a knife-edge threshold to be rejected).
+
+The fix is a second, independent signal: a coarse HSV color-histogram
+"fingerprint" stored alongside each sample's embedding. identify()'s
+CNN-embedding ranking still picks the best candidate, but that candidate is
+only confirmed if its color histogram ALSO correlates well with that same
+product's own gallery -- two weak, differently-biased signals (one
+shape/layout-dominated, one color-distribution-dominated) that a genuinely
+different object is unlikely to satisfy simultaneously, even though either
+one alone can be fooled. See identify()'s and _histogram()'s docstrings.
 """
 
 from __future__ import annotations
@@ -72,6 +94,24 @@ SINGLE_PRODUCT_MATCH_FLOOR = 0.65
 RECOMMENDED_SAMPLES = 15        # UI guidance: "enough" data to be reliable
 CALIBRATION_SEED = 42
 CALIBRATION_SIZE = 30
+
+# Color-histogram cross-check (see module docstring "Important detail #2").
+# 8x8x8 HSV bins: coarse enough to be robust to lighting/crop-boundary
+# noise, fine enough to separate genuinely different-colored objects.
+HIST_BINS = (8, 8, 8)
+HIST_DIM = HIST_BINS[0] * HIST_BINS[1] * HIST_BINS[2]
+# Minimum HISTCMP_CORREL (-1..1) between a query and the best-matching
+# product's own gallery histograms. Measured against this project's own
+# ProductRecognizer with a synthetic registered product and several
+# synthetic unrelated objects (not guessed): a genuine same-product match
+# under different lighting scored 0.877; two clearly unrelated shapes
+# scored -0.03 and 0.02; the hardest case -- a same-shape/layout object in
+# a DIFFERENT color, which scored a dangerously high 0.96 centered
+# EMBEDDING similarity (see docstring) -- scored only 0.48 here, well
+# below this floor. Like MATCH_FLOOR, an initial calibrated value from
+# this one measurement, not a rigorously swept optimum across many real
+# products -- revisit as more real registration data accumulates.
+HIST_MATCH_FLOOR = 0.55
 
 _embed_lock = threading.Lock()  # serialize forward passes across camera threads
 
@@ -138,8 +178,13 @@ class ProductRecognizer:
         # catalog. When set, only those products can be matched or trained, no matter
         # what stale data sits in the gallery on disk. See set_active_provider().
         self._active_provider = None
-        self._load()
+        # Computed before _load() so _load() can validate each stored gallery
+        # file's width (embedding ++ color histogram, see module docstring
+        # "Important detail #2") against it and quarantine anything that
+        # predates the histogram column instead of silently misreading it.
         self._calibration_mean = self._load_or_build_calibration()
+        self._embed_dim = int(self._calibration_mean.shape[0])
+        self._load()
 
     # ------------------------------------------------------------- storage
     def _gallery_path(self, product_key: str) -> Path:
@@ -157,10 +202,39 @@ class ProductRecognizer:
         if manifest_path.exists():
             with open(manifest_path, "r", encoding="utf-8") as f:
                 self._manifest = json.load(f)
+        expected_width = self._embed_dim + HIST_DIM
+        incompatible: list[str] = []
         for product_key in list(self._manifest.keys()):
             path = self._gallery_path(product_key)
-            if path.exists():
-                self._gallery[product_key] = np.load(path)
+            if not path.exists():
+                continue
+            array = np.load(path)
+            if array.ndim != 2 or array.shape[1] != expected_width:
+                # Pre-dates the color-histogram column (or is otherwise
+                # corrupt) -- identify()'s histogram cross-check has no data
+                # to work with for these rows, and treating a
+                # narrower/wider array as if it matched would silently
+                # misread garbage as either embedding or histogram values.
+                # Quarantine (never delete) and drop from the live gallery
+                # so the product just needs re-registering with the current
+                # pipeline, same reversible pattern as prune_inactive().
+                incompatible.append(product_key)
+                continue
+            self._gallery[product_key] = array
+        if incompatible:
+            qdir = self.gallery_dir / "_quarantine" / (time.strftime("%Y%m%d-%H%M%S") + "_incompatible")
+            qdir.mkdir(parents=True, exist_ok=True)
+            for product_key in incompatible:
+                path = self._gallery_path(product_key)
+                if path.exists():
+                    shutil.move(str(path), str(qdir / path.name))
+                self._manifest.pop(product_key, None)
+            self._save_manifest()
+            logger.warning(
+                "ProductRecognizer: quarantined %d gallery file(s) saved by an older format "
+                "(no color-histogram data) -- re-register these products: %s",
+                len(incompatible), ", ".join(sorted(incompatible)),
+            )
 
     # --------------------------------------------------- catalog coupling
     def set_active_provider(self, provider) -> None:
@@ -240,6 +314,38 @@ class ProductRecognizer:
         this directly (see module docstring)."""
         return self._embed_raw(image_bgr)
 
+    def centered_embed(self, image_bgr: np.ndarray) -> np.ndarray:
+        """Calibration-centered embedding — the same space identify() scores
+        matches in. Exposed for callers that need to compare two images to
+        each other directly (e.g. core.training's near-duplicate rejection
+        during registration) rather than against a stored gallery."""
+        return self._centered(self.embed(image_bgr)[None, :])[0]
+
+    @staticmethod
+    def _histogram(image_bgr: np.ndarray) -> np.ndarray:
+        """Coarse HSV color-distribution fingerprint, L1-normalized (so
+        histogram correlation is comparable regardless of crop size) and
+        flattened to HIST_DIM float32 values. Deliberately blunt -- not
+        meant to recognize texture or shape on its own, only to complement
+        the embedding's own opposite blind spot (see module docstring
+        "Important detail #2")."""
+        hsv = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2HSV)
+        hist = cv2.calcHist([hsv], [0, 1, 2], None, list(HIST_BINS), [0, 180, 0, 256, 0, 256])
+        total = float(hist.sum())
+        if total > 0:
+            hist = hist / total
+        return hist.flatten().astype(np.float32)
+
+    def _embed_and_describe(self, image_bgr: np.ndarray) -> np.ndarray:
+        """Embedding ++ color histogram, concatenated -- the single vector
+        stored per gallery sample. Splitting it back into its two parts
+        always uses self._embed_dim, computed once from the calibration
+        vector's own length (see __init__)."""
+        return np.concatenate([self.embed(image_bgr), self._histogram(image_bgr)]).astype(np.float32)
+
+    def _split(self, combined: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+        return combined[..., :self._embed_dim], combined[..., self._embed_dim:]
+
     def _centered(self, vectors: np.ndarray) -> np.ndarray:
         centered = vectors - self._calibration_mean
         norms = np.linalg.norm(centered, axis=-1, keepdims=True)
@@ -252,15 +358,15 @@ class ProductRecognizer:
         Raises ProductDeleted if the product is not in the catalog (any more) - this is
         what stops a still-running import from resurrecting a deleted product."""
         self._require_active(product_key)        # fail fast before the expensive forward pass
-        embedding = self.embed(image_bgr)
+        combined = self._embed_and_describe(image_bgr)
         with self._lock:
             # Re-check atomically with the mutation: a delete that ran while we were
             # embedding has already removed the catalog entry, so we must not write.
             self._require_active(product_key)
             existing = self._gallery.get(product_key)
             self._gallery[product_key] = (
-                np.vstack([existing, embedding[None, :]]) if existing is not None
-                else embedding[None, :]
+                np.vstack([existing, combined[None, :]]) if existing is not None
+                else combined[None, :]
             )
             np.save(self._gallery_path(product_key), self._gallery[product_key])
             self._manifest[product_key] = {
@@ -296,9 +402,17 @@ class ProductRecognizer:
 
     def identify(self, image_bgr: np.ndarray, floor: float = MATCH_FLOOR,
                  margin: float = MATCH_MARGIN):
-        """Returns (product_key, similarity) for the best match, or (None, best_score)
-        if nothing clears the floor, or if the top match doesn't beat the runner-up
-        product by enough of a margin to be confident it isn't a mix-up."""
+        """Returns (product_key, similarity) for the best match, or
+        (None, best_score) if nothing clears the floor, if the top match
+        doesn't beat the runner-up product by enough of a margin to be
+        confident it isn't a mix-up, OR if the winning candidate's color
+        histogram doesn't also correlate well enough with that same
+        product's own gallery (see module docstring "Important detail #2"
+        -- the embedding alone is not discriminative enough to trust by
+        itself; both signals must agree). best_score is always the
+        embedding similarity, even when the histogram check is what caused
+        the reject, so a caller/log can tell "close embedding, wrong
+        color" apart from "not close at all"."""
         active = self._active_keys()
         with self._lock:
             gallery = {k: v for k, v in self._gallery.items() if active is None or k in active}
@@ -308,9 +422,10 @@ class ProductRecognizer:
         query = self._centered(self.embed(image_bgr)[None, :])[0]
 
         scores: dict[str, float] = {}
-        for product_key, embeddings in gallery.items():
-            if embeddings.shape[0] == 0:
+        for product_key, combined in gallery.items():
+            if combined.shape[0] == 0:
                 continue
+            embeddings, _hist = self._split(combined)
             centered = self._centered(embeddings)
             scores[product_key] = float(np.max(centered @ query))
 
@@ -326,6 +441,35 @@ class ProductRecognizer:
         # instead of silently trusting a disabled safety check.
         effective_floor = floor if has_runner_up else max(floor, SINGLE_PRODUCT_MATCH_FLOOR)
 
-        if best_score >= effective_floor and (best_score - runner_up_score) >= margin:
-            return best_key, best_score
-        return None, best_score
+        if not (best_score >= effective_floor and (best_score - runner_up_score) >= margin):
+            return None, best_score
+
+        if not self._histogram_agrees(image_bgr, gallery[best_key]):
+            return None, best_score  # embedding liked it; color distribution disagreed -- reject
+
+        return best_key, best_score
+
+    def _histogram_agrees(self, image_bgr: np.ndarray, combined_gallery: np.ndarray) -> bool:
+        """Second, independent verification signal for identify()'s winning
+        candidate: does the query's color distribution correlate well with
+        ANY of that product's own registered views? A same-shaped,
+        differently-colored object can fool the shape/layout-biased
+        embedding (see module docstring) but is very unlikely to also
+        coincidentally match the registered product's actual color
+        distribution. An inconclusive comparison (no real color signal on
+        either side) rejects rather than assumes a match, consistent with
+        this project's "ambiguous -> no detection" rule."""
+        _embeddings, gallery_hists = self._split(combined_gallery)
+        query_hist = self._histogram(image_bgr)
+        if not np.any(query_hist) or gallery_hists.shape[0] == 0:
+            return False
+        best_corr = -1.0
+        for hist in gallery_hists:
+            if not np.any(hist):
+                continue
+            try:
+                corr = cv2.compareHist(query_hist, hist.astype(np.float32), cv2.HISTCMP_CORREL)
+            except cv2.error:
+                continue
+            best_corr = max(best_corr, corr)
+        return best_corr >= HIST_MATCH_FLOOR

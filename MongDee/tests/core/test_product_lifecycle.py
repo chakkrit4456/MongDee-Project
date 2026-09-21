@@ -11,7 +11,7 @@ import numpy as np
 import pytest
 
 from core.product_lifecycle import ProductDeleted, load_product_keys, reconcile
-from core.recognizer import ProductRecognizer
+from core.recognizer import HIST_DIM, ProductRecognizer
 
 
 def _catalog(path, keys):
@@ -65,6 +65,11 @@ def _recognizer(tmp_path, monkeypatch, live):
     rec = ProductRecognizer(gallery_dir=tmp_path, device="cpu")
     monkeypatch.setattr(rec, "_centered", lambda v: v)
     monkeypatch.setattr(rec, "embed", lambda img: np.array([1.0, 0.0]))
+    # These fake 2-element gallery vectors carry no real color-histogram data --
+    # this file's tests are about catalog/ghost-product lifecycle, not the
+    # histogram cross-check (which has its own dedicated tests, see
+    # test_recognizer.py), so bypass it the same way test_recognizer_identify.py does.
+    monkeypatch.setattr(rec, "_histogram_agrees", lambda *a, **k: True)
     rec.set_active_provider(lambda: set(live))
     return rec
 
@@ -89,7 +94,23 @@ def test_has_any_gallery_and_sample_counts_ignore_inactive(tmp_path, monkeypatch
 
 
 def test_prune_inactive_quarantines_files_and_updates_manifest(tmp_path, monkeypatch):
-    _, gal = _real_project_state(tmp_path)
+    # Unlike the offline reconcile() tests above (pure file/manifest audit,
+    # indifferent to array width), this test builds a REAL ProductRecognizer
+    # against the fixture data, so the fake gallery row must be wide enough
+    # (embedding ++ histogram) to be accepted by _load()'s format check
+    # instead of quarantined as an old-format file before prune_inactive()
+    # ever gets to run.
+    probe = ProductRecognizer(gallery_dir=tmp_path / "_probe", device="cpu")
+    width = probe._embed_dim + HIST_DIM
+
+    prod = tmp_path / "products.json"
+    _catalog(prod, ["product-4b11ff33", "product-227cc848", "product-15bda15f"])
+    gal = tmp_path / "gallery"
+    gal.mkdir()
+    (gal / "manifest.json").write_text(json.dumps({"product-4621553d": {"count": 30, "updated_at": 1.0}}))
+    np.save(gal / "product-4621553d.npy", np.ones((30, width)))
+    np.save(gal / "_calibration_mean.npy", np.ones(probe._embed_dim))
+
     rec = _recognizer(gal, monkeypatch, {"product-4b11ff33"})
     assert "product-4621553d" in rec._gallery                           # it really was loaded from disk
     assert rec.prune_inactive() == ["product-4621553d"]

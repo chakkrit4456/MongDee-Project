@@ -30,14 +30,7 @@ body {
     -webkit-text-fill-color: transparent;
     color: #8b7bff;
 }
-.stat-card.has-alert .value {
-    background: none;
-    -webkit-text-fill-color: unset;
-    color: var(--danger-text);
-}
-
 .stat-card-icon { color: #8b7bff; }
-.stat-card.has-alert .stat-card-icon { color: var(--danger); }
 
 .tab-btn.active { border-bottom-color: #8b7bff; }
 

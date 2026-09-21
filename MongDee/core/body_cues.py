@@ -153,6 +153,16 @@ BODY_FEATURE_NAMES = (
      "neck_skin", "torso_skin", "legs_skin", "torso_width", "legs_width", "torso_legs_width_ratio",
      "torso_sat", "legs_sat", "torso_val", "legs_val", "torso_dark", "legs_dark"]
     + [f"torso_c{i}" for i in range(COLOR_BINS)] + [f"legs_c{i}" for i in range(COLOR_BINS)]
+    # hair_descriptor()'s illumination-normalised cue, one input among many below -- see that
+    # function's docstring and core/body_gender.py's module docstring: this is NOT a rule ("short
+    # hair = male"), it is six more numbers the online logistic model learns a weight for from
+    # THIS booth's own labelled people, exactly like every other feature in this vector. A person
+    # is never classified from hair length alone: BodyGenderModel.predict() only returns an
+    # opinion once it has beaten chance by a measured margin on held-out predictions (MIN_ACCURACY,
+    # see body_gender.py), and that opinion is only one weighted vote inside
+    # GlobalPersonAttributeSmoother's evidence-gated, multi-frame fusion (core/attributes.py) --
+    # never a standalone decision, never from a single frame.
+    + ["hair_dark_norm", "hair_width_norm", "hair_side_norm", "hair_below_norm", "hair_sat", "hair_val"]
 )
 BODY_FEATURE_DIM = len(BODY_FEATURE_NAMES)
 
@@ -185,7 +195,16 @@ def body_features(crop_bgr: np.ndarray) -> np.ndarray | None:
         _dark_fraction(torso), _dark_fraction(legs),
     ]
     colours = np.concatenate([_color_hist(torso), _color_hist(legs)])
-    return np.concatenate([np.asarray(scalar, dtype=np.float32), colours.astype(np.float32)])
+    # See BODY_FEATURE_NAMES's comment: hair_descriptor is illumination-normalised (this function's
+    # own bands above are not), so it also gives the model a cross-camera-consistent hair-colour
+    # cue (hair_sat/hair_val) that nothing above provides. Computed from the original crop (its own
+    # _prepare/normalize_illumination pipeline), not the already-resized `img`, so it is not double-
+    # resized. Never None here in practice (this function already required _prepare to succeed on
+    # the same crop), but a zero vector is a safe, neutral fallback if it ever were.
+    hair = hair_descriptor(crop_bgr)
+    if hair is None:
+        hair = np.zeros(HAIR_DESCRIPTOR_DIM, dtype=np.float32)
+    return np.concatenate([np.asarray(scalar, dtype=np.float32), colours.astype(np.float32), hair])
 
 
 # ------------------------------------------------------------------ hairstyle cue (for identity, not gender)

@@ -29,8 +29,12 @@ def _run(monkeypatch, devices, **kw):
 
 
 def test_only_enumerated_indices_are_opened(monkeypatch):
+    """Not a literally-exact match to `known` any more (see core.vision.DISCOVERY_INDEX_SAFETY_
+    MARGIN's own docstring: a real DirectShow enumeration can undercount by a device or two if
+    called while a driver is still initializing -- the missing-cameras investigation's confirmed
+    root cause), but still nowhere near a blind sweep: enumerated max=3 probes up to 5, not 15."""
     found, opened = _run(monkeypatch, {0: "HD WebCam", 1: "USB Camera", 2: "USB Camera", 3: "OBS Virtual Camera"})
-    assert opened == [0, 1, 2, 3] and found == [0, 1, 2, 3]
+    assert opened == [0, 1, 2, 3, 4, 5] and found == [0, 1, 2, 3, 4, 5]
 
 
 def test_enumeration_unavailable_keeps_the_blind_sweep(monkeypatch):

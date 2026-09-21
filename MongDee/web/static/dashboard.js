@@ -683,7 +683,6 @@ async function _refreshImpl() {
     const filteredHealth = applyFilters(allHealth);
 
     const activeBoothIds = new Set([...filteredInteractions, ...filteredHealth].map(r => r.booth_id));
-    const openAlerts = filteredHealth.filter(h => h.status === 'error');
 
     // ชื่อบูธ/Event ที่กำลังดูอยู่ — ใช้ตัวที่เลือกในฟิลเตอร์ ถ้าไม่ได้เลือกใช้บูธที่เปิดหน้านี้อยู่
     const selectedBoothId = document.getElementById('booth-filter').value || document.body.dataset.boothId;
@@ -693,16 +692,11 @@ async function _refreshImpl() {
     document.getElementById('context-event-name').textContent =
         selectedEventId ? `· Event: ${eventLabels[selectedEventId] || selectedEventId}` : '';
 
-    const alertBanner = document.getElementById('critical-alert-banner');
-    if (openAlerts.length > 0) {
-        const latest = [...openAlerts].sort((a, b) => (b.ts || 0) - (a.ts || 0))[0];
-        const device = latest.camera_id ? `${latest.camera_id} — ` : '';
-        document.getElementById('critical-alert-text').textContent =
-            `พบปัญหาอุปกรณ์ ${openAlerts.length} รายการ — ล่าสุด: ${device}${latest.message || ''} (${fmtTs(latest.ts)})`;
-        alertBanner.classList.remove('hidden');
-    } else {
-        alertBanner.classList.add('hidden');
-    }
+    // Alerts (Open Alerts stat + the critical-alert banner) were removed from this dashboard --
+    // they're live on the booth screen itself now (web/templates/booth.html's "การแจ้งเตือนล่าสุด"
+    // panel, driven by state.recent_alerts in booth.js), so a duplicate summary here was redundant.
+    // Device/health HISTORY (the "อุปกรณ์ & แจ้งเตือน" tab below) is unchanged -- that's a
+    // filterable audit record across booths/events the live booth panel can't replace.
 
     // Spec: "จำนวนคนทั้งหมด" must only ever come from actual Virtual
     // Tripwire line crossings (core/tripwire.py) — never presence_sessions
@@ -712,8 +706,6 @@ async function _refreshImpl() {
     document.getElementById('stat-total').textContent = filteredInteractions.length;
     document.getElementById('stat-products').textContent = new Set(filteredInteractions.map(r => r.product_name)).size;
     document.getElementById('stat-booths').textContent = activeBoothIds.size;
-    document.getElementById('stat-alerts').textContent = openAlerts.length;
-    document.getElementById('stat-alerts-card').classList.toggle('has-alert', openAlerts.length > 0);
     document.getElementById('stat-people-now').textContent = live.people_now;
     document.getElementById('stat-avg-presence').textContent = presence.avg_sec.toFixed(1);
     document.getElementById('stat-tripwire-in').textContent = tripwireStats.total_in;
@@ -836,10 +828,6 @@ function renderLastUpdated() {
 }
 
 setInterval(renderLastUpdated, 1000);
-
-document.getElementById('critical-alert-jump').addEventListener('click', () => {
-    document.querySelector('.tab-btn[data-tab="tab-health"]').click();
-});
 
 // คลิกสินค้าในการ์ด "สินค้าในระบบ" (แท็บภาพรวม) -> เด้งไปแท็บประวัติกิจกรรม
 // พร้อมกรองด้วยชื่อสินค้านั้นทันที โดยใช้ช่องค้นหา/เส้นเวลาที่มีอยู่แล้ว

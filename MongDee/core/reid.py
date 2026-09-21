@@ -59,6 +59,74 @@ MAX_EMBEDDINGS_PER_PERSON = 8  # memory cap (spec section 22) — oldest dropped
 DEFAULT_MIN_TRANSITION_SEC = 0.0
 DEFAULT_MAX_TRANSITION_SEC = 30.0
 
+# ---------------------------------------------- camera-layout-derived topology
+#
+# set_camera_transition() existed but nothing at startup ever called it with real numbers, so
+# every deployment silently ran on the topology-blind defaults above (any camera to any camera,
+# 0-30s, "plausible"). Human walking speed bounds turn a physical camera-to-camera distance (from
+# a booth layout file -- same schema as configs/booth_layout.example.json) into a real transition
+# window instead: "if camera positions/configuration are available, use them" (spec section 12).
+# Deliberately wide (brisk walk to a slow browse-while-walking pace), plus a pause allowance on the
+# slow end because a booth visitor typically stops to look at something between cameras rather
+# than walking straight through.
+MIN_WALK_SPEED_MPS = 0.35
+MAX_WALK_SPEED_MPS = 2.0
+TRANSITION_PAUSE_ALLOWANCE_SEC = 5.0
+_LAYOUT_UNIT_TO_METERS = {"m": 1.0, "meter": 1.0, "meters": 1.0, "ft": 0.3048, "feet": 0.3048}
+
+
+def transition_window_from_distance(distance_m: float, min_speed_mps: float = MIN_WALK_SPEED_MPS,
+                                     max_speed_mps: float = MAX_WALK_SPEED_MPS,
+                                     pause_allowance_sec: float = TRANSITION_PAUSE_ALLOWANCE_SEC
+                                     ) -> "tuple[float, float]":
+    """(min_sec, max_sec) a real person could plausibly take to walk `distance_m` between two
+    cameras. Pure function (no registry/IO) so it's directly unit-testable against known
+    distances/speeds without needing a layout file."""
+    if distance_m <= 0:
+        return (0.0, pause_allowance_sec)
+    return (distance_m / max_speed_mps, distance_m / min_speed_mps + pause_allowance_sec)
+
+
+def camera_transitions_from_booth_layout(layout: dict) -> "dict[tuple[str, str], tuple[float, float]]":
+    """Extracts every camera's (x, y) position from a booth-layout dict (the schema
+    configs/booth_layout.example.json uses: {"unit": "m"|"ft", "objects": [{"object_type":
+    "camera", "id" or "metadata": {"camera_id": ...}, "x": ..., "y": ...}, ...]}) and returns a
+    {(camera_a, camera_b): (min_sec, max_sec)} map for every camera pair, ready to feed into
+    GlobalIdentityRegistry.set_camera_transition(). Returns {} (never raises) for a layout with
+    fewer than two identifiable cameras -- an incomplete/malformed layout should fall back to the
+    existing topology-blind default, not break startup."""
+    unit_scale = _LAYOUT_UNIT_TO_METERS.get(str(layout.get("unit", "m")).lower(), 1.0)
+    cameras: dict[str, tuple[float, float]] = {}
+    for obj in layout.get("objects", []):
+        if obj.get("object_type") != "camera":
+            continue
+        camera_id = (obj.get("metadata") or {}).get("camera_id") or obj.get("id")
+        if not camera_id or "x" not in obj or "y" not in obj:
+            continue
+        cameras[camera_id] = (float(obj["x"]) * unit_scale, float(obj["y"]) * unit_scale)
+
+    windows: "dict[tuple[str, str], tuple[float, float]]" = {}
+    ids = sorted(cameras)
+    for i, cam_a in enumerate(ids):
+        for cam_b in ids[i + 1:]:
+            ax, ay = cameras[cam_a]
+            bx, by = cameras[cam_b]
+            distance = ((ax - bx) ** 2 + (ay - by) ** 2) ** 0.5
+            windows[(cam_a, cam_b)] = transition_window_from_distance(distance)
+    return windows
+
+
+def apply_camera_layout(registry: "GlobalIdentityRegistry", layout: dict) -> int:
+    """Configures `registry` with every camera-pair transition window derivable from `layout`
+    (see camera_transitions_from_booth_layout). Returns how many pairs were configured, so a
+    caller can log/warn when a supplied layout file yielded zero usable camera positions (e.g. a
+    typo'd camera_id that never matches this run's actual camera_ids) -- harmless to the registry
+    either way, but worth an operator noticing."""
+    windows = camera_transitions_from_booth_layout(layout)
+    for (cam_a, cam_b), (min_sec, max_sec) in windows.items():
+        registry.set_camera_transition(cam_a, cam_b, min_sec, max_sec)
+    return len(windows)
+
 # ------------------------------------------------------- sampling/quality gate
 
 # Spec section 21: don't embed every frame. Re-embed the same track at most

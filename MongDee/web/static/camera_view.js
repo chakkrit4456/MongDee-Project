@@ -20,6 +20,16 @@ document.addEventListener('webkitfullscreenchange', updateFullscreenBtn);
 updateFullscreenBtn();
 
 const streamImg = document.querySelector('#cam-stage img');
+// Connected from JS (not a static src="..." in the template) with a unique
+// cache-busting suffix, same as every reconnect below: a popout window
+// opened at nearly the same moment as another one (e.g. clicking "popout"
+// on several camera panels in quick succession — see cam_grid.js) would
+// otherwise request the exact same bare "/stream/{id}" URL string at
+// close to the same instant as its sibling window if two popouts ever
+// happened to target the same camera id, which a browser/proxy is free to
+// coalesce into one shared connection instead of two independent ones.
+if (streamImg) streamImg.src = `/stream/${CAMERA_ID}?t=${Date.now()}`;
+
 // A dropped connection (network blip, server restart) otherwise leaves this
 // <img> broken with nothing to retry it — reload the stream a beat later so
 // a popped-out window (often left running unattended on its own monitor)

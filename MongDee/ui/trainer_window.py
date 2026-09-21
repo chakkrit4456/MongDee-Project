@@ -31,6 +31,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from core.person_segmenter import get_person_segmenter
 from core.recognizer import RECOMMENDED_SAMPLES
 from core.training import import_images, import_video, slugify
 from core.vision import discover_cameras
@@ -54,12 +55,15 @@ class ImportWorker(QThread):
 
     def run(self):
         try:
+            segmenter = get_person_segmenter(self.model_device)
             if self.kind == "images":
                 added = import_images(self.paths, self.product_key, self.recognizer,
-                                       self.model, self.model_device, progress_cb=self.progress.emit)
+                                       self.model, self.model_device, progress_cb=self.progress.emit,
+                                       person_segmenter=segmenter)
             else:
                 added = import_video(self.paths[0], self.product_key, self.recognizer,
-                                      self.model, self.model_device, progress_cb=self.progress.emit)
+                                      self.model, self.model_device, progress_cb=self.progress.emit,
+                                      person_segmenter=segmenter)
             self.finished_ok.emit(added)
         except Exception as exc:
             self.failed.emit(str(exc))

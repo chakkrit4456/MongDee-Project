@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 
 import core.vision as vision
+from core import capture_process
 
 
 @pytest.fixture(autouse=True)
@@ -19,6 +20,20 @@ def _reset_active_camera_count():
     and silently change which profile list that test's _open_capture call
     is expected to try."""
     vision._active_camera_count = 0
+    yield
+
+
+@pytest.fixture(autouse=True)
+def _reset_cross_process_lock_flag():
+    """core.capture_process._cross_process_lock_needed is also process-wide, one-way (set once
+    escalation happens, never cleared -- see its own docstring) state: a real subprocess-spawning
+    test in this SAME pytest process (test_camera_process_escalation.py, test_capture_process.py)
+    running first would otherwise permanently make every _open_capture call in every later test
+    pay for a real OS semaphore acquire/release it does not need, which is exactly the per-call
+    overhead this flag exists to avoid in the common (never-escalated) case -- several of this
+    module's own tests assert tight wall-clock bounds on _open_capture/discover_cameras and would
+    flake under that extra cost."""
+    capture_process._cross_process_lock_needed.clear()
     yield
     vision._active_camera_count = 0
 
@@ -76,7 +91,97 @@ def setup(monkeypatch, **kwargs):
     monkeypatch.setattr(vision.cv2, "VideoCapture", create)
     monkeypatch.setattr(vision, "_candidate_opens", lambda device: [(device, cv2.CAP_DSHOW)])
     monkeypatch.setattr(vision, "OPEN_WARMUP_SLEEP_SEC", 0)
+    # Isolate from this machine's real DirectShow enumeration -- _forbidden_device_name()
+    # otherwise calls it for real, and on a box with a real virtual-camera driver installed
+    # (observed here: index 2 identifying as "OBS Virtual Camera" instead of a real USB camera,
+    # varying across separate enumeration calls), that leaks unrelated real-world device state
+    # into every test built on this fixture.
+    monkeypatch.setattr(vision, "_forbidden_device_name", lambda device: None)
     return captures
+
+
+class WedgedReleaseCapture(Capture):
+    """Like Capture(broken=True) (isOpened=True, read() always fails --
+    exactly what a rejected/failed candidate looks like), but release()
+    blocks on a gate the test controls, standing in for a real wedged
+    DirectShow graph (see _release_capture_safely's docstring)."""
+
+    def __init__(self, *a, **k):
+        super().__init__(*a, broken=True, **k)
+        self.gate = threading.Event()
+        self.release_started = threading.Event()
+
+    def release(self):
+        self.release_started.set()
+        self.gate.wait(5.0)
+        super().release()
+
+
+def _setup_wedged_release(monkeypatch):
+    caps: list[WedgedReleaseCapture] = []
+
+    def create(source=None, backend=None):
+        cap = WedgedReleaseCapture(source, backend)
+        caps.append(cap)
+        return cap
+
+    monkeypatch.setattr(vision.cv2, "VideoCapture", create)
+    monkeypatch.setattr(vision, "_candidate_opens", lambda device: [(device, cv2.CAP_DSHOW)])
+    monkeypatch.setattr(vision, "OPEN_WARMUP_SLEEP_SEC", 0)
+    monkeypatch.setattr(vision, "RELEASE_JOIN_TIMEOUT_SEC", 0.1)
+    return caps
+
+
+def test_open_capture_does_not_hang_when_a_rejected_candidates_release_wedges(monkeypatch):
+    """Regression test: _open_capture()'s own candidate-rejection loop used
+    to call cap.release() synchronously, WHILE HOLDING the shared
+    _open_lock -- a single wedged release there would hold that lock
+    forever and silently stop every camera in the process from ever
+    opening again (the reported "one or all cameras stuck 'connecting'
+    until the server is restarted" symptom). Must stay bounded instead."""
+    caps = _setup_wedged_release(monkeypatch)
+    try:
+        t0 = time.monotonic()
+        result = vision._open_capture(0, label="TEST")
+        elapsed = time.monotonic() - t0
+        assert elapsed < 2.0                    # bounded, not stuck forever on the wedge
+        assert not result.isOpened()             # every profile failed -- an unopened capture returned
+        # Release really was attempted for each rejected candidate (just didn't block on it) --
+        # wait rather than a bare boolean check, since the background release thread's OS
+        # scheduling isn't guaranteed to land inside RELEASE_JOIN_TIMEOUT_SEC under load.
+        # Excludes the final cv2.VideoCapture() sentinel _open_capture() itself returns once every
+        # candidate is exhausted (source=None) -- that one is `result`, never released by the function.
+        real_candidates = [c for c in caps if c.source is not None]
+        assert real_candidates and all(c.release_started.wait(2.0) for c in real_candidates)
+        # The lock must be free again -- a second, unrelated open succeeds immediately.
+        assert vision._open_lock.acquire(timeout=1.0)
+        vision._open_lock.release()
+    finally:
+        for c in caps:
+            c.gate.set()  # let the background release threads finish -- don't leak them past this test
+
+
+def test_discover_cameras_does_not_hang_when_a_candidates_release_wedges(monkeypatch):
+    """Same regression as above, for discover_cameras() -- called forever
+    by BoothManager's Hot-Plug Scan, so a wedge here used to be able to
+    permanently kill hot-plug recovery for the rest of the process's life."""
+    caps = _setup_wedged_release(monkeypatch)
+    try:
+        t0 = time.monotonic()
+        found = vision.discover_cameras(max_index=3)
+        elapsed = time.monotonic() - t0
+        # Only cv2.VideoCapture is mocked here -- _forbidden_device_name()'s real
+        # list_directshow_devices() call (PowerShell/COM device enumeration) still runs for
+        # real, and on a machine with real cameras attached that alone measured ~3.0-3.1s across
+        # 3 probed indices, occasionally tripping a tighter bound. The bound only needs to rule
+        # out "hangs forever on the wedge" (RELEASE_JOIN_TIMEOUT_SEC=0.1 per candidate), not match
+        # a specific real-enumeration cost.
+        assert elapsed < 8.0
+        assert found == []
+        assert caps and all(c.release_started.wait(2.0) for c in caps)
+    finally:
+        for c in caps:
+            c.gate.set()
 
 
 def test_multiple_cameras_configured_before_first_read(monkeypatch):
@@ -370,6 +475,10 @@ def test_usb_streaming_resource_error_retry_never_substitutes_a_different_device
     matter how many times it fails."""
     monkeypatch.setattr(vision, "_candidate_opens", lambda device: [(device, cv2.CAP_DSHOW)])
     monkeypatch.setattr(vision, "OPEN_WARMUP_SLEEP_SEC", 0)
+    # Isolate from this machine's real DirectShow enumeration (_forbidden_device_name() otherwise
+    # calls it for real) -- on a box with a real virtual-camera driver installed, that enumeration
+    # can legitimately vary between runs and has nothing to do with what this test checks.
+    monkeypatch.setattr(vision, "_forbidden_device_name", lambda device: None)
     opened_sources = []
 
     def create(source=None, backend=None):
@@ -421,10 +530,59 @@ def test_discover_cameras_never_opens_skipped_builtin_index(monkeypatch):
     monkeypatch.setattr(vision.cv2, "VideoCapture", create)
     monkeypatch.setattr(vision, "_candidate_opens", lambda device: [(device, cv2.CAP_DSHOW)])
     monkeypatch.setattr(vision, "OPEN_WARMUP_SLEEP_SEC", 0)
+    # See the same isolation note above: this machine's real DirectShow enumeration must not
+    # decide which indices this test finds.
+    monkeypatch.setattr(vision, "_forbidden_device_name", lambda device: None)
 
     found = vision.discover_cameras(max_index=3, skip=frozenset({0}))
     assert 0 not in opened
     assert found == [1, 2]
+
+
+def test_discover_cameras_probes_past_an_incomplete_directshow_enumeration(monkeypatch):
+    """CONFIRMED ROOT CAUSE regression test (missing-cameras investigation): Windows/DirectShow's
+    own enumeration (core.camera_identity.list_directshow_devices) can legitimately report fewer
+    devices than physically exist right now (e.g. a camera whose driver is still initializing at
+    the exact moment this is called -- plausible at startup with several cameras, or right after a
+    hot-plug event). Before the fix, discover_cameras() trusted that count as exact and clamped its
+    probe range to it (`max(known) + 1`), so real cameras beyond it were never even attempted --
+    not retried, not logged, just silently never probed. Here `known` only reports index 0 while
+    real (simulated) cameras exist at 0-2; discovery must still find all three (DISCOVERY_INDEX_
+    SAFETY_MARGIN=2 reaches index 2; it is a deliberately small hedge, not unlimited, so this test
+    stays within that margin rather than asserting an arbitrarily large undercount is recoverable)."""
+    opened = []
+    def create(source=None, backend=None):
+        opened.append(source)
+        return Capture(source, backend, broken=(source is not None and source >= 3))
+    monkeypatch.setattr(vision.cv2, "VideoCapture", create)
+    monkeypatch.setattr(vision, "_candidate_opens", lambda device: [(device, cv2.CAP_DSHOW)])
+    monkeypatch.setattr(vision, "OPEN_WARMUP_SLEEP_SEC", 0)
+    import core.camera_identity as camera_identity
+    monkeypatch.setattr(camera_identity, "list_directshow_devices", lambda: {0: "USB Camera"})
+
+    found = vision.discover_cameras(max_index=16)
+    assert found == [0, 1, 2]
+
+
+def test_discover_cameras_still_narrows_the_scan_for_a_larger_complete_enumeration(monkeypatch):
+    """The original optimization (avoid a dozen wasted ~1s failed-open probes when only a couple of
+    cameras exist) must survive the fix above: a `known` enumeration that already reports several
+    devices still meaningfully narrows the scan, it just no longer narrows all the way down to
+    exactly `max(known) + 1` with zero safety margin."""
+    opened = []
+    def create(source=None, backend=None):
+        opened.append(source)
+        return Capture(source, backend)
+    monkeypatch.setattr(vision.cv2, "VideoCapture", create)
+    monkeypatch.setattr(vision, "_candidate_opens", lambda device: [(device, cv2.CAP_DSHOW)])
+    monkeypatch.setattr(vision, "OPEN_WARMUP_SLEEP_SEC", 0)
+    import core.camera_identity as camera_identity
+    monkeypatch.setattr(camera_identity, "list_directshow_devices",
+                         lambda: {0: "USB Camera", 1: "USB Camera 2"})
+
+    vision.discover_cameras(max_index=16)
+    assert max(opened) < 10   # nowhere near the full 0..15 blind sweep
+    assert max(opened) >= 3   # but still past `known`'s own max(1) + 1, per the safety margin
 
 
 def _never_open(source=None, backend=None):

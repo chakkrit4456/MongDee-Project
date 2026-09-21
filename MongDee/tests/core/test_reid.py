@@ -10,7 +10,13 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from core.reid import GlobalIdentityRegistry, ReIDSampler
+from core.reid import (
+    GlobalIdentityRegistry,
+    ReIDSampler,
+    apply_camera_layout,
+    camera_transitions_from_booth_layout,
+    transition_window_from_distance,
+)
 
 # Two clearly distinct synthetic "identities" in embedding space, plus a
 # small-noise variant of each to stand in for "the same person seen again,
@@ -173,3 +179,82 @@ def test_sampler_forget_clears_throttle_state():
     sampler.should_embed("CAM-1", track, frame_height=480, now=100.0)
     sampler.forget("CAM-1", 1)
     assert sampler.should_embed("CAM-1", track, frame_height=480, now=100.1) is True
+
+
+# ------------------------------------- camera-layout-derived transition topology
+
+
+def test_transition_window_from_distance_scales_with_distance():
+    near_min, near_max = transition_window_from_distance(1.0)
+    far_min, far_max = transition_window_from_distance(10.0)
+    assert 0 < near_min < near_max
+    assert far_min > near_min and far_max > near_max
+
+
+def test_transition_window_from_zero_distance_is_near_instant():
+    min_sec, max_sec = transition_window_from_distance(0.0)
+    assert min_sec == 0.0
+    assert max_sec > 0.0   # still allows the pause allowance, not a zero-width window
+
+
+def test_camera_transitions_from_booth_layout_matches_the_example_schema():
+    # Same shape as configs/booth_layout.example.json.
+    layout = {
+        "unit": "m",
+        "objects": [
+            {"id": "CAM01", "object_type": "camera", "x": 0.0, "y": 0.0,
+             "metadata": {"camera_id": "CAM01"}},
+            {"id": "CAM02", "object_type": "camera", "x": 9.0, "y": 0.0,
+             "metadata": {"camera_id": "CAM02"}},
+            {"id": "SHELF-A", "object_type": "shelf", "x": 2.5, "y": 3.0},  # not a camera -- ignored
+        ],
+    }
+    windows = camera_transitions_from_booth_layout(layout)
+    assert set(windows) == {("CAM01", "CAM02")}
+    min_sec, max_sec = windows[("CAM01", "CAM02")]
+    expected_min, expected_max = transition_window_from_distance(9.0)
+    assert min_sec == pytest.approx(expected_min)
+    assert max_sec == pytest.approx(expected_max)
+
+
+def test_camera_transitions_from_booth_layout_converts_feet_to_meters():
+    layout = {
+        "unit": "ft",
+        "objects": [
+            {"id": "A", "object_type": "camera", "x": 0.0, "y": 0.0},
+            {"id": "B", "object_type": "camera", "x": 10.0, "y": 0.0},
+        ],
+    }
+    windows = camera_transitions_from_booth_layout(layout)
+    min_sec, _max_sec = windows[("A", "B")]
+    expected_min, _ = transition_window_from_distance(10.0 * 0.3048)
+    assert min_sec == pytest.approx(expected_min)
+
+
+def test_camera_transitions_from_booth_layout_with_fewer_than_two_cameras_is_empty():
+    layout = {"unit": "m", "objects": [{"id": "A", "object_type": "camera", "x": 0.0, "y": 0.0}]}
+    assert camera_transitions_from_booth_layout(layout) == {}
+    assert camera_transitions_from_booth_layout({"objects": []}) == {}
+    assert camera_transitions_from_booth_layout({}) == {}
+
+
+def test_apply_camera_layout_configures_the_registry():
+    reg = GlobalIdentityRegistry()
+    layout = {
+        "unit": "m",
+        "objects": [
+            {"id": "CAM-1", "object_type": "camera", "x": 0.0, "y": 0.0},
+            {"id": "CAM-2", "object_type": "camera", "x": 5.0, "y": 0.0},
+        ],
+    }
+    configured = apply_camera_layout(reg, layout)
+    assert configured == 1
+    expected = transition_window_from_distance(5.0)
+    assert reg._transition_window("CAM-1", "CAM-2") == pytest.approx(expected)
+
+
+def test_apply_camera_layout_with_no_usable_cameras_configures_nothing():
+    reg = GlobalIdentityRegistry()
+    assert apply_camera_layout(reg, {"objects": []}) == 0
+    # unconfigured pair still falls back to the existing topology-blind default
+    assert reg._transition_window("CAM-1", "CAM-2") == (0.0, 30.0)

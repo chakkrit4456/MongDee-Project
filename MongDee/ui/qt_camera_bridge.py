@@ -27,7 +27,7 @@ class QtCameraWorker(QObject):
 
     def __init__(self, camera_id: str, device, model, allowed_classes: list[str],
                  recognizer=None, conf_threshold: float = 0.45, device_target="cpu",
-                 show_unknown: bool = True, gender_age_backend=None, performance_monitor=None,
+                 gender_age_backend=None, performance_monitor=None,
                  parent=None):
         super().__init__(parent)
         self._last_frame_emit = 0.0
@@ -39,7 +39,6 @@ class QtCameraWorker(QObject):
             recognizer=recognizer,
             conf_threshold=conf_threshold,
             device_target=device_target,
-            show_unknown=show_unknown,
             gender_age_backend=gender_age_backend,
             performance_monitor=performance_monitor,
             on_frame=self._emit_frame,
