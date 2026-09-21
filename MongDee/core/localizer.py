@@ -16,14 +16,30 @@ from __future__ import annotations
 import cv2
 import numpy as np
 
-MIN_AREA_FRAC = 0.03   # ignore blobs smaller than 3% of the frame (noise)
-MAX_AREA_FRAC = 0.75   # ignore blobs bigger than 75% of the frame (lighting shifts, whole-bg change)
+MIN_AREA_FRAC = 0.015  # ignore blobs smaller than 1.5% of the frame (noise) -- was 0.03; a product
+                        # held at arm's length or seen by a wide-angle camera can easily be smaller
+                        # than 3% of the frame, and identify()'s own distance-scaled confidence/hit
+                        # requirements (core/product_confirm.py) already raise the bar further for a
+                        # small box, so this floor only needs to keep out single-pixel noise, not do
+                        # the real far-object filtering itself.
+MAX_AREA_FRAC = 0.90   # ignore blobs bigger than 90% of the frame (lighting shifts, whole-bg change)
+                        # -- was 0.75, which rejected a product held up close enough to fill most of
+                        # the frame (a completely normal "show it to the camera" pose). A genuinely
+                        # unrelated whole-frame change (a light flicking on, someone walking behind
+                        # the camera) still won't match any trained embedding, so identify()'s own
+                        # floor is the real guard here, not this area cap.
 
 
 class ForegroundProposer:
     def __init__(self):
+        # history=700 (was 400): with learningRate=-1 the background model absorbs roughly 1/history
+        # of each frame's content every pass, so a product held still in front of the camera for
+        # ~13s (400 frames at 30fps) used to melt entirely into "background" and stop producing any
+        # foreground blob at all -- i.e. the box would vanish even though the product never moved.
+        # 700 roughly doubles that grace period without meaningfully slowing how fast the model
+        # relearns a genuinely rearranged background between booth visitors.
         self._bg_subtractor = cv2.createBackgroundSubtractorMOG2(
-            history=400, varThreshold=40, detectShadows=True
+            history=700, varThreshold=40, detectShadows=True
         )
         self._kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
 
@@ -91,7 +107,14 @@ def _iou(box_a, box_b) -> float:
     return inter / union if union > 0 else 0.0
 
 
-HUMAN_OVERLAP_REJECT_FRAC = 0.60  # candidate is mostly a hand/arm, not a product -> reject outright
+HUMAN_OVERLAP_REJECT_FRAC = 0.80  # candidate is mostly a hand/arm, not a product -> reject outright
+                                   # -- was 0.60, which rejected the single most common presentation
+                                   # pose (holding the product up toward the camera in-hand, so the
+                                   # hand/wrist/forearm can easily cover half or more of the raw
+                                   # foreground blob). The surviving non-human remainder still has to
+                                   # clear MIN_CROP_SIDE_PX and identify()'s own confidence floor, so
+                                   # this only needs to reject candidates that are ALMOST ENTIRELY
+                                   # hand (a wave with nothing held), not merely hand-dominant.
 HUMAN_OVERLAP_TRIM_FRAC = 0.02    # below this, the box is basically clean already -- skip retightening
 
 

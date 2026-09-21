@@ -1764,7 +1764,7 @@ class CameraWorker(threading.Thread):
         now = time.time()
         self._product_confirmer.forget_stale(now)
         confirmed_this_pass: set[str] = set()
-        proposals = self._proposer.propose(frame, exclude_boxes=claimed_boxes, max_regions=2)
+        proposals = self._proposer.propose(frame, exclude_boxes=claimed_boxes, max_regions=3)
         human_mask = self._person_segmenter.person_mask(frame) if proposals else None
         for bbox in proposals:
             refined = exclude_human_region(bbox, human_mask)
