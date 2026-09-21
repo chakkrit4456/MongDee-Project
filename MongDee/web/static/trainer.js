@@ -526,11 +526,12 @@ async function startRecording() {
             statusEl.textContent = `ล้มเหลว: ${result.detail || 'ไม่พบภาพสินค้าที่ใช้ได้'}`;
             return;
         }
+        await fetchProducts();
+        selectProduct(selectedKey);
         statusEl.textContent = distinctViews >= DISTINCT_VIEWS_TARGET
             ? `บันทึกสำเร็จ: เก็บมุมมองที่แตกต่างกัน ${result.added} มุม จาก ${result.attempted} เฟรม`
             : `หยุดบันทึก (ครบเวลาสูงสุด): เก็บได้ ${result.added} มุมจาก ${DISTINCT_VIEWS_TARGET} ที่แนะนำ ` +
               `— ลองบันทึกเพิ่มหรืออัปโหลดรูป/วิดีโอเพิ่มเติมเพื่อความแม่นยำ`;
-        fetchProducts();
     } catch (e) {
         statusEl.textContent = 'ล้มเหลว: ไม่สามารถสรุปผลการบันทึกได้';
     }
