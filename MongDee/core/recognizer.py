@@ -112,6 +112,12 @@ HIST_DIM = HIST_BINS[0] * HIST_BINS[1] * HIST_BINS[2]
 # this one measurement, not a rigorously swept optimum across many real
 # products -- revisit as more real registration data accumulates.
 HIST_MATCH_FLOOR = 0.55
+# A color-histogram correlation at least this strong can rescue a far/small candidate past the
+# DISTANCE-scaled portion of identify()'s floor (see identify()'s docstring) -- set well above
+# HIST_MATCH_FLOOR (a genuine same-product-different-lighting match measured 0.877, see
+# HIST_MATCH_FLOOR's own comment) so only a color match that is itself already quite confident
+# gets to compensate for the embedding's degraded discriminative power at long range/low detail.
+STRONG_HIST_RESCUE_FLOOR = 0.80
 
 # Viewpoint-robustness augmentation (see ProductRecognizer._viewpoint_variants): each real
 # registered photo also stores a few synthetic nearby-angle/lighting variants, so the gallery
@@ -492,14 +498,30 @@ class ProductRecognizer:
         effective_floor = floor if has_runner_up else max(floor, SINGLE_PRODUCT_MATCH_FLOOR)
 
         if not (best_score >= effective_floor and (best_score - runner_up_score) >= margin):
-            return None, best_score
+            # A far/small candidate can fail only because of the DISTANCE-scaled portion of
+            # `floor` (core/product_confirm.py's product_min_confidence, raised well above the
+            # embedding's own base MATCH_FLOOR for a small box) while still being a genuine match
+            # -- MobileNetV3's shape/layout embedding is exactly what degrades most on a low-
+            # detail, far-away crop, but color distribution barely changes with distance/blur.
+            # Rescue it ONLY on an unusually strong color-histogram correlation (well above the
+            # ordinary HIST_MATCH_FLOOR bar), and never past the two floors that guard against a
+            # real reported false-positive class of bug: the plain MATCH_FLOOR, and (since there
+            # is no runner-up to cross-check against) SINGLE_PRODUCT_MATCH_FLOOR -- both stay
+            # absolute regardless of how strong the color match looks.
+            rescued = (
+                has_runner_up and best_score >= floor and (best_score - runner_up_score) >= margin
+                and self._histogram_agrees(image_bgr, gallery[best_key], min_correlation=STRONG_HIST_RESCUE_FLOOR)
+            )
+            if not rescued:
+                return None, best_score
 
         if not self._histogram_agrees(image_bgr, gallery[best_key]):
             return None, best_score  # embedding liked it; color distribution disagreed -- reject
 
         return best_key, best_score
 
-    def _histogram_agrees(self, image_bgr: np.ndarray, combined_gallery: np.ndarray) -> bool:
+    def _histogram_agrees(self, image_bgr: np.ndarray, combined_gallery: np.ndarray,
+                           min_correlation: float = HIST_MATCH_FLOOR) -> bool:
         """Second, independent verification signal for identify()'s winning
         candidate: does the query's color distribution correlate well with
         ANY of that product's own registered views? A same-shaped,
@@ -522,4 +544,4 @@ class ProductRecognizer:
             except cv2.error:
                 continue
             best_corr = max(best_corr, corr)
-        return best_corr >= HIST_MATCH_FLOOR
+        return best_corr >= min_correlation

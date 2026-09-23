@@ -218,8 +218,16 @@ BOX_FOLLOW_ENABLED = True     # boxes follow the picture at the capture frame ra
 PERSON_LOW_CONF = 0.25
 PERSON_BIRTH_IMMEDIATE_SCORE = 0.70
 PERSON_MIN_HITS = 2
-PERSON_COAST_SEC = 0.6
-PERSON_TRACK_MAX_AGE_SEC = 2.5
+# Was 0.6 / 2.5. A missed AI-pass match (motion blur, a brief partial occlusion, a fast walker
+# landing just under MOTION_MIN_MATCH_IOU) used to evict the track fairly quickly -- the person
+# then reappears as a brand-new track_id, which needs PERSON_MIN_HITS fresh hits again before it
+# is even drawn, i.e. a visible blink-off-then-back-on even though core/box_motion.py was
+# following the picture perfectly the whole time. Longer coasting/max-age gives the Kalman-
+# predicted box (core/tracker.py's coasting_tracks) more time to keep showing through a miss, and
+# more time for the SAME track_id to be re-matched when the detector picks the person back up, so
+# a real detector hiccup during ordinary movement reads as one continuous box, not a flicker.
+PERSON_COAST_SEC = 1.2
+PERSON_TRACK_MAX_AGE_SEC = 3.5
 
 
 def _make_person_tracker() -> PersonTracker:

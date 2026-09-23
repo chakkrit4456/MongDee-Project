@@ -113,6 +113,20 @@ class TripwireLine:
             return None, distance
         return (SIDE_A if distance >= 0 else SIDE_B), distance
 
+    def raw_side_of(self, nx: float, ny: float) -> str:
+        """Like side_of(), but never returns None/ambiguous -- used only when the caller has
+        independently established (via bbox_touches_line) that the detection box is physically
+        overlapping the line, which is itself strong evidence this is a real crossing attempt
+        rather than detector jitter far from the line. See update()'s docstring for why this is
+        what lets a crossing register without requiring the whole box to have passed fully
+        through to the other side first."""
+        dx, dy = self.x2 - self.x1, self.y2 - self.y1
+        length = (dx * dx + dy * dy) ** 0.5
+        if length == 0:
+            return SIDE_A
+        cross = dx * (ny - self.y1) - dy * (nx - self.x1)
+        return SIDE_A if cross >= 0 else SIDE_B
+
     def to_dict(self) -> dict:
         return dataclasses.asdict(self)
 
@@ -123,6 +137,28 @@ class TripwireLine:
             x1=float(d["x1"]), y1=float(d["y1"]), x2=float(d["x2"]), y2=float(d["y2"]),
             inside_side=d["inside_side"], enabled=bool(d.get("enabled", True)),
         )
+
+
+def bbox_touches_line(bbox: list[float], line: "TripwireLine",
+                       frame_width: int, frame_height: int) -> bool:
+    """True when the detection box (pixel [x1,y1,x2,y2]) physically overlaps the tripwire line --
+    i.e. the line passes through the box's rectangle, not just its foot point. Checked via the
+    box's four corners: if they aren't all on the same raw side (no dead zone -- any straddle
+    counts), the line cuts through the box somewhere. This is what lets a crossing be counted the
+    moment a person's detection box reaches the line, instead of requiring the WHOLE box (and
+    specifically its foot point, past a further DEAD_ZONE_NORM margin) to have already crossed
+    all the way to the other side."""
+    if frame_width <= 0 or frame_height <= 0:
+        return False
+    dx, dy = line.x2 - line.x1, line.y2 - line.y1
+    if dx == 0 and dy == 0:
+        return False
+    x1, y1, x2, y2 = bbox
+    signs = []
+    for px, py in ((x1, y1), (x2, y1), (x1, y2), (x2, y2)):
+        nx, ny = px / frame_width, py / frame_height
+        signs.append(dx * (ny - line.y1) - dy * (nx - line.x1))
+    return min(signs) < 0 < max(signs)
 
 
 def foot_point(bbox: list[float]) -> tuple[float, float]:
@@ -202,9 +238,19 @@ class TripwireCounter:
 
             fx, fy = foot_point(t["bbox"])
             nx, ny = fx / frame_width, fy / frame_height
-            side, _dist = line.side_of(nx, ny)
-            if side is None:
-                continue  # inside the dead zone — last solid side (if any) stands unchanged
+            if bbox_touches_line(t["bbox"], line, frame_width, frame_height):
+                # The box is physically overlapping the line right now -- that overlap is
+                # itself strong evidence this is a genuine crossing attempt, not detector
+                # jitter, so trust the foot point's raw side immediately instead of also
+                # requiring it to clear DEAD_ZONE_NORM past the line. TRIPWIRE_CONFIRM_FRAMES
+                # and CROSSING_COOLDOWN_SEC below still guard against noise the same as always
+                # -- this only changes WHEN a side reading is trusted, not how many consistent
+                # readings are required before a crossing fires.
+                side = line.raw_side_of(nx, ny)
+            else:
+                side, _dist = line.side_of(nx, ny)
+                if side is None:
+                    continue  # inside the dead zone — last solid side (if any) stands unchanged
 
             if (track_age_sec < TRACK_MIN_AGE_SEC or
                     bbox_height_norm < TRACK_MIN_BBOX_HEIGHT_NORM):
