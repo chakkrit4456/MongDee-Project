@@ -57,7 +57,7 @@ async function loadSettings() {
     const settings = await res.json();
     activeBoothId = settings.booth_id;
     renderCameraList(settings.cameras);
-    await Promise.all([loadEvents(), loadBooths()]);
+    await Promise.all([loadEvents(), loadBooths(), loadCameraSettings()]);
 }
 
 // -------------------------------------------------------------- events
@@ -281,6 +281,34 @@ async function removeCamera(cameraId) {
     } catch (e) { return; }
     await loadSettings();
 }
+
+async function loadCameraSettings() {
+    try {
+        const res = await apiFetch('/api/booth/camera_settings');
+        const settings = await res.json();
+        document.getElementById('enable-builtin-camera-checkbox').checked = !!settings.enable_builtin_camera;
+    } catch (e) { /* apiFetch already showed the error banner */ }
+}
+
+document.getElementById('enable-builtin-camera-checkbox').addEventListener('change', async (e) => {
+    const enabled = e.target.checked;
+    const status = document.getElementById('camera-status');
+    try {
+        await apiFetch('/api/booth/camera_settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ enable_builtin_camera: enabled }),
+        });
+    } catch (err) {
+        e.target.checked = !enabled;  // revert the checkbox — the save failed
+        return;
+    }
+    status.textContent = enabled
+        ? 'เปิดใช้กล้องในตัวแล้ว — กำลังค้นหากล้อง (ไม่เกินสักครู่)'
+        : 'ปิดใช้กล้องในตัวแล้ว';
+    setTimeout(() => { status.textContent = ''; }, 4000);
+    if (enabled) setTimeout(loadSettings, 6000);  // pick up the auto-discovered camera once the next hot-plug scan finds it
+});
 
 // -------------------------------------------------------------- GPU
 // Acceleration is now installed automatically (see requirements.txt /

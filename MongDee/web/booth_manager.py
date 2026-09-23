@@ -1928,6 +1928,32 @@ class BoothManager:
         worker.start()
         return camera_id
 
+    def get_camera_settings(self) -> dict:
+        """Built-in-camera policy (see load_camera_settings's own docstring) for the /settings
+        page's "กล้อง" section — this was previously only editable by hand-editing
+        booth_settings.json, with no UI or API surface to see or change it at all."""
+        return load_camera_settings(booth_settings_path_for(self.db_path))
+
+    def set_builtin_camera_enabled(self, enabled: bool) -> dict:
+        """Flip enable_builtin_camera and persist it, merging into whatever else already lives in
+        booth_settings.json (see activate_booth's own comment on why this must never be a blind
+        overwrite). Takes effect without a restart: BoothManager._hotplug_loop re-reads this file
+        fresh every scan tick, so a laptop's integrated webcam is auto-discovered and added on the
+        next tick once enabled (or immediately if the operator also restarts the process)."""
+        settings_path = booth_settings_path_for(self.db_path)
+        settings_path.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            with open(settings_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            if not isinstance(data, dict):
+                data = {}
+        except (FileNotFoundError, json.JSONDecodeError):
+            data = {}
+        data["enable_builtin_camera"] = bool(enabled)
+        with open(settings_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        return self.get_camera_settings()
+
     def remove_camera(self, camera_id: str) -> None:
         with self._lock:
             worker = self.workers.pop(camera_id, None)

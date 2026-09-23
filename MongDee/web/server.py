@@ -322,6 +322,15 @@ def create_app(booth: BoothManager) -> FastAPI:
         booth.reset_data()
         return {"ok": True}
 
+    # --------------------------------------------------- built-in camera policy
+    @app.get("/api/booth/camera_settings")
+    def api_get_camera_settings():
+        return booth.get_camera_settings()
+
+    @app.post("/api/booth/camera_settings")
+    def api_set_camera_settings(payload: dict):
+        return booth.set_builtin_camera_enabled(bool(payload.get("enable_builtin_camera", False)))
+
     # -------------------------------------------------------------- tripwire
     @app.get("/api/booth/cameras/{camera_id}/tripwire")
     def api_get_tripwire(camera_id: str):

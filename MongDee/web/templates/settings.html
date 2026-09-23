@@ -61,6 +61,15 @@
     <button id="add-camera-btn"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>เพิ่มกล้อง</button>
   </div>
   <div id="camera-status" style="color:var(--accent); margin-top:8px;"></div>
+  <label style="display:flex; align-items:center; gap:8px; margin-top:14px; cursor:pointer;">
+    <input type="checkbox" id="enable-builtin-camera-checkbox">
+    ใช้กล้องในตัวโน้ตบุ๊ก (built-in webcam) ด้วย
+  </label>
+  <p style="color:var(--text-faint); font-size:12px; margin:4px 0 0;">
+    ปกติกล้องในตัวโน้ตบุ๊กจะถูกกันไว้ไม่ให้ระบบดึงมาใช้อัตโนมัติ (กันสลับไปมากับกล้อง USB ของบูธโดยไม่ตั้งใจ)
+    ถ้าต้องการใช้กล้องในตัวจริงๆ ให้ติ๊กช่องนี้ — ระบบจะค้นหาและเพิ่มกล้องในตัวให้อัตโนมัติภายในไม่กี่วินาที
+    ไม่ต้องรีสตาร์ทโปรแกรม
+  </p>
 </div>
 
 <h3 style="margin-top:18px;">ตัวเร่งความเร็ว (GPU)</h3>
